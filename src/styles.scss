@@ -1,1 +1,36 @@
-/* You can add global styles to this file, and also import other style files */
+// 1. ประกาศ @use ไว้ที่บรรทัดแรกสุดของไฟล์เสมอ
+@use '@angular/material' as mat;
+
+/* ==========================================
+   Global Styles & Angular Material Theming
+   ========================================== */
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$rose-palette,
+        tertiary: mat.$red-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  // Default the application to a light color theme.
+  color-scheme: light;
+
+  // Set a default background, font and text colors
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
+
+/* คุณสามารถเพิ่ม Global Styles อื่นๆ ต่อท้ายด้านล่างนี้ได้เลยครับ */

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1200 180">
+
+  <defs>
+
+    <pattern id="halftone"
+             width="32"
+             height="32"
+             patternUnits="userSpaceOnUse"
+             patternTransform="rotate(-25)">
+
+      <circle cx="8" cy="8" r="2" fill="#f2b7f3"/>
+      <circle cx="24" cy="8" r="4" fill="#7a007d"/>
+
+      <circle cx="8" cy="24" r="5" fill="#feffea"/>
+      <circle cx="24" cy="24" r="7" fill="#7a007d"/>
+
+    </pattern>
+
+
+    <linearGradient id="fadeSize">
+      <stop offset="0%" stop-color="white"/>
+      <stop offset="100%" stop-color="black"/>
+    </linearGradient>
+
+
+    <mask id="grow">
+      <rect width="1200"
+            height="180"
+            fill="url(#fadeSize)"/>
+    </mask>
+
+
+  </defs>
+
+
+  <g mask="url(#grow)">
+    <rect width="1200"
+          height="180"
+          fill="url(#halftone)"/>
+  </g>
+
+
+</svg>

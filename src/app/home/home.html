@@ -1,0 +1,112 @@
+<div class="page-wrap">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-line"></div>
+
+      <a
+        class="sidebar-item"
+        [class.active]="activeSection === 'home'"
+        (click)="scrollTo('sec-home')"
+      >
+        <span class="dot"></span>
+        <span class="label">หน้าแรก</span>
+      </a>
+
+      <div class="sidebar-line"></div>
+
+      <a
+        class="sidebar-item"
+        [class.active]="activeSection === 'about'"
+        (click)="scrollTo('sec-about')"
+      >
+        <span class="dot"></span>
+        <span class="label">เกี่ยวกับเรา</span>
+      </a>
+
+      <div class="sidebar-line"></div>
+
+      <a
+        class="sidebar-item"
+        [class.active]="activeSection === 'forms'"
+        (click)="scrollTo('sec-forms')"
+      >
+        <span class="dot"></span>
+        <span class="label">แบบฟอร์มคำร้อง</span>
+      </a>
+
+      <div class="sidebar-line"></div>
+    </nav>
+
+    <div class="dots-polka"></div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content" #contentRef (scroll)="onScroll()">
+    <section id="sec-home" class="section sec-home">
+      <!-- Banner Slideshow -->
+      <div class="banner">
+        <div class="slideshow-container">
+          <div
+            class="slide"
+            *ngFor="let slide of slides; let i = index"
+            [class.active]="i === currentIndex"
+            [@slideAnim]="i === currentIndex ? 'in' : 'out'"
+          >
+            <img [src]="slide.image" [alt]="slide.caption" />
+          </div>
+
+          <button class="prev" (click)="prevSlide()" aria-label="ก่อนหน้า">&#10094;</button>
+          <button class="next" (click)="nextSlide()" aria-label="ถัดไป">&#10095;</button>
+
+          <!-- Dots -->
+          <div class="dots">
+            <span
+              class="dot"
+              *ngFor="let slide of slides; let i = index"
+              [class.active]="i === currentIndex"
+              (click)="goToSlide(i)"
+            >
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────── -->
+
+    <section id="sec-about" class="section sec-about">
+      <h2 class="section-title">ทำเนียบกำลังผล</h2>
+
+      <div class="card-grid">
+        <div class="staff-card" *ngFor="let staff of staffList">
+          <!-- ✅ เปลี่ยนตรงนี้ -->
+          <div class="staff-img">
+            <img [src]="staff.image" [alt]="staff.name" *ngIf="staff.image; else placeholder" />
+            <ng-template #placeholder>
+              <mat-icon>person</mat-icon>
+            </ng-template>
+          </div>
+          <div class="staff-info">
+            <p class="staff-name">{{ staff.name }}</p>
+            <span class="staff-rank">{{ staff.rank }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-forms" class="section sec-forms">
+      <h2 class="section-title">แบบฟอร์มคำร้อง</h2>
+
+      <div class="form-list">
+        <div class="form-item-card" *ngFor="let item of forms" (click)="viewForm(item.viewUrl)">
+          <span class="form-title">{{ item.title }}</span>
+          <a [href]="item.downloadUrl" class="download-btn" (click)="$event.stopPropagation()" target="_blank">
+            <mat-icon class="dl-icon">arrow_circle_down</mat-icon>
+            <span class="dl-text">ดาวน์โหลด</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

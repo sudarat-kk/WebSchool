@@ -1,0 +1,33 @@
+<mat-toolbar class="school-header">
+  <!-- Logo -->
+  <div class="logo-area">
+    <img src="assets/image/logo.png" alt="School Logo" class="logo-img" />
+    <span class="school-title">Evalutation Signalschool</span>
+  </div>
+  <!-- Desktop Nav -->
+  <nav class="desktop-nav">
+    <a mat-button routerLink="/student" routerLinkActive="active-link">สำหรับผู้เรียน</a>
+    <a mat-button routerLink="/teacher" routerLinkActive="active-link">สำหรับครู-อาจารย์</a>
+    <a mat-button routerLink="/curriculum" routerLinkActive="active-link">สำหรับคณะกำกับหลักสูตร</a>
+    <a mat-button routerLink="/evaluation" routerLinkActive="active-link"
+      >แบบประเมินติดตามผู้สำเร็จฯ</a
+    >
+    <a mat-button routerLink="/training" routerLinkActive="active-link">สรุปผลการฝึกอบรม</a>
+    <a mat-button routerLink="/summary" routerLinkActive="active-link">สรุปผลการประเมินฯ</a>
+  </nav>
+
+  <!-- Mobile Hamburger -->
+  <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="mobileMenu">
+    <mat-icon>menu</mat-icon>
+  </button>
+</mat-toolbar>
+
+<!-- Mobile Dropdown Menu -->
+<mat-menu #mobileMenu="matMenu">
+  <a mat-menu-item routerLink="/student">สำหรับผู้เรียน</a>
+  <a mat-menu-item routerLink="/teacher">สำหรับครู-อาจารย์</a>
+  <a mat-menu-item routerLink="/curriculum">สำหรับคณะกำกับหลักสูตร</a>
+  <a mat-menu-item routerLink="/evaluation">แบบประเมินติดตามผู้สำเร็จฯ</a>
+  <a mat-menu-item routerLink="/training">สรุปผลการฝึกอบรม</a>
+  <a mat-menu-item routerLink="/summary">สรุปผลการประเมินฯ</a>
+</mat-menu>

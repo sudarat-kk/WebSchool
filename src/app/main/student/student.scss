@@ -1,0 +1,253 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-image: url('/assets/image/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.student-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Sarabun', sans-serif; /* standard font often used in Thai UI */
+  background-color: rgba(255, 255, 255, 0.9); /* slight transparency so background is visible but text is readable */
+  min-height: 100vh;
+}
+
+/* Header Section */
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rem;
+  
+  .back-button {
+    margin-right: 1rem;
+    mat-icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  .course-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+/* Title Section */
+.alert-title-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5rem;
+
+  .alert-title {
+    display: flex;
+    align-items: center;
+    color: #d32f2f;
+    font-size: 36px;
+    font-weight: 600;
+    margin: 0;
+
+    .alert-icon {
+      margin-left: 0.5rem;
+      font-size: 1.8rem;
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+}
+
+/* Chart Container Mockup */
+.chart-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
+
+  .chart-mockup {
+    width: 80%;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+
+    .chart-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .chart-subtitle {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+
+    .chart-percentage {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+      
+      span {
+        font-size: 0.8rem;
+        color: #666;
+      }
+      strong {
+        font-size: 1.5rem;
+      }
+    }
+
+    .chart-bars {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      height: 150px;
+      border-bottom: 1px solid #ccc;
+      border-left: 1px solid #ccc;
+      padding: 0 10px;
+
+      .bar {
+        width: 15px;
+        background-color: #1976d2;
+        height: 100%; // Default for mock, we randomize in real app
+        border-radius: 2px 2px 0 0;
+      }
+      
+      // randomize heights roughly
+      .bar:nth-child(even) { height: 80%; }
+      .bar:nth-child(3n) { height: 95%; }
+      .bar:nth-child(5n) { height: 75%; }
+    }
+  }
+}
+
+/* Filter Row */
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 0 2rem;
+  
+  .filter-left, .filter-right {
+    width: 45%;
+  }
+
+  .custom-select-wrapper {
+    position: relative;
+    width: 100%;
+
+    .custom-select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      background-color: #e0e0e0;
+      font-family: inherit;
+      font-size: 1rem;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+    
+    // Add dropdown arrow visually
+    &::after {
+      content: '▼';
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 0.8rem;
+      color: #666;
+    }
+  }
+
+  .search-wrapper {
+    position: relative;
+    width: 100%;
+
+    .search-input {
+      width: 100%;
+      padding: 0.8rem 1rem 0.8rem 2.5rem;
+      border-radius: 20px;
+      border: 1px solid #000;
+      background-color: #e0e0e0;
+      font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #333;
+    }
+  }
+}
+
+/* Grid Cards */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  padding: 0 2rem;
+
+  .course-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid #eef0f5;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.04);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      border-color: #d1d5db;
+    }
+
+    .card-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .status-dot {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+      &.green {
+        background-color: #4caf50;
+      }
+
+      &.red {
+        background-color: #f44336;
+      }
+    }
+  }
+}
