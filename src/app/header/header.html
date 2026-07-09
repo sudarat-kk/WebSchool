@@ -6,14 +6,183 @@
   </div>
   <!-- Desktop Nav -->
   <nav class="desktop-nav">
-    <a mat-button routerLink="/student" routerLinkActive="active-link">สำหรับผู้เรียน</a>
-    <a mat-button routerLink="/teacher" routerLinkActive="active-link">สำหรับครู-อาจารย์</a>
-    <a mat-button routerLink="/curriculum" routerLinkActive="active-link">สำหรับคณะกำกับหลักสูตร</a>
-    <a mat-button routerLink="/evaluation" routerLinkActive="active-link"
-      >แบบประเมินติดตามผู้สำเร็จฯ</a
-    >
-    <a mat-button routerLink="/training" routerLinkActive="active-link">สรุปผลการฝึกอบรม</a>
-    <a mat-button routerLink="/summary" routerLinkActive="active-link">สรุปผลการประเมินฯ</a>
+    <ul class="menu-list">
+
+    <!-- สำหรับผู้เรียน -->
+    <li class="dropdown">
+      <a mat-button routerLink="/student" routerLinkActive="active-link">
+        สำหรับผู้เรียน ▾
+      </a>
+
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a href="#">ชั้นนายพัน เหล่า ส. <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/student">รุ่นที่ 63</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">ชั้นนายร้อย เหล่า ส. <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/student">รุ่นที่ 70</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">นายสิบอาวุโส (เร่งรัด) <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 8</a></li>
+            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 9</a></li>
+            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 10</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">นายสิบชั้นต้น (เร่งรัด) <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 7</a></li>
+            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 8</a></li>
+            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 9</a></li>
+            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 10</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">นนส.ทบ. เหล่า ส. <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/student">รุ่นที่ 29/68</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">ช่างอิเล็กทรอนิกส์ <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/student">รุ่นที่ 23</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">พนักงานวิทยุถ่ายทอดฯ <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/student">รุ่นที่ 40</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
+    <!-- สำหรับครู-อาจารย์ -->
+    <li class="dropdown">
+      <a mat-button routerLink="/teacher" routerLinkActive="active-link">
+        สำหรับครู-อาจารย์ ▾
+      </a>
+
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a href="#">ชั้นนายพัน เหล่า ส. <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/teacher">รุ่นที่ 63</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">ชั้นนายร้อย เหล่า ส. <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/teacher">รุ่นที่ 69</a></li>
+            <li><a routerLink="/teacher">รุ่นที่ 70</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">นายสิบอาวุโส (เร่งรัด) <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/teacher">ผ่านสื่อฯ รุ่นที่ 8</a></li>
+            <li><a routerLink="/teacher">ผ่านสื่อฯ รุ่นที่ 9</a></li>
+            <li><a routerLink="/teacher">ผ่านสื่อฯ รุ่นที่ 10</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
+    <!-- สำหรับคณะกำกับหลักสูตร -->
+    <li class="dropdown">
+      <a mat-button routerLink="/curriculum" routerLinkActive="active-link">
+        สำหรับคณะกำกับหลักสูตร ▾
+      </a>
+
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a href="#">ชั้นนายพัน เหล่า ส. <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/curriculum">รุ่นที่ 63</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">ชั้นนายร้อย เหล่า ส. <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/curriculum">รุ่นที่ 69</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
+    <!-- แบบประเมินติดตามผู้สำเร็จ -->
+    <li class="dropdown">
+      <a mat-button routerLink="/evaluation" routerLinkActive="active-link">
+        แบบประเมินติดตามผู้สำเร็จฯ ▾
+      </a>
+
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a href="#">นายสิบอาวุโส (เร่งรัด) <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/evaluation">ผ่านสื่อฯ รุ่นที่ 8</a></li>
+            <li><a routerLink="/evaluation">ผ่านสื่อฯ รุ่นที่ 9</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown-submenu">
+          <a href="#">ช่างอิเล็กทรอนิกส์ <span class="arrow">❯</span></a>
+          <ul class="submenu-side">
+            <li><a routerLink="/evaluation">รุ่นที่ 22</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
+    <!-- สรุปผลการฝึกอบรม -->
+    <li class="dropdown">
+      <a mat-button routerLink="/training" routerLinkActive="active-link">
+        สรุปผลการฝึกอบรม ▾
+      </a>
+
+      <ul class="dropdown-menu">
+        <li><a routerLink="/training">ชั้นนายพัน</a></li>
+        <li><a routerLink="/training">นายสิบอาวุโส</a></li>
+        <li><a routerLink="/training">นายสิบชั้นต้น</a></li>
+        <li><a routerLink="/training">ช่างอิเล็กทรอนิกส์</a></li>
+        <li><a routerLink="/training">นักเรียนนายสิบ เหล่า ส.</a></li>
+      </ul>
+    </li>
+
+    <!-- สรุปผลการประเมิน -->
+    <li class="dropdown">
+      <a mat-button routerLink="/summary" routerLinkActive="active-link">
+        สรุปผลการประเมินฯ ▾
+      </a>
+
+      <ul class="dropdown-menu">
+        <li><a routerLink="/summary">ชั้นนายพัน</a></li>
+        <li><a routerLink="/summary">ชั้นนายร้อย</a></li>
+        <li><a routerLink="/summary">ชั้นนายสิบอาวุโส (เร่งรัด)</a></li>
+        <li><a routerLink="/summary">ชั้นนายสิบชั้นต้น (เร่งรัด)</a></li>
+        <li><a routerLink="/summary">ช่างอิเล็กทรอนิกส์</a></li>
+        <li><a routerLink="/summary">นนส.ทบ.</a></li>
+      </ul>
+    </li>
+
+  </ul>
   </nav>
 
   <!-- Mobile Hamburger -->
@@ -24,10 +193,156 @@
 
 <!-- Mobile Dropdown Menu -->
 <mat-menu #mobileMenu="matMenu">
-  <a mat-menu-item routerLink="/student">สำหรับผู้เรียน</a>
-  <a mat-menu-item routerLink="/teacher">สำหรับครู-อาจารย์</a>
-  <a mat-menu-item routerLink="/curriculum">สำหรับคณะกำกับหลักสูตร</a>
-  <a mat-menu-item routerLink="/evaluation">แบบประเมินติดตามผู้สำเร็จฯ</a>
-  <a mat-menu-item routerLink="/training">สรุปผลการฝึกอบรม</a>
-  <a mat-menu-item routerLink="/summary">สรุปผลการประเมินฯ</a>
+  <button mat-menu-item [matMenuTriggerFor]="mobStudent">สำหรับผู้เรียน</button>
+  <button mat-menu-item [matMenuTriggerFor]="mobTeacher">สำหรับครู-อาจารย์</button>
+  <button mat-menu-item [matMenuTriggerFor]="mobCurriculum">สำหรับคณะกำกับหลักสูตร</button>
+  <button mat-menu-item [matMenuTriggerFor]="mobEvaluation">แบบประเมินติดตามผู้สำเร็จฯ</button>
+  <button mat-menu-item [matMenuTriggerFor]="mobTraining">สรุปผลการฝึกอบรม</button>
+  <button mat-menu-item [matMenuTriggerFor]="mobSummary">สรุปผลการประเมินฯ</button>
+</mat-menu>
+
+<mat-menu #mobStudent="matMenu">
+  <button mat-menu-item [matMenuTriggerFor]="subStdNaipan">ชั้นนายพัน เหล่า ส.</button>
+  <button mat-menu-item [matMenuTriggerFor]="subStdNairoi">ชั้นนายร้อย เหล่า ส.</button>
+  <button mat-menu-item [matMenuTriggerFor]="subStdSenior">นายสิบอาวุโส (เร่งรัด)</button>
+  <button mat-menu-item [matMenuTriggerFor]="subStdJunior">นายสิบชั้นต้น (เร่งรัด)</button>
+  <button mat-menu-item [matMenuTriggerFor]="subStdNns">นนส.ทบ. เหล่า ส.</button>
+  <button mat-menu-item [matMenuTriggerFor]="subStdElect">ช่างอิเล็กทรอนิกส์</button>
+  <button mat-menu-item [matMenuTriggerFor]="subStdRadio">พนักงานวิทยุถ่ายทอดฯ</button>
+</mat-menu>
+
+<mat-menu #subStdNaipan="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 63</a>
+</mat-menu>
+<mat-menu #subStdNairoi="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 70</a>
+</mat-menu>
+<mat-menu #subStdSenior="matMenu">
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 10</a>
+</mat-menu>
+<mat-menu #subStdJunior="matMenu">
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 7</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 10</a>
+</mat-menu>
+<mat-menu #subStdNns="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 29/68</a>
+</mat-menu>
+<mat-menu #subStdElect="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 23</a>
+</mat-menu>
+<mat-menu #subStdRadio="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 40</a>
+</mat-menu>
+
+
+<mat-menu #mobTeacher="matMenu">
+  <button mat-menu-item [matMenuTriggerFor]="subTchNaipan">ชั้นนายพัน เหล่า ส.</button>
+  <button mat-menu-item [matMenuTriggerFor]="subTchNairoi">ชั้นนายร้อย เหล่า ส.</button>
+  <button mat-menu-item [matMenuTriggerFor]="subTchSenior">นายสิบอาวุโส (เร่งรัด)</button>
+  <button mat-menu-item [matMenuTriggerFor]="subTchJunior">นายสิบชั้นต้น (เร่งรัด)</button>
+  <button mat-menu-item [matMenuTriggerFor]="subTchNns">นนส.ทบ. เหล่า ส.</button>
+  <button mat-menu-item [matMenuTriggerFor]="subTchElect">ช่างอิเล็กทรอนิกส์</button>
+</mat-menu>
+
+<mat-menu #subTchNaipan="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 63</a>
+</mat-menu>
+<mat-menu #subTchNairoi="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 69</a>
+  <a mat-menu-item routerLink="#">รุ่นที่ 70</a>
+</mat-menu>
+<mat-menu #subTchSenior="matMenu">
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 10</a>
+</mat-menu>
+<mat-menu #subTchJunior="matMenu">
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 7</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
+</mat-menu>
+<mat-menu #subTchNns="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 29/68</a>
+</mat-menu>
+<mat-menu #subTchElect="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 23</a>
+  <a mat-menu-item routerLink="#">รุ่นที่ 40</a>
+</mat-menu>
+
+
+<mat-menu #mobCurriculum="matMenu">
+  <button mat-menu-item [matMenuTriggerFor]="subCurNaipan">ชั้นนายพัน เหล่า ส.</button>
+  <button mat-menu-item [matMenuTriggerFor]="subCurNairoi">ชั้นนายร้อย เหล่า ส.</button>
+  <button mat-menu-item [matMenuTriggerFor]="subCurSenior">ชั้นนายสิบอาวุโส (เร่งรัด)</button>
+  <button mat-menu-item [matMenuTriggerFor]="subCurJunior">ชั้นนายสิบชั้นต้น (เร่งรัด)</button>
+  <button mat-menu-item [matMenuTriggerFor]="subCurElect">ช่างอิเล็กทรอนิกส์</button>
+  <button mat-menu-item [matMenuTriggerFor]="subCurNns">นนส.ทบ. เหล่า ส.</button>
+  <button mat-menu-item [matMenuTriggerFor]="subCurRadio">พนักงานวิทยุถ่ายทอดฯ</button>
+</mat-menu>
+
+<mat-menu #subCurNaipan="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 63</a>
+</mat-menu>
+<mat-menu #subCurNairoi="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 69</a>
+</mat-menu>
+<mat-menu #subCurSenior="matMenu">
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 10</a>
+</mat-menu>
+<mat-menu #subCurJunior="matMenu">
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 7</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
+</mat-menu>
+<mat-menu #subCurElect="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 23</a>
+</mat-menu>
+<mat-menu #subCurNns="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 29/68</a>
+</mat-menu>
+<mat-menu #subCurRadio="matMenu">
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 40</a>
+</mat-menu>
+
+
+<mat-menu #mobEvaluation="matMenu">
+  <button mat-menu-item [matMenuTriggerFor]="subEvaSenior">นายสิบอาวุโส (เร่งรัด)</button>
+  <button mat-menu-item [matMenuTriggerFor]="subEvaElect">ช่างอิเล็กทรอนิกส์</button>
+  <button mat-menu-item [matMenuTriggerFor]="subEvaNns">นนส.ทบ. เหล่า ส.</button>
+</mat-menu>
+
+<mat-menu #subEvaSenior="matMenu">
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
+  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
+</mat-menu>
+<mat-menu #subEvaElect="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 22</a>
+</mat-menu>
+<mat-menu #subEvaNns="matMenu">
+  <a mat-menu-item routerLink="#">รุ่นที่ 28/67</a>
+</mat-menu>
+
+
+<mat-menu #mobTraining="matMenu">
+  <a mat-menu-item routerLink="#">ชั้นนายพัน</a>
+  <a mat-menu-item routerLink="#">นายสิบอาวุโส</a>
+  <a mat-menu-item routerLink="#">นายสิบชั้นต้น</a>
+  <a mat-menu-item routerLink="#">ช่างอิเล็กทรอนิกส์</a>
+  <a mat-menu-item routerLink="#">นักเรียนนายสิบ เหล่า ส.</a>
+</mat-menu>
+
+
+<mat-menu #mobSummary="matMenu">
+  <a mat-menu-item routerLink="#">ชั้นนายพัน</a>
+  <a mat-menu-item routerLink="#">ชั้นนายร้อย</a>
+  <a mat-menu-item routerLink="#">ชั้นนายสิบอาวุโส (เร่งรัด)</a>
+  <a mat-menu-item routerLink="#">ชั้นนายสิบชั้นต้น (เร่งรัด)</a>
+  <a mat-menu-item routerLink="#">ช่างอิเล็กทรอนิกส์</a>
+  <a mat-menu-item routerLink="#">นนส.ทบ.</a>
 </mat-menu>
