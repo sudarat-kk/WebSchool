@@ -1,144 +1,261 @@
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap');
 
+// ── ประกาศตัวแปรไว้บนสุด ───────────────────
+$purple-hover: #3e0549;
+
 :host {
   position: sticky;
   top: 0;
   z-index: 1000;
   display: block;
 }
+
 // ── Toolbar ───────────────────────────────────────────────
 .school-header {
   background: #fffcfc !important;
-  // border-bottom: 2px solid #311352;
   font-family: 'Sarabun', sans-serif;
-  height: 104px !important;
+  height: 104px !important; 
   min-height: unset !important;
-  padding: 0 !important; // ลบ padding ออก ให้ flex จัดเต็มความกว้าง
+  padding: 0 20px !important; 
   display: flex !important;
-  align-items: stretch !important; // ยืดทุกช่องให้สูงเท่ากัน
+  justify-content: space-between; 
+  align-items: center !important; 
   flex-wrap: nowrap;
   
-  /* Make header sticky */
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Add a slight shadow to separate it from content when scrolling */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+
+  max-width: 100vw;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-// ── Logo (1 ช่อง) ─────────────────────────────────────────
+// ── Logo (ฝั่งซ้าย) ─────────────────────────────────────────
 .logo-area {
-  flex: 2; // 1 ส่วนเท่ากับเมนูแต่ละช่อง
-  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
-}
-
-.logo-area .logo-img {
-  height: 60px;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
+  text-decoration: none;
   flex-shrink: 0;
+
+  .logo-img {
+    height: 60px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  .school-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #000000;
+    white-space: nowrap;
+  }
 }
 
-.logo-area .school-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #000000;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; // ตัด ... ถ้าชื่อยาวเกินช่อง
-}
-
-// ── Nav Items (7 ช่อง) ────────────────────────────────────
+// ── Nav Items (กลุ่มปุ่มตัวอักษรใหญ่ เรียงหน้ากระดานฝั่งขวา) ───────────────────
 .desktop-nav {
-  flex: 7; // 7 ส่วน = 7 เมนู
-  min-width: 0;
   display: flex;
-  align-items: stretch;
+  align-items: center; 
+  flex-grow: 1; 
+  justify-content: flex-end; 
+  padding-left: 20px; 
+  min-width: 0; 
 
-  a[mat-button] {
-    flex: 1; // แบ่งพื้นที่ใน 7 ส่วนเท่ากัน
-    min-width: 0;
-    height: 100%;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+  .menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center; 
+    gap: 12px; 
+    max-width: 100%;
+  }
+
+  a[mat-button], button[mat-button] {
+    flex: unset !important; 
+    width: auto !important; 
+    padding: 10px 14px; 
 
     font-family: 'Sarabun', sans-serif;
-    font-size: 20px;
+    font-size: 17px; // ตัวอักษรเมนูหลักขนาด 17px ใหญ่เต็มตาตามที่ขอครับ
     font-weight: 500;
     color: #3d3d3d;
-    line-height: 1.3;
-    word-break: break-word;
-    white-space: normal; // ให้ตัดคำลงบรรทัดได้ในช่อง
-    padding: 0 4px;
+    line-height: 1.4; 
+    white-space: nowrap; 
 
-    border-radius: 0;
-    border-bottom: 3px solid transparent;
-    // border-left: 0.5px solid #2d03e7;
-    transition:
-      color 0.2s,
-      border-color 0.2s,
-      background 0.2s;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
 
     &:hover {
-      color: #3e0549;
-      border-bottom-color: #411c52;
+      color: $purple-hover;
       background: #f5f3ff;
     }
 
     &.active-link {
-      color: #e4b3ee;
-      border-bottom-color: #411c52;
+      color: #1976d2; 
+      font-weight: 600;
       background: #faf5ff;
     }
   }
 }
 
-// ── Mobile ────────────────────────────────────────────────
+/// ── 🛠️ Dropdown เมนูชั้นที่ 1 (หล่นลงมาด้านล่างเยื้องซ้ายนิดๆ) ───────────────────
+.dropdown {
+  position: relative; 
+  list-style: none;
+
+  &:hover > .dropdown-menu {
+    display: block;
+  }
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%; 
+  
+  /* ขยับกล่องดร็อปดาวน์ชั้นแรกเยื้องมาทางซ้ายเล็กน้อย (-15px) เพื่อให้สมดุลกับตำแหน่งปุ่มหลัก */
+  right: -15px;
+  left: auto;
+  
+  min-width: 260px;      
+  width: max-content;   
+  max-width: 90vw;      
+
+  background: #fff;
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+
+  li {
+    position: relative; 
+  }
+
+  a {
+    display: block;
+    padding: 12px 16px; 
+    text-decoration: none;
+    color: #333;
+    font-size: 15px; 
+    line-height: 1.4; 
+    white-space: nowrap; 
+    
+    &:hover {
+      background: #f5f5f5;
+      color: $purple-hover;
+    }
+  }
+}
+
+// ── 🛠️ Dropdown เมนูย่อยชั้นที่ 2 (แก้ไขทิศทาง: บังคับให้เด้งไปฝั่งขวามือ) ───────────────────
+.dropdown-submenu {
+  &:hover > .submenu-side {
+    display: block;
+  }
+}
+
+.submenu-side {
+  display: none;
+  position: absolute;
+  top: 0;         
+  
+  /* 🔄 [แก้ไขจุดสำคัญ] เปลี่ยนจากฝั่งซ้าย ให้กางกระโดดออกไปทาง "ขวามือ" (Left: 100%) เสมอตามที่คุณต้องการ */
+  left: 100%;     
+  right: auto;
+  margin-left: 2px;
+  margin-right: 0;
+  
+  min-width: 220px;
+  width: max-content; 
+  background: #fff;
+  list-style: none;
+  padding: 8px 0;
+  margin-top: 0;
+  border-radius: 8px;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.15); 
+  z-index: 1001; 
+
+  a {
+    display: block;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: #333;
+    white-space: nowrap; 
+    line-height: 1.4;
+
+    &:hover {
+      background: #f5f5f5;
+      color: $purple-hover;
+    }
+  }
+}
+
+/* 🔄 หมุนลูกศรชี้กลับไปทางขวาตามเดิม เพื่อให้สอดคล้องกับทิศทางเมนูที่กางไปทางขวา */
+.arrow {
+  float: right;
+  margin-left: 0;
+  margin-right: 8px;
+  margin-top: 2px;
+  font-size: 16px;
+  transform: none; 
+}
+
+// ── Mobile Button ─────────────────────────────────────────
 .mobile-menu-btn {
   display: none !important;
   flex-shrink: 0;
   color: #4c1d95;
 }
 
-// ── Responsive ───────────────────────────────────────────
-@media (max-width: 768px) {
+// ── ⚡ 🛠️ RESPONSIVE บีบขนาดปุ่มหลักป้องกันการดันจอตอนย่อหน้าเบราว์เซอร์ ──
+@media (max-width: 1450px) and (min-width: 1281px) {
+  .desktop-nav {
+    .menu-list {
+      gap: 6px !important; 
+    }
+    
+    a[mat-button], button[mat-button] {
+      font-size: 15px !important; 
+      padding: 6px 8px !important;
+    }
+  }
+
+  .dropdown-menu {
+    right: 0 !important; 
+    left: auto !important;
+  }
+}
+
+// ── Responsive (สลับเข้าโหมดมือถือเมื่อขนาดจอต่ำกว่า 1280px) ───────────────────
+@media (max-width: 1280px) { 
   .school-header {
-    height: 64px !important; // ย่อความสูงหัวเว็บลงมาเพื่อให้สมมาตรกับจอมือถือ ไม่เว้นช่องว่างโหรงเหรง
-    align-items: center !important; // จัดของระดับลูกทั้งหมดให้อยู่กึ่งกลางแนวตั้งบนบรรทัดเดียวกัน
+    height: 64px !important; 
   }
 
   .desktop-nav {
-    display: none;
+    display: none !important;
   }
 
   .logo-area {
-    flex: 1; // โลโก้ขยายเต็มที่เหลือ
-    gap: 6px;
-    padding: 0 8px;
-    align-items: center; // ป้องกันบิดเบน
-  }
-
-  .logo-area .logo-img {
-    height: 40px; // ย่อโลโก้ประจำโรงเรียนลงให้พอดีกับแถบบาร์ใหม่
-  }
-
-  .logo-area .school-title {
-    font-size: 15px; // ขนาดหัวตัวหนังสือกระชับพอดีตา
+    .school-title {
+      font-size: 16px;
+    }
+    .logo-img {
+      height: 40px;
+    }
   }
 
   .mobile-menu-btn {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    align-self: center !important; // บังคับให้ปุ่มขีดสามขีดอยู่กึ่งกลางแนวตั้ง ไม่ลอยขึ้นไปบนสุด
     margin-left: auto;
-    flex-shrink: 0;
   }
 }
 
@@ -146,7 +263,6 @@
 .chevron-banner {
   width: 100%;
   line-height: 0;
-
   svg {
     display: block;
   }
