@@ -2,11 +2,13 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterModule } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, RouterModule, MatButtonModule],
   templateUrl: './home.html',
   styleUrl: './home.scss',
   animations: [
