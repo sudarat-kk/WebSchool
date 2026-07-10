@@ -1,0 +1,52 @@
+<div class="login-page">
+    <div class="page-header">
+        <button mat-icon-button class="back-button" routerLink="/">
+            <mat-icon>chevron_left</mat-icon>
+        </button>
+    </div>
+
+    <div class="page-content">
+        <h1 class="main-title">ระบบแจ้งผลการเรียนออนไลน์ โรงเรียนทหารสื่อสาร กรมทหารสื่อสาร</h1>
+        <p class="sub-title">
+            กรอกเลขรหัสผ่านของผู้เรียน
+            <mat-icon class="title-icon">search</mat-icon>
+        </p>
+
+        <div class="login-container">
+            <mat-form-field appearance="outline" class="password-field">
+                <mat-label>รหัสนักเรียน</mat-label>
+                <input matInput type="text" placeholder="กรอกรหัสนักเรียนของคุณ">
+                <mat-icon matSuffix>account_circle</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="password-field">
+                <mat-label>กรอกเลข 4 ตัว หลังของบัตรประจำตัวประชาชน</mat-label>
+                <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="กรอกรหัสผ่านของคุณ">
+
+                <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword"
+                    [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </button>
+            </mat-form-field>
+        </div>
+
+        <div class="action-container">
+            <button mat-flat-button class="search-btn">ค้นหา</button>
+        </div>
+
+        <div class="support-footer">
+            <div class="support-left">
+                <mat-icon class="warning-icon">warning</mat-icon>
+                <span>หากพบปัญหา แจ้งมาได้ที่</span>
+            </div>
+
+            <div class="support-right-inline">
+                <a href="tel:02-2975248" mat-mini-fab class="phone-btn">
+                    <mat-icon>phone</mat-icon>
+                </a>
+                <span class="phone-number-text">02-2975248</span>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -251,3 +251,13 @@
     }
   }
 }
+
+.alert-title {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.alert-title:hover {
+  text-decoration: underline;
+}
