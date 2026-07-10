@@ -1,0 +1,123 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-image: url('/assets/image/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.teacher-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Sarabun', sans-serif;
+  background-color: rgba(255, 255, 255, 0.9);
+  min-height: 100vh;
+}
+
+/* Header Section */
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5rem;
+  
+  .back-button {
+    margin-right: 1rem;
+    mat-icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  .course-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+/* Title Section */
+.alert-title-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5rem;
+
+  .alert-title {
+    display: flex;
+    align-items: center;
+    color: #1976d2; /* Changed color to blue for distinction, or use student's red */
+    font-size: 36px;
+    font-weight: 600;
+    margin: 0;
+
+    .alert-icon {
+      margin-left: 0.5rem;
+      font-size: 1.8rem;
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+}
+
+/* Grid Cards */
+.cards-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 0 2rem;
+
+  .course-card {
+    width: 100%;
+    max-width: 350px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid #eef0f5;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.04);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      border-color: #d1d5db;
+    }
+
+    .card-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .status-dot {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+      &.green {
+        background-color: #4caf50;
+      }
+
+      &.red {
+        background-color: #f44336;
+      }
+    }
+  }
+}
