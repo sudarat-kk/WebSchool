@@ -1,313 +1,90 @@
 <mat-toolbar class="school-header">
-  <!-- Logo -->
-  <div class="logo-area">
+  <div class="logo-area" routerLink="/" style="cursor: pointer">
     <img src="assets/image/logo.png" alt="School Logo" class="logo-img" />
-    <span class="school-title">Evalutation Signalschool</span>
+    <span class="school-title">Evaluation Signalschool</span>
   </div>
-  <!-- Desktop Nav -->
+
   <nav class="desktop-nav">
     <ul class="menu-list">
+      <li class="dropdown" *ngFor="let menu of menuData">
+        <a mat-button [routerLink]="menu.path" routerLinkActive="active-link">
+          {{ menu.title }} ▾
+        </a>
 
-    <!-- สำหรับผู้เรียน -->
-    <li class="dropdown">
-      <a mat-button routerLink="/student" routerLinkActive="active-link">
-        สำหรับผู้เรียน ▾
-      </a>
+        <ul class="dropdown-menu" *ngIf="menu.submenus">
+          <li class="dropdown-submenu" *ngFor="let sub of menu.submenus">
+            <a href="javascript:void(0)">{{ sub.course_name }} <span class="arrow">❯</span></a>
+            <ul class="submenu-side">
+              <li *ngFor="let gen of sub.generations">
+                <a [routerLink]="menu.path">{{ gen }}</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
 
-      <ul class="dropdown-menu">
-        <li class="dropdown-submenu">
-          <a href="#">ชั้นนายพัน เหล่า ส. <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/student">รุ่นที่ 63</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">ชั้นนายร้อย เหล่า ส. <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/student">รุ่นที่ 70</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">นายสิบอาวุโส (เร่งรัด) <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 8</a></li>
-            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 9</a></li>
-            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 10</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">นายสิบชั้นต้น (เร่งรัด) <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 7</a></li>
-            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 8</a></li>
-            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 9</a></li>
-            <li><a routerLink="/student">ผ่านสื่อฯ รุ่นที่ 10</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">นนส.ทบ. เหล่า ส. <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/student">รุ่นที่ 29/68</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">ช่างอิเล็กทรอนิกส์ <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/student">รุ่นที่ 23</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">พนักงานวิทยุถ่ายทอดฯ <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/student">รุ่นที่ 40</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-
-    <!-- สำหรับครู-อาจารย์ -->
-    <li class="dropdown">
-      <a mat-button routerLink="/teacher" routerLinkActive="active-link">
-        สำหรับครู-อาจารย์ ▾
-      </a>
-
-      <ul class="dropdown-menu">
-        <li class="dropdown-submenu">
-          <a href="#">ชั้นนายพัน เหล่า ส. <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/teacher">รุ่นที่ 63</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">ชั้นนายร้อย เหล่า ส. <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/teacher">รุ่นที่ 69</a></li>
-            <li><a routerLink="/teacher">รุ่นที่ 70</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">นายสิบอาวุโส (เร่งรัด) <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/teacher">ผ่านสื่อฯ รุ่นที่ 8</a></li>
-            <li><a routerLink="/teacher">ผ่านสื่อฯ รุ่นที่ 9</a></li>
-            <li><a routerLink="/teacher">ผ่านสื่อฯ รุ่นที่ 10</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-
-    <!-- สำหรับคณะกำกับหลักสูตร -->
-    <li class="dropdown">
-      <a mat-button routerLink="/curriculum" routerLinkActive="active-link">
-        สำหรับคณะกำกับหลักสูตร ▾
-      </a>
-
-      <ul class="dropdown-menu">
-        <li class="dropdown-submenu">
-          <a href="#">ชั้นนายพัน เหล่า ส. <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/curriculum">รุ่นที่ 63</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">ชั้นนายร้อย เหล่า ส. <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/curriculum">รุ่นที่ 69</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-
-    <!-- แบบประเมินติดตามผู้สำเร็จ -->
-    <li class="dropdown">
-      <a mat-button routerLink="/evaluation" routerLinkActive="active-link">
-        แบบประเมินติดตามผู้สำเร็จฯ ▾
-      </a>
-
-      <ul class="dropdown-menu">
-        <li class="dropdown-submenu">
-          <a href="#">นายสิบอาวุโส (เร่งรัด) <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/evaluation">ผ่านสื่อฯ รุ่นที่ 8</a></li>
-            <li><a routerLink="/evaluation">ผ่านสื่อฯ รุ่นที่ 9</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown-submenu">
-          <a href="#">ช่างอิเล็กทรอนิกส์ <span class="arrow">❯</span></a>
-          <ul class="submenu-side">
-            <li><a routerLink="/evaluation">รุ่นที่ 22</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-
-    <!-- สรุปผลการฝึกอบรม -->
-    <li class="dropdown">
-      <a mat-button routerLink="/training" routerLinkActive="active-link">
-        สรุปผลการฝึกอบรม ▾
-      </a>
-
-      <ul class="dropdown-menu">
-        <li><a routerLink="/training">ชั้นนายพัน</a></li>
-        <li><a routerLink="/training">นายสิบอาวุโส</a></li>
-        <li><a routerLink="/training">นายสิบชั้นต้น</a></li>
-        <li><a routerLink="/training">ช่างอิเล็กทรอนิกส์</a></li>
-        <li><a routerLink="/training">นักเรียนนายสิบ เหล่า ส.</a></li>
-      </ul>
-    </li>
-
-    <!-- สรุปผลการประเมิน -->
-    <li class="dropdown">
-      <a mat-button routerLink="/summary" routerLinkActive="active-link">
-        สรุปผลการประเมินฯ ▾
-      </a>
-
-      <ul class="dropdown-menu">
-        <li><a routerLink="/summary">ชั้นนายพัน</a></li>
-        <li><a routerLink="/summary">ชั้นนายร้อย</a></li>
-        <li><a routerLink="/summary">ชั้นนายสิบอาวุโส (เร่งรัด)</a></li>
-        <li><a routerLink="/summary">ชั้นนายสิบชั้นต้น (เร่งรัด)</a></li>
-        <li><a routerLink="/summary">ช่างอิเล็กทรอนิกส์</a></li>
-        <li><a routerLink="/summary">นนส.ทบ.</a></li>
-      </ul>
-    </li>
-
-  </ul>
+        <ul class="dropdown-menu" *ngIf="menu.simpleItems">
+          <li *ngFor="let item of menu.simpleItems">
+            <a [routerLink]="menu.path">{{ item }}</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
   </nav>
 
-<button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="mobileMenu">
+
+  <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="mobileMainMenu">
     <mat-icon>menu</mat-icon>
   </button>
 </mat-toolbar>
 
-<mat-menu #mobileMenu="matMenu" class="mobile-step-menu-l1">
-  <button mat-menu-item [matMenuTriggerFor]="mobStudent">สำหรับผู้เรียน</button>
-  <button mat-menu-item [matMenuTriggerFor]="mobTeacher">สำหรับครู-อาจารย์</button>
-  <button mat-menu-item [matMenuTriggerFor]="mobCurriculum">สำหรับคณะกำกับหลักสูตร</button>
-  <button mat-menu-item [matMenuTriggerFor]="mobEvaluation">แบบประเมินติดตามผู้สำเร็จฯ</button>
-  <button mat-menu-item [matMenuTriggerFor]="mobTraining">สรุปผลการฝึกอบรม</button>
-  <button mat-menu-item [matMenuTriggerFor]="mobSummary">สรุปผลการประเมินฯ</button>
+
+<mat-menu #mobileMainMenu="matMenu">
+  <ng-container *ngFor="let menu of menuData">
+    <button
+      mat-menu-item
+      *ngIf="menu.submenus"
+      [matMenuTriggerFor]="courseSubMenu"
+      [matMenuTriggerData]="{ submenus: menu.submenus, path: menu.path }"
+    >
+      {{ menu.title }}
+    </button>
+
+    <button
+      mat-menu-item
+      *ngIf="menu.simpleItems"
+      [matMenuTriggerFor]="simpleMenu"
+      [matMenuTriggerData]="{ simpleItems: menu.simpleItems, path: menu.path }"
+    >
+      {{ menu.title }}
+    </button>
+  </ng-container>
 </mat-menu>
 
-<mat-menu #mobStudent="matMenu" class="mobile-step-menu-l2">
-  <button mat-menu-item [matMenuTriggerFor]="subStdNaipan">ชั้นนายพัน เหล่า ส.</button>
-  <button mat-menu-item [matMenuTriggerFor]="subStdNairoi">ชั้นนายร้อย เหล่า ส.</button>
-  <button mat-menu-item [matMenuTriggerFor]="subStdSenior">นายสิบอาวุโส (เร่งรัด)</button>
-  <button mat-menu-item [matMenuTriggerFor]="subStdJunior">นายสิบชั้นต้น (เร่งรัด)</button>
-  <button mat-menu-item [matMenuTriggerFor]="subStdNns">นนส.ทบ. เหล่า ส.</button>
-  <button mat-menu-item [matMenuTriggerFor]="subStdElect">ช่างอิเล็กทรอนิกส์</button>
-  <button mat-menu-item [matMenuTriggerFor]="subStdRadio">พนักงานวิทยุถ่ายทอดฯ</button>
+<mat-menu #courseSubMenu="matMenu">
+  <ng-template matMenuContent let-submenus="submenus" let-path="path">
+    <button
+      mat-menu-item
+      *ngFor="let sub of submenus"
+      [matMenuTriggerFor]="genSubMenu"
+      [matMenuTriggerData]="{ generations: sub.generations, path: path }"
+    >
+      {{ sub.course_name }}
+    </button>
+  </ng-template>
 </mat-menu>
 
-<mat-menu #subStdNaipan="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="/student">รุ่นที่ 63</a></mat-menu>
-<mat-menu #subStdNairoi="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 70</a></mat-menu>
-<mat-menu #subStdSenior="matMenu" class="mobile-step-menu-l3">
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 10</a>
-</mat-menu>
-<mat-menu #subStdJunior="matMenu" class="mobile-step-menu-l3">
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 7</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 10</a>
-</mat-menu>
-<mat-menu #subStdNns="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 29/68</a></mat-menu>
-<mat-menu #subStdElect="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 23</a></mat-menu>
-<mat-menu #subStdRadio="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 40</a></mat-menu>
-
-<mat-menu #mobTeacher="matMenu" class="mobile-step-menu-l2">
-  <button mat-menu-item [matMenuTriggerFor]="subTchNaipan">ชั้นนายพัน เหล่า ส.</button>
-  <button mat-menu-item [matMenuTriggerFor]="subTchNairoi">ชั้นนายร้อย เหล่า ส.</button>
-  <button mat-menu-item [matMenuTriggerFor]="subTchSenior">นายสิบอาวุโส (เร่งรัด)</button>
-  <button mat-menu-item [matMenuTriggerFor]="subTchJunior">นายสิบชั้นต้น (เร่งรัด)</button>
-  <button mat-menu-item [matMenuTriggerFor]="subTchNns">นนส.ทบ. เหล่า ส.</button>
-  <button mat-menu-item [matMenuTriggerFor]="subTchElect">ช่างอิเล็กทรอนิกส์</button>
+<mat-menu #genSubMenu="matMenu">
+  <ng-template matMenuContent let-generations="generations" let-path="path">
+    <a mat-menu-item *ngFor="let gen of generations" [routerLink]="path">
+      {{ gen }}
+    </a>
+  </ng-template>
 </mat-menu>
 
-<mat-menu #subTchNaipan="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 63</a></mat-menu>
-<mat-menu #subTchNairoi="matMenu" class="mobile-step-menu-l3">
-  <a mat-menu-item routerLink="#">รุ่นที่ 69</a>
-  <a mat-menu-item routerLink="#">รุ่นที่ 70</a>
-</mat-menu>
-<mat-menu #subTchSenior="matMenu" class="mobile-step-menu-l3">
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 10</a>
-</mat-menu>
-<mat-menu #subTchJunior="matMenu" class="mobile-step-menu-l3">
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 7</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
-</mat-menu>
-<mat-menu #subTchNns="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 29/68</a></mat-menu>
-<mat-menu #subTchElect="matMenu" class="mobile-step-menu-l3">
-  <a mat-menu-item routerLink="#">รุ่นที่ 23</a>
-  <a mat-menu-item routerLink="#">รุ่นที่ 40</a>
-</mat-menu>
-
-<mat-menu #mobCurriculum="matMenu" class="mobile-step-menu-l2">
-  <button mat-menu-item [matMenuTriggerFor]="subCurNaipan">ชั้นนายพัน เหล่า ส.</button>
-  <button mat-menu-item [matMenuTriggerFor]="subCurNairoi">ชั้นนายร้อย เหล่า ส.</button>
-  <button mat-menu-item [matMenuTriggerFor]="subCurSenior">ชั้นนายสิบอาวุโส (เร่งรัด)</button>
-  <button mat-menu-item [matMenuTriggerFor]="subCurJunior">ชั้นนายสิบชั้นต้น (เร่งรัด)</button>
-  <button mat-menu-item [matMenuTriggerFor]="subCurElect">ช่างอิเล็กทรอนิกส์</button>
-  <button mat-menu-item [matMenuTriggerFor]="subCurNns">นนส.ทบ. เหล่า ส.</button>
-  <button mat-menu-item [matMenuTriggerFor]="subCurRadio">พนักงานวิทยุถ่ายทอดฯ</button>
-</mat-menu>
-
-<mat-menu #subCurNaipan="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 63</a></mat-menu>
-<mat-menu #subCurNairoi="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 69</a></mat-menu>
-<mat-menu #subCurSenior="matMenu" class="mobile-step-menu-l3">
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 10</a>
-</mat-menu>
-<mat-menu #subCurJunior="matMenu" class="mobile-step-menu-l3">
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 7</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
-</mat-menu>
-<mat-menu #subCurElect="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 23</a></mat-menu>
-<mat-menu #subCurNns="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 29/68</a></mat-menu>
-<mat-menu #subCurRadio="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 40</a></mat-menu>
-
-<mat-menu #mobEvaluation="matMenu" class="mobile-step-menu-l2">
-  <button mat-menu-item [matMenuTriggerFor]="subEvaSenior">นายสิบอาวุโส (เร่งรัด)</button>
-  <button mat-menu-item [matMenuTriggerFor]="subEvaElect">ช่างอิเล็กทรอนิกส์</button>
-  <button mat-menu-item [matMenuTriggerFor]="subEvaNns">นนส.ทบ. เหล่า ส.</button>
-</mat-menu>
-
-<mat-menu #subEvaSenior="matMenu" class="mobile-step-menu-l3">
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 8</a>
-  <a mat-menu-item routerLink="#">ผ่านสื่อฯ รุ่นที่ 9</a>
-</mat-menu>
-<mat-menu #subEvaElect="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 22</a></mat-menu>
-<mat-menu #subEvaNns="matMenu" class="mobile-step-menu-l3"><a mat-menu-item routerLink="#">รุ่นที่ 28/67</a></mat-menu>
-
-<mat-menu #mobTraining="matMenu" class="mobile-step-menu-l2">
-  <a mat-menu-item routerLink="#">ชั้นนายพัน</a>
-  <a mat-menu-item routerLink="#">นายสิบอาวุโส</a>
-  <a mat-menu-item routerLink="#">นายสิบชั้นต้น</a>
-  <a mat-menu-item routerLink="#">ช่างอิเล็กทรอนิกส์</a>
-  <a mat-menu-item routerLink="#">นักเรียนนายสิบ เหล่า ส.</a>
-</mat-menu>
-
-<mat-menu #mobSummary="matMenu" class="mobile-step-menu-l2">
-  <a mat-menu-item routerLink="#">ชั้นนายพัน</a>
-  <a mat-menu-item routerLink="#">ชั้นนายร้อย</a>
-  <a mat-menu-item routerLink="#">ชั้นนายสิบอาวุโส (เร่งรัด)</a>
-  <a mat-menu-item routerLink="#">ชั้นนายสิบชั้นต้น (เร่งรัด)</a>
-  <a mat-menu-item routerLink="#">ช่างอิเล็กทรอนิกส์</a>
-  <a mat-menu-item routerLink="#">นนส.ทบ.</a>
+<mat-menu #simpleMenu="matMenu">
+  <ng-template matMenuContent let-simpleItems="simpleItems" let-path="path">
+    <a mat-menu-item *ngFor="let item of simpleItems" [routerLink]="path">
+      {{ item }}
+    </a>
+  </ng-template>
 </mat-menu>
