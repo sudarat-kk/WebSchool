@@ -236,6 +236,7 @@ $purple-hover: #3e0549;
   }
 }
 
+
 @media (max-width: 1366px) and (min-width: 769px) {
   .desktop-nav {
     .menu-list {
@@ -257,6 +258,7 @@ $purple-hover: #3e0549;
 
 // ── Responsive (สลับเข้าโหมดมือถือเมื่อขนาดจอต่ำกว่า 768px) ───────────────────
 @media (max-width: 768px) {
+
   .school-header {
     height: 64px !important;
   }
@@ -279,6 +281,69 @@ $purple-hover: #3e0549;
     align-items: center !important;
     justify-content: center !important;
     margin-left: auto;
+  }
+
+  // ── 🛠️ [เวอร์ชันสมบูรณ์] ล้างค่าเยื้องที่ทำให้ปุ่มทับกัน + คุมธีมม่วงพาสเทลไล่เฉด ──
+  ::ng-deep {
+    // โครงสร้างพื้นฐานของกล่องแผงเมนูทุกระดับชั้นบน Mobile
+    .mobile-step-menu-l1,
+    .mobile-step-menu-l2,
+    .mobile-step-menu-l3,
+    .mat-mdc-menu-panel,
+    .mat-menu-panel {
+      min-width: 240px !important; /* ความกว้างที่ปลอดภัย ตัวอักษรด้านบนและข้อความยาวๆ จะไม่ขาด */
+      max-width: 290px !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 24px rgba(62, 5, 73, 0.15) !important;
+      
+      /* 🔄 ล้างค่าตำแหน่งฝืนธรรมชาติออกทั้งหมด ป้องกันเมนูเอ๋อจิ้มไม่ตรงปุ่ม */
+      margin: 0 !important;
+      transform: none !important;
+    }
+
+    // ── 💜 เลเยอร์ที่ 1: เมนูหลัก (สำหรับผู้เรียน / สำหรับครู...) ──
+    .mat-mdc-menu-panel.mobile-step-menu-l1,
+    .mobile-step-menu-l1 .mat-mdc-menu-content {
+      background-color: #f7f3f9 !important; /* สีม่วงพาสเทลอ่อนใส สบายตา */
+    }
+
+    // ── 💜 เลเยอร์ที่ 2: เมนูย่อยชั้นที่ 2 (ชั้นนายพัน เหล่า ส...) ──
+    .mat-mdc-menu-panel.mobile-step-menu-l2,
+    .mobile-step-menu-l2 .mat-mdc-menu-content {
+      background-color: #eee5f4 !important; /* ปรับเฉดม่วงเข้มขึ้นหนึ่งสเต็ปเพื่อให้เห็นมิติการซ้อนชั้น */
+    }
+
+    // ── 💜 เลเยอร์ที่ 3: เมนูย่อยชั้นที่ 3 (รุ่นที่ 63...) ──
+    .mat-mdc-menu-panel.mobile-step-menu-l3,
+    .mobile-step-menu-l3 .mat-mdc-menu-content {
+      background-color: #e4d6ee !important; /* สีม่วงพาสเทลระดับสุดท้าย */
+    }
+
+    // ตกแต่งรายละเอียดปุ่มและตัวอักษรด้านในให้อ่านง่าย คลีนๆ
+    .mobile-step-menu-l1 .mat-mdc-menu-item,
+    .mobile-step-menu-l2 .mat-mdc-menu-item,
+    .mobile-step-menu-l3 .mat-mdc-menu-item {
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: #2c212e !important; /* ตัวหนังสือสีเข้มอมม่วงอ่านง่าย */
+      padding: 12px 16px !important;
+      white-space: nowrap !important; /* ป้องกันตัวหนังสือหักตกบรรทัด */
+      border-bottom: 1px solid rgba(62, 5, 73, 0.04) !important;
+
+      &:last-child {
+        border-bottom: none !important;
+      }
+
+      // ไอคอนลูกศรชี้ขวา (Chevron) ข้างในเมนู
+      .mat-mdc-menu-submenu-icon, .mat-menu-ripple {
+        color: #6a5370 !important;
+      }
+
+      // ไฮไลท์เมื่อเอานิ้วไปแตะเลือกเมนู
+      &:hover, &:focus, &.cdk-program-focused {
+        background-color: #dbcaeb !important;
+      }
+    }
   }
 }
 
