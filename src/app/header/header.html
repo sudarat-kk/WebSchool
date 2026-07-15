@@ -13,7 +13,8 @@
 
         <ul class="dropdown-menu" *ngIf="menu.submenus">
           <li class="dropdown-submenu" *ngFor="let sub of menu.submenus">
-            <a href="javascript:void(0)">{{ sub.course_name }} <span class="arrow">❯</span></a>
+            <!-- เปลี่ยนจาก ❯ เป็น &#10095; -->
+            <a href="javascript:void(0)">{{ sub.course_name }} <span class="arrow">&#10095;</span></a>
             <ul class="submenu-side">
               <li *ngFor="let gen of sub.generations">
                 <a [routerLink]="menu.path">{{ gen }}</a>
@@ -38,42 +39,33 @@
 </mat-toolbar>
 
 
-<mat-menu #mobileMainMenu="matMenu">
+<!-- สเต็ปที่ 1: เมนูหลัก (เพิ่ม class="mobile-step-menu-l1") -->
+<mat-menu #mobileMainMenu="matMenu" class="mobile-step-menu-l1">
   <ng-container *ngFor="let menu of menuData">
-    <button
-      mat-menu-item
-      *ngIf="menu.submenus"
-      [matMenuTriggerFor]="courseSubMenu"
-      [matMenuTriggerData]="{ submenus: menu.submenus, path: menu.path }"
-    >
+    <button mat-menu-item *ngIf="menu.submenus" [matMenuTriggerFor]="courseSubMenu"
+      [matMenuTriggerData]="{ submenus: menu.submenus, path: menu.path }">
       {{ menu.title }}
     </button>
 
-    <button
-      mat-menu-item
-      *ngIf="menu.simpleItems"
-      [matMenuTriggerFor]="simpleMenu"
-      [matMenuTriggerData]="{ simpleItems: menu.simpleItems, path: menu.path }"
-    >
+    <button mat-menu-item *ngIf="menu.simpleItems" [matMenuTriggerFor]="simpleMenu"
+      [matMenuTriggerData]="{ simpleItems: menu.simpleItems, path: menu.path }">
       {{ menu.title }}
     </button>
   </ng-container>
 </mat-menu>
 
-<mat-menu #courseSubMenu="matMenu">
+<!-- สเต็ปที่ 2: เมนูย่อยชั้นที่ 2 เช่น ชั้นนายพัน เหล่า ส. (เพิ่ม class="mobile-step-menu-l2") -->
+<mat-menu #courseSubMenu="matMenu" class="mobile-step-menu-l2">
   <ng-template matMenuContent let-submenus="submenus" let-path="path">
-    <button
-      mat-menu-item
-      *ngFor="let sub of submenus"
-      [matMenuTriggerFor]="genSubMenu"
-      [matMenuTriggerData]="{ generations: sub.generations, path: path }"
-    >
+    <button mat-menu-item *ngFor="let sub of submenus" [matMenuTriggerFor]="genSubMenu"
+      [matMenuTriggerData]="{ generations: sub.generations, path: path }">
       {{ sub.course_name }}
     </button>
   </ng-template>
 </mat-menu>
 
-<mat-menu #genSubMenu="matMenu">
+<!-- สเต็ปที่ 3: เมนูย่อยชั้นที่ 3 เช่น รุ่นที่ 63... (เพิ่ม class="mobile-step-menu-l3") -->
+<mat-menu #genSubMenu="matMenu" class="mobile-step-menu-l3">
   <ng-template matMenuContent let-generations="generations" let-path="path">
     <a mat-menu-item *ngFor="let gen of generations" [routerLink]="path">
       {{ gen }}
@@ -81,7 +73,8 @@
   </ng-template>
 </mat-menu>
 
-<mat-menu #simpleMenu="matMenu">
+<!-- สำหรับ Simple Menu ทั่วไปที่ไม่มีชั้นย่อย (เพิ่ม class="mobile-step-menu-l2") -->
+<mat-menu #simpleMenu="matMenu" class="mobile-step-menu-l2">
   <ng-template matMenuContent let-simpleItems="simpleItems" let-path="path">
     <a mat-menu-item *ngFor="let item of simpleItems" [routerLink]="path">
       {{ item }}

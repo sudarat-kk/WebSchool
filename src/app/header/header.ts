@@ -1,45 +1,63 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, inject, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+
+// Angular Material
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
-import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+
+// Service
 import { NavService } from '../services/nav';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
+    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
     MatMenuModule,
-    CommonModule,
     RouterLink,
-    RouterLinkActive,
+    RouterLinkActive
   ],
   templateUrl: './header.html',
-  styleUrl: './header.scss',
+  styleUrls: ['./header.scss']
 })
 export class Header implements OnInit {
-  // สร้าง Array มารอรับข้อมูลจาก Backend
   menuData: any[] = [];
+
+  // inject เครื่องมือช่วยอัปเดตหน้าจอของ Angular
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(private navService: NavService) {}
 
   ngOnInit(): void {
     this.navService.getNavigationData().subscribe({
       next: (data) => {
-        this.menuData = data;
+        if (data && data.length > 0) {
+          this.menuData = data;
+        } else {
+          // ใส่ข้อมูลสำรองกันพลาดไว้ ถ้ารีเฟรชแล้ว API ดึงข้อมูลมาช้า
+          this.setMockData();
+        }
+        // สั่งให้ Angular บังคับเช็กและวาดหน้าจอใหม่ทันทีที่มีข้อมูลเข้ามา
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('ไม่สามารถดึงข้อมูลเมนูได้, ใช้ข้อมูลจำลองแทน:', err);
-        this.menuData = [
-          { id: 'menu_1', title: 'หน้าแรก (Mock)', path: '/', role: 'all' },
-          { id: 'menu_2', title: 'สำหรับผู้เรียน', path: '/student', role: 'student' },
-        ];
-      },
+        this.setMockData();
+        this.cdr.detectChanges();
+      }
     });
+  }
+
+  private setMockData(): void {
+    this.menuData = [
+      { id: 'menu_1', title: 'หน้าแรก (Mock)', path: '/', role: 'all' },
+      { id: 'menu_2', title: 'สำหรับผู้เรียน', path: '/student', role: 'student' }
+    ];
   }
 }

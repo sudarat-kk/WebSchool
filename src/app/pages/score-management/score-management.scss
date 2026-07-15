@@ -1,0 +1,178 @@
+// ==========================================
+// 🎨 Color & Style Variables (Soft Pink-Lavender Theme)
+// ==========================================
+// ใช้สีจากภาพตัวอย่าง: สีขาวอมชมพูม่วงจางๆ นวลๆ สบายตามาก
+$bg-pastel: #fdf8f9;           
+
+$bg-input: #ffffff;           // กล่องข้อความสีขาวบริสุทธิ์เพื่อตัดกับพื้นหลังจางๆ
+$border-input: #f0e4e7;       // เส้นขอบชมพูม่วงพาสเทลจางๆ เพื่อให้รับกับสีพื้นหลัง
+$text-dark: #4d3a43;          // ตัวหนังสือสีน้ำตาลม่วงเข้มโทนซอฟต์ อ่านง่ายไม่แข็งกระด้าง
+$text-muted: #bda2b0;         // สีข้อความจางและลูกศร
+
+$color-gold: #c2881b;         // สีทองหัวข้อ 1 (ปรับโทนให้อ่านง่ายบนพื้นสว่าง)
+$color-purple-label: #8c6a91; // สีม่วงพาสเทลตุ่นๆ หัวข้อ 2
+$color-orange-pastel: #f5af65; // สีปุ่มส้มพาสเทล (ส้มอ่อนละมุนตา)
+$color-orange-hover: #e59c50;
+
+// ==========================================
+// 🧩 Layout Styles (จัดกึ่งกลางชัวร์ๆ + ปุ่มย้อนกลับแยกออก)
+// ==========================================
+.page-wrapper {
+  // บังคับให้เต็มหน้าจอและล็อกให้อยู่กึ่งกลางเสมอ
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  
+  background-color: $bg-pastel; // ใช้สีพาสเทลอ่อนสุดละมุนตัวใหม่นี้เลยครับ!
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 24px;
+  overflow-y: auto;
+
+  // ⬅️ ปุ่มย้อนกลับ: อยู่มุมซ้ายบนเสมอ
+  .top-bar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.7); // ขาวใสบางเบา
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(140, 106, 145, 0.15);
+      color: $color-purple-label;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 4px 10px rgba(140, 106, 145, 0.04);
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 1);
+        border-color: $color-purple-label;
+        transform: translateY(-1px);
+      }
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  // 🎯 ตัวจัดกึ่งกลางเนื้อหาฟอร์มทั้งหมด
+  .center-content {
+    flex: 1;
+    display: flex;
+    justify-content: center; // กลางแนวนอน
+    align-items: center;     // กลางแนวตั้ง
+    width: 100%;
+    padding-bottom: 40px;
+  }
+}
+
+// ==========================================
+// 📝 Form Styles
+// ==========================================
+.course-container {
+  width: 100%;
+  max-width: 600px;
+  font-family: 'Sarabun', 'Kanit', 'Helvetica Neue', sans-serif;
+
+  .form-group {
+    margin-bottom: 25px;
+
+    label {
+      display: block;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+
+      &.label-gold { color: $color-gold; }
+      &.label-blue { color: $color-purple-label; } 
+    }
+  }
+
+  .select-wrapper {
+    position: relative;
+    width: 100%;
+
+    select {
+      width: 100%;
+      padding: 15px 18px;
+      background-color: $bg-input;
+      color: $text-dark;
+      border: 1.5px solid $border-input;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+      outline: none;
+      box-shadow: 0 4px 12px rgba(140, 106, 145, 0.02); // เงานวลๆ อ่อนบางเบาที่สุด
+      transition: all 0.25s ease;
+
+      &:focus {
+        border-color: $color-purple-label;
+        box-shadow: 0 0 0 4px rgba(140, 106, 145, 0.1);
+      }
+    }
+
+    .arrow-icon {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-muted;
+      font-size: 12px;
+      pointer-events: none;
+    }
+  }
+
+  // ปุ่มเพิ่มวิชา สีส้มพาสเทลสวยละมุนเข้ากัน
+  .btn-submit {
+    width: 100%;
+    background-color: $color-orange-pastel;
+    color: #ffffff; 
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 16px rgba(245, 175, 101, 0.25);
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      background-color: $color-orange-hover;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(245, 175, 101, 0.35);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}

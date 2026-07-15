@@ -1,0 +1,48 @@
+<div class="score-management-page">
+    <div class="page-header">
+        <button mat-icon-button class="back-button" routerLink="/">
+            <mat-icon>chevron_left</mat-icon>
+        </button>
+    </div>
+
+    <div class="page-wrapper">
+  <!-- 🎯 ส่วนเนื้อหาหลัก: อยู่กึ่งกลางหน้าจอพอดีเป๊ะชัวร์ๆ -->
+  <div class="center-content">
+    <div class="course-container">
+      
+      <!-- ส่วนที่ 1 -->
+      <div class="form-group">
+        <label class="label-gold">เลือกโครงสร้างหลักสูตร</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="selectedStructure" (change)="onStructureChange()">
+            <option value="all">แสดงทั้งหมด</option>
+          </select>
+          <span class="arrow-icon">▼</span>
+        </div>
+      </div>
+
+      <!-- ส่วนที่ 2 -->
+      <div class="form-group">
+        <label class="label-purple">รายวิชาในหลักสูตรที่เลือก</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="selectedSubject">
+            @for (subject of subjects; track subject.id) {
+              <option [ngValue]="subject">
+                {{ subject.code }} {{ subject.name }} [{{ subject.group }}] - {{ subject.credit }} หน่วยกิต
+              </option>
+            }
+          </select>
+          <span class="arrow-icon">▼</span>
+        </div>
+      </div>
+
+      <!-- ปุ่มเพิ่มหลักสูตร -->
+      <button class="btn-submit" (click)="addCourse()">
+        <mat-icon>add_box</mat-icon>
+        เพิ่มหลักสูตร / เพิ่มวิชา
+      </button>
+
+    </div>
+  </div>
+
+</div>
