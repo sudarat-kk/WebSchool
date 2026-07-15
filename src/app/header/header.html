@@ -14,9 +14,12 @@
         <ul class="dropdown-menu" *ngIf="menu.submenus">
           <li class="dropdown-submenu" *ngFor="let sub of menu.submenus">
             <a href="javascript:void(0)">{{ sub.course_name }} <span class="arrow">❯</span></a>
+            <!-- โครงสร้าง class เดิม แต่ปรับตัวแปรลูปให้ใช้ batches ของ API -->
             <ul class="submenu-side">
-              <li *ngFor="let gen of sub.generations">
-                <a [routerLink]="menu.path">{{ gen }}</a>
+              <li *ngFor="let batch of sub.batches">
+                <a [routerLink]="menu.path" [queryParams]="{ batchId: batch.batch_id }">{{
+                  batch.batch_name
+                }}</a>
               </li>
             </ul>
           </li>
@@ -31,13 +34,12 @@
     </ul>
   </nav>
 
-
   <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="mobileMainMenu">
     <mat-icon>menu</mat-icon>
   </button>
 </mat-toolbar>
 
-
+<!-- ส่วน Mobile Menu -->
 <mat-menu #mobileMainMenu="matMenu">
   <ng-container *ngFor="let menu of menuData">
     <button
@@ -66,7 +68,7 @@
       mat-menu-item
       *ngFor="let sub of submenus"
       [matMenuTriggerFor]="genSubMenu"
-      [matMenuTriggerData]="{ generations: sub.generations, path: path }"
+      [matMenuTriggerData]="{ batches: sub.batches, path: path }"
     >
       {{ sub.course_name }}
     </button>
@@ -74,9 +76,15 @@
 </mat-menu>
 
 <mat-menu #genSubMenu="matMenu">
-  <ng-template matMenuContent let-generations="generations" let-path="path">
-    <a mat-menu-item *ngFor="let gen of generations" [routerLink]="path">
-      {{ gen }}
+  <!-- รับค่า batches มาวนลูปแสดงผลใน Mobile Menu -->
+  <ng-template matMenuContent let-batches="batches" let-path="path">
+    <a
+      mat-menu-item
+      *ngFor="let batch of batches"
+      [routerLink]="path"
+      [queryParams]="{ batchId: batch.batch_id }"
+    >
+      {{ batch.batch_name }}
     </a>
   </ng-template>
 </mat-menu>
