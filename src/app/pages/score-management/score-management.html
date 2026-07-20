@@ -1,48 +1,146 @@
 <div class="score-management-page">
-    <div class="page-header">
-        <button mat-icon-button class="back-button" routerLink="/">
-            <mat-icon>chevron_left</mat-icon>
-        </button>
-    </div>
+  <div class="page-header">
+    <button mat-icon-button class="back-button" routerLink="/admin">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <h1 class="page-title">การกรอกคะแนน</h1>
+  </div>
 
-    <div class="page-wrapper">
-  <!-- 🎯 ส่วนเนื้อหาหลัก: อยู่กึ่งกลางหน้าจอพอดีเป๊ะชัวร์ๆ -->
-  <div class="center-content">
-    <div class="course-container">
-      
-      <!-- ส่วนที่ 1 -->
-      <div class="form-group">
-        <label class="label-gold">เลือกโครงสร้างหลักสูตร</label>
-        <div class="select-wrapper">
-          <select [(ngModel)]="selectedStructure" (change)="onStructureChange()">
-            <option value="all">แสดงทั้งหมด</option>
-          </select>
-          <span class="arrow-icon">▼</span>
-        </div>
-      </div>
-
-      <!-- ส่วนที่ 2 -->
-      <div class="form-group">
-        <label class="label-purple">รายวิชาในหลักสูตรที่เลือก</label>
-        <div class="select-wrapper">
-          <select [(ngModel)]="selectedSubject">
-            @for (subject of subjects; track subject.id) {
-              <option [ngValue]="subject">
-                {{ subject.code }} {{ subject.name }} [{{ subject.group }}] - {{ subject.credit }} หน่วยกิต
-              </option>
-            }
-          </select>
-          <span class="arrow-icon">▼</span>
-        </div>
-      </div>
-
-      <!-- ปุ่มเพิ่มหลักสูตร -->
-      <button class="btn-submit" (click)="addCourse()">
+  <div class="page-wrapper">
+    <!-- โซนปุ่มสั่งการด้านขวาบน -->
+    <div class="action-buttons-group">
+      <button class="btn-action btn-purple-light" (click)="addCourse()">
         <mat-icon>add_box</mat-icon>
         เพิ่มหลักสูตร / เพิ่มวิชา
       </button>
-
+      <button class="btn-action btn-purple-dark" (click)="addStudent()">
+        <mat-icon>person_add</mat-icon>
+        เพิ่มนักเรียน
+      </button>
     </div>
+
+    <!-- ส่วนเนื้อหาหลัก: Dropdown เลือกวิชา -->
+    <div class="center-content">
+      <div class="course-container">
+
+        <!-- ส่วนที่ 1: เลือกโครงสร้างหลักสูตร -->
+        <div class="form-group">
+          <label class="form-label">เลือกโครงสร้างหลักสูตร</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="selectedStructure" (change)="onStructureChange()">
+              <option value="all">แสดงทั้งหมด</option>
+            </select>
+            <span class="arrow-icon">▼</span>
+          </div>
+        </div>
+
+        <!-- ส่วนที่ 2: รายวิชาในหลักสูตร -->
+        <div class="form-group">
+          <label class="form-label">รายวิชาในหลักสูตร</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="selectedSubject">
+              @for (subject of subjects; track subject.id) {
+              <option [ngValue]="subject">
+                {{ subject.code }} {{ subject.name }} [{{ subject.group }}] - {{ subject.credit }} หน่วยกิต
+              </option>
+              }
+            </select>
+            <span class="arrow-icon">▼</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ตารางคะแนน -->
+    <div class="table-responsive">
+      <table class="score-table">
+        <thead>
+          <!-- แถวที่ 1 ของหัวตาราง -->
+          <tr>
+            <th rowspan="2">ลำดับ</th>
+            <th rowspan="2">รหัสประจำตัว</th>
+            <th rowspan="2">ชื่อ-นามสกุล</th>
+            <th rowspan="2">คะแนนดิบ</th>
+            <th rowspan="2">คิดเป็นร้อยละ</th>
+            <th>หน่วยกิต</th>
+            <th>2</th>
+            <th>ค่าประกอบ</th>
+          </tr>
+          <!-- แถวที่ 2 ของหัวตาราง -->
+          <tr>
+            <td>ค่าที่ได้</td>
+            <td>เกรด</td>
+            <td class="text-bold">Index</td>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 🟩 Loop ข้อมูลนักเรียน (8 คอลัมน์สมดุลเท่าหัวตาราง) -->
+          @for (student of students; track student.id; let i = $index) {
+            <tr>
+              <td>{{ i + 1 }}</td>
+              <td>{{ student.code }}</td>
+              <td class="text-left">{{ student.name }}</td>
+              <td>
+                <!-- ช่องสำหรับกรอกคะแนนดิบ -->
+                <input 
+                  type="number" 
+                  class="input-score" 
+                  [(ngModel)]="student.rawScore" 
+                  placeholder="0"
+                  min="0"
+                  max="100">
+              </td>
+              <td>{{ student.percentage || '-' }}</td>
+              <td>{{ student.creditEarned || '-' }}</td>
+              <td>{{ student.grade || '-' }}</td>
+              <td>{{ student.indexValue || '-' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="empty-row">กรุณาเลือกรายวิชาเพื่อแสดงรายชื่อนักเรียน</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 🎯 ปุ่มบันทึกคะแนนทั้งหมด วางไว้ด้านล่างขวาของตาราง -->
+    <div class="submit-container">
+      <button class="btn-submit" (click)="submitScores()">
+        <mat-icon>save</mat-icon>
+        บันทึกคะแนนทั้งหมด
+      </button>
+    </div>
+
   </div>
 
+  <!-- Footer สรุปผลด้านล่างสุด (ผูกสูตรคำนวณแบบอัตโนมัติ) -->
+  <div class="page-footer-summary">
+    <div class="summary-item main-title">
+      <mat-icon>trending_up</mat-icon>
+      <div>ผลลัพธ์ภาพรวม<br>ของรุ่นชั้น</div>
+    </div>
+    
+    <div class="summary-item">
+      คะแนนเฉลี่ยทั้งห้อง
+      <span class="value-summary">{{ averageScore || '-' }}</span>
+    </div>
+
+    <div class="summary-item">
+      คะแนนสูงสุด / ต่ำสุด
+      <span class="value-summary">
+        {{ maxScore !== null ? maxScore : '-' }}/{{ minScore !== null ? minScore : '-' }}
+      </span>
+    </div>
+
+    <div class="summary-item highlight-green">
+      ผ่านเกณฑ์ (เกรด >= 1.0)
+      <span class="value">0 คน</span>
+    </div>
+    <div class="summary-item highlight-red">
+      ไม่ผ่าน / กรอกคะแนนผิดพลาด
+      <span class="value">0 คน</span>
+    </div>
+  </div>
 </div>

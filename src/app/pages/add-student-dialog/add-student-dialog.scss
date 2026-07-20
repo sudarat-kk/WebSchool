@@ -1,0 +1,263 @@
+// ==========================================
+// 💡 ประกาศตัวแปรสีและฟอนต์ (Variables - ธีมม่วงพาสเทลละมุน)
+// ==========================================
+$purple-light: #f5f3ff;      
+$purple-pastel: #a78bfa;     
+$purple-pastel-hover: #c084fc; 
+$purple-focus-glow: rgba(167, 139, 250, 0.15); 
+$text-dark: #374151;         // ตัวแปรเจ้าปัญหา ประกาศไว้ตรงนี้แล้วครับ!
+$text-muted: #9ca3af;        
+$border-color: #f3f4f6;      
+$shadow: 0 20px 25px -5px rgba(167, 139, 250, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+
+// ==========================================
+// โครงสร้างหลักของ Modal
+// ==========================================
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.25); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  backdrop-filter: blur(4px); 
+}
+
+.modal-container {
+  background-color: #ffffff;
+  border-radius: 16px; 
+  width: 100%;
+  max-width: 600px; 
+  box-shadow: $shadow;
+  overflow: hidden;
+  position: relative;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .modal-header-bar {
+    background-color: $purple-light;
+    height: 75px; 
+    position: relative;
+    display: flex;
+    justify-content: center;
+
+    .logo-placeholder {
+      position: absolute;
+      bottom: -24px;
+      background-color: #ffffff;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(167, 139, 250, 0.12);
+
+      .mock-logo {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .modal-content {
+    padding: 2.25rem 2rem 2rem; 
+    position: relative;
+
+    .btn-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: $text-muted;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+
+      &:hover {
+        color: $purple-pastel;
+        background-color: $purple-light;
+      }
+
+      .material-icons {
+        font-size: 1.15rem; 
+      }
+    }
+
+    .modal-tabs {
+      display: flex;
+      border-bottom: 2px solid $border-color;
+      margin-bottom: 1.75rem;
+      gap: 1.75rem;
+
+      button {
+        background: none;
+        border: none;
+        padding: 0.65rem 0;
+        font-size: 0.9rem; 
+        font-weight: 500;
+        color: $text-muted;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+
+        &:hover {
+          color: $purple-pastel;
+        }
+
+        &.active {
+          color: $purple-pastel;
+          font-weight: 600;
+
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: $purple-pastel;
+            border-radius: 2px 2px 0 0;
+          }
+        }
+      }
+    }
+
+    // ==========================================
+    // ส่วนสไตล์ของ ฟอร์มและการกรอกข้อมูล
+    // ==========================================
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem; 
+
+      .form-row {
+        display: flex;
+        gap: 1.5rem; 
+        width: 100%;
+        
+        .form-group {
+          flex: 0 0 calc(50% - 0.75rem); 
+        }
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        width: 100%;
+
+        label {
+          font-size: 0.85rem; 
+          font-weight: 500;
+          color: $text-dark;
+          padding-left: 2px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+          width: 100%;
+          box-sizing: border-box; 
+          padding: 0.65rem 0.85rem; 
+          border: 1.5px solid #e5e7eb; 
+          border-radius: 8px; 
+          font-size: 0.85rem; 
+          color: $text-dark;
+          outline: none;
+          background-color: #ffffff;
+          transition: all 0.2s;
+
+          &:focus {
+            border-color: $purple-pastel;
+            box-shadow: 0 0 0 2.5px $purple-focus-glow; 
+          }
+
+          &::placeholder {
+            color: #cbcbcb;
+          }
+        }
+
+        select {
+          appearance: none;
+          background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 0.85rem center;
+          background-size: 1.1em;
+          padding-right: 2.5rem;
+        }
+
+        &.short-input {
+          max-width: 160px; 
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        margin-top: 1rem;
+
+        &.right { justify-content: flex-end; }
+        &.center { justify-content: center; }
+
+        .btn-submit {
+          background-color: $purple-pastel;
+          color: #ffffff;
+          border: none;
+          padding: 0.6rem 2.25rem; 
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.9rem; 
+          cursor: pointer;
+          box-shadow: 0 4px 6px -1px rgba(167, 139, 250, 0.15);
+          transition: all 0.2s;
+
+          &:hover {
+            background-color: $purple-pastel-hover;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 10px -1px rgba(167, 139, 250, 0.25);
+          }
+        }
+
+        .btn-submit-wide {
+          background-color: $purple-pastel;
+          color: #ffffff;
+          border: none;
+          font-weight: 600;
+          font-size: 0.9rem; 
+          cursor: pointer;
+          box-shadow: 0 4px 6px -1px rgba(167, 139, 250, 0.15);
+          transition: all 0.2s;
+          width: 100%;
+          padding: 0.75rem 2rem;
+          border-radius: 8px;
+
+          &:hover {
+            background-color: $purple-pastel-hover;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 10px -1px rgba(167, 139, 250, 0.25);
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
