@@ -1,7 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap');
 
-// ── ประกาศตัวแปรไว้บนสุด ───────────────────
-$purple-hover: #3e0549;
+// ── ประกาศตัวแปรไว้บนสุด (แก้ไขชื่อให้ระบบรู้จักเรียบร้อยครับ) ───────────────────
+$purple-hover: #3e0549;         // 💜 สีม่วงเข้มสำหรับตัวหนังสือ (ตัวแปรเดิมของคุณ)
+$bg-menu-purple: #f4f0fa;       // สีม่วงอ่อนมากๆ เกือบขาวที่เป็นพื้นหลังของตัวกล่องหลัก
+$passed-parent-bg: #d2c7de;     // สีเทาอมม่วงหม่น (แถบเมนูตัวแม่ที่โดนเมาส์เลื่อนผ่านไปแล้ว)
+$active-child-bg: #e1d2f0;      // สีม่วงพาสเทลไฮไลต์ (แถบเมนูตัวลูกที่เมาส์กำลังชี้อยู่จริงๆ)
+$purple-hover: #3e0549;         // สีม่วงเข้มสำหรับตัวหนังสือ
+$bg-menu-purple: #f4f0fa;       // 💜 สีม่วงพาสเทลอ่อนมากๆ เกือบขาวที่เป็นพื้นหลังกล่องตามรูป
+$active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ตอนเมาส์ชี้ (รุ่นที่ 63)
 
 :host {
   position: sticky;
@@ -81,7 +87,7 @@ $purple-hover: #3e0549;
     padding: 10px 14px;
 
     font-family: 'Sarabun', sans-serif;
-    font-size: 20px; // ตัวอักษรเมนูหลักขนาด 17px ใหญ่เต็มตาตามที่ขอครับ
+    font-size: 20px; 
     font-weight: 500;
     color: #3d3d3d;
     line-height: 1.4;
@@ -119,44 +125,58 @@ $purple-hover: #3e0549;
   display: none;
   position: absolute;
   top: 100%;
-
-  /* ขยับกล่องดร็อปดาวน์ชั้นแรกเยื้องมาทางซ้ายเล็กน้อย (-15px) เพื่อให้สมดุลกับตำแหน่งปุ่มหลัก */
   right: -15px;
   left: auto;
-
   min-width: 260px;
   width: max-content;
   max-width: 90vw;
-
-  background: #fff;
+  
+  background: $bg-menu-purple; // พื้นหลังสีม่วงอ่อนนวลตามรูป
   list-style: none;
-  padding: 8px 0;
+  padding: 8px; 
   margin: 0;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 16px; // โค้งมนตามรูป
+  box-shadow: 0 4px 20px rgba(74, 46, 90, 0.12);
   z-index: 1000;
 
   li {
     position: relative;
+    margin-bottom: 2px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    // เมื่อเมาส์ชี้ตรงๆ ที่ชั้นที่ 1 -> ไฮไลต์เป็นแถบสีม่วงอ่อน โค้งมน
+    &:hover > a {
+      background: $active-child-bg; 
+      color: $purple-hover; // เรียกใช้ตัวแปรเดิมได้สมบูรณ์แล้วครับ
+    }
+  }
+
+  // ── 🎯 เมื่อเมาส์ไหลข้ามไปเล่นที่ชั้นที่ 2 (Submenu) แล้ว 
+  // เปลี่ยนแถบเมนูตัวแม่ (ชั้นที่ 1) ให้กลายเป็น "สีเทาอมม่วงหม่น" ตามรูปภาพ
+  li.dropdown-submenu:hover {
+    &:has(.submenu-side:hover) > a {
+      color: $purple-hover;
+      background: $passed-parent-bg; 
+    }
   }
 
   a {
     display: block;
     padding: 12px 16px;
     text-decoration: none;
-    color: #333;
-    font-size: 20px;
+    color: #333; 
+    font-size: 16px;
     line-height: 1.4;
     white-space: nowrap;
-
-    &:hover {
-      background: #f5f5f5;
-      color: $purple-hover;
-    }
+    border-radius: 12px; // กรอบข้างในโค้งมน
+    transition: color 0.15s, background-color 0.15s;
   }
 }
 
-// ── 🛠️ Dropdown เมนูย่อยชั้นที่ 2 (แก้ไขทิศทาง: บังคับให้เด้งไปฝั่งขวามือ) ───────────────────
+
 .dropdown-submenu {
   &:hover > .submenu-side {
     display: block;
@@ -168,21 +188,38 @@ $purple-hover: #3e0549;
   position: absolute;
   top: 0;
 
-  /* 🔄 [แก้ไขจุดสำคัญ] เปลี่ยนจากฝั่งซ้าย ให้กางกระโดดออกไปทาง "ขวามือ" (Left: 100%) เสมอตามที่คุณต้องการ */
+  /* 🔄 บังคับให้เด้งไปฝั่งขวามือเสมอตามต้องการ */
   left: 100%;
   right: auto;
-  margin-left: 2px;
+  margin-left: 6px; /* เว้นช่องไฟนิดนึงให้เห็นมิติกล่องซ้อนกันสวยๆ แบบในรูป */
   margin-right: 0;
 
   min-width: 220px;
   width: max-content;
-  background: #fff;
+  
+  /* 🎯 [จุดแก้ไข] เปลี่ยนจาก #fff (สีขาว) เป็นสีม่วงอ่อนพาสเทลตามรูปภาพ */
+  background: $bg-menu-purple; 
+  
   list-style: none;
-  padding: 8px 0;
+  padding: 8px; /* เพิ่มพื้นที่ให้กรอบโค้งมนด้านในลอยเด่นขึ้นมา */
   margin-top: 0;
-  border-radius: 8px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 16px; /* โค้งมนมนนุ่มฟูตามรูป */
+  box-shadow: 4px 4px 20px rgba(74, 46, 90, 0.12); /* เงาอมม่วงจางๆ */
   z-index: 1001;
+
+  li {
+    margin-bottom: 2px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    /* 🎯 เมื่อเมาส์ชี้ที่เมนูย่อย (เช่น รุ่นที่ 63) ให้ไฮไลต์เป็นสีม่วงที่ชัดขึ้น */
+    &:hover > a {
+      background: $active-child-bg;
+      color: $purple-hover; 
+    }
+  }
 
   a {
     display: block;
@@ -191,11 +228,8 @@ $purple-hover: #3e0549;
     color: #333;
     white-space: nowrap;
     line-height: 1.4;
-
-    &:hover {
-      background: #f5f5f5;
-      color: $purple-hover;
-    }
+    border-radius: 12px; /* ทำไฮไลต์ด้านในให้โค้งมนรับกับตัวกล่อง */
+    transition: color 0.15s, background-color 0.15s;
   }
 }
 
@@ -256,11 +290,11 @@ $purple-hover: #3e0549;
   }
 }
 
-// ── Responsive (สลับเข้าโหมดมือถือเมื่อขนาดจอต่ำกว่า 768px) ───────────────────
-@media (max-width: 768px) {
 
+// ── Responsive (สลับเข้าโหมดมือถือเมื่อขนาดจอต่ำกว่า 1280px) ───────────────────
+@media (max-width: 1280px) { 
   .school-header {
-    height: 64px !important;
+    height: 64px !important; 
   }
 
   .desktop-nav {
@@ -283,69 +317,100 @@ $purple-hover: #3e0549;
     margin-left: auto;
   }
 
-  // ── 🛠️ [เวอร์ชันสมบูรณ์] ล้างค่าเยื้องที่ทำให้ปุ่มทับกัน + คุมธีมม่วงพาสเทลไล่เฉด ──
+  // ── 🛠️ [เวอร์ชันปรับปรุงตามตัวอย่าง] จัดระยะสมดุลและสวยงามเหมือนดีไซน์ ──
   ::ng-deep {
-    // โครงสร้างพื้นฐานของกล่องแผงเมนูทุกระดับชั้นบน Mobile
+    // ล้างตำแหน่งเอฟเฟกต์ที่ระบบพยายามดันเมนูหลุดเฟรม
+    .cdk-overlay-connected-position-bounding-box {
+      .cdk-overlay-pane {
+        transform: none !important; 
+      }
+    }
+
+    // ── 📐 บังคับขนาดความกว้างให้ได้สัดส่วนเท่ากันทุกชั้นตามภาพตัวอย่าง ──
     .mobile-step-menu-l1,
     .mobile-step-menu-l2,
     .mobile-step-menu-l3,
-    .mat-mdc-menu-panel,
-    .mat-menu-panel {
-      min-width: 240px !important; /* ความกว้างที่ปลอดภัย ตัวอักษรด้านบนและข้อความยาวๆ จะไม่ขาด */
-      max-width: 290px !important;
-      border-radius: 12px !important;
-      box-shadow: 0 8px 24px rgba(62, 5, 73, 0.15) !important;
-      
-      /* 🔄 ล้างค่าตำแหน่งฝืนธรรมชาติออกทั้งหมด ป้องกันเมนูเอ๋อจิ้มไม่ตรงปุ่ม */
-      margin: 0 !important;
-      transform: none !important;
+    .mat-mdc-menu-panel {
+      width: 240px !important;
+      min-width: 240px !important;
+      max-width: 250px !important;
+      border-radius: 16px !important; /* ปรับให้ขอบกล่องมนสวยงามตามรูป */
+      box-shadow: 0 10px 30px rgba(62, 5, 73, 0.12) !important;
     }
 
-    // ── 💜 เลเยอร์ที่ 1: เมนูหลัก (สำหรับผู้เรียน / สำหรับครู...) ──
+    // ── 💜 โทนสีม่วงพาสเทลและระยะซ้อนเหลื่อม (ขยับเยื้องขวาพอดีคำเหมือนตัวอย่าง) ──
+
+    // เลเยอร์ที่ 1: เมนูหลัก (สำหรับผู้เรียน)
     .mat-mdc-menu-panel.mobile-step-menu-l1,
     .mobile-step-menu-l1 .mat-mdc-menu-content {
-      background-color: #f7f3f9 !important; /* สีม่วงพาสเทลอ่อนใส สบายตา */
+      --mat-menu-container-color: #f7f3f9 !important; 
+      background-color: #f7f3f9 !important;
     }
 
-    // ── 💜 เลเยอร์ที่ 2: เมนูย่อยชั้นที่ 2 (ชั้นนายพัน เหล่า ส...) ──
+    // เลเยอร์ที่ 2: ชั้นหลักสูตร (ชั้นนายพัน เหล่า ส.)
     .mat-mdc-menu-panel.mobile-step-menu-l2,
     .mobile-step-menu-l2 .mat-mdc-menu-content {
-      background-color: #eee5f4 !important; /* ปรับเฉดม่วงเข้มขึ้นหนึ่งสเต็ปเพื่อให้เห็นมิติการซ้อนชั้น */
+      --mat-menu-container-color: #ede2f5 !important; 
+      background-color: #ede2f5 !important;
+      margin-left: 20px !important;  /* เยื้องไปทางขวาพอดีขอบ */
+      margin-top: 8px !important;
+      position: relative !important;
     }
 
-    // ── 💜 เลเยอร์ที่ 3: เมนูย่อยชั้นที่ 3 (รุ่นที่ 63...) ──
+    // เลเยอร์ที่ 3: ชั้นรุ่น (รุ่นที่ 63) -> ปรับให้กว้างเท่าเพื่อน แต่จัดซ้อนเหลื่อมลงมาสวย ๆ
     .mat-mdc-menu-panel.mobile-step-menu-l3,
     .mobile-step-menu-l3 .mat-mdc-menu-content {
-      background-color: #e4d6ee !important; /* สีม่วงพาสเทลระดับสุดท้าย */
+      --mat-menu-container-color: #e2d1f0 !important; 
+      background-color: #e2d1f0 !important;
+      margin-left: 35px !important;  /* ขยับเหลื่อมขวาตามสเต็ปบันทึก */
+      margin-top: 10px !important;   /* ขยับลงมาให้สอดรับกับปุ่มที่กด */
+      position: relative !important;
     }
 
-    // ตกแต่งรายละเอียดปุ่มและตัวอักษรด้านในให้อ่านง่าย คลีนๆ
+    // ── 📝 จัดสไตล์ปุ่ม ข้อความ และไอคอนด้านใน ──
     .mobile-step-menu-l1 .mat-mdc-menu-item,
     .mobile-step-menu-l2 .mat-mdc-menu-item,
     .mobile-step-menu-l3 .mat-mdc-menu-item {
-      font-size: 14px !important;
+      font-size: 15px !important;
       font-weight: 500 !important;
-      color: #2c212e !important; /* ตัวหนังสือสีเข้มอมม่วงอ่านง่าย */
-      padding: 12px 16px !important;
-      white-space: nowrap !important; /* ป้องกันตัวหนังสือหักตกบรรทัด */
+      color: #2c212e !important; 
+      padding: 14px 18px !important; /* จัดพื้นที่ให้กดง่ายในมือถือ */
+      white-space: nowrap !important;
       border-bottom: 1px solid rgba(62, 5, 73, 0.04) !important;
 
       &:last-child {
         border-bottom: none !important;
       }
 
-      // ไอคอนลูกศรชี้ขวา (Chevron) ข้างในเมนู
       .mat-mdc-menu-submenu-icon, .mat-menu-ripple {
         color: #6a5370 !important;
       }
 
-      // ไฮไลท์เมื่อเอานิ้วไปแตะเลือกเมนู
       &:hover, &:focus, &.cdk-program-focused {
-        background-color: #dbcaeb !important;
+        background-color: #d3beeb !important;
+      }
+    }
+
+    // ✨ จัดรูปแบบปุ่มในชั้น "รุ่นที่ 63" ให้ดูสมส่วน ไม่โล่งโจ้งเกินไป
+   .mobile-step-menu-l3 .mat-mdc-menu-item {
+      font-size: 15px !important;
+      font-weight: 500 !important;
+      color: #2c212e !important; 
+      white-space: nowrap !important;
+      justify-content: flex-start !important; 
+      
+      // ลดระยะด้านในของปุ่มลง ให้กล่องรุ่นหดแคบแนวตั้งลงตามต้องการ
+      height: 36px !important;       /* บังคับความสูงคงที่ให้ดูกะทัดรัด */
+      min-height: 36px !important;
+      padding: 0px 10px !important;   /* ปล่อยพื้นที่แนวตั้งให้แฟบลง */
+      
+      &:hover, &:focus, &.cdk-program-focused {
+        background-color: #d3beeb !important;
       }
     }
   }
 }
+
 
 // ── Chevron Banner ────────────────────────────────────────
 .chevron-banner {
