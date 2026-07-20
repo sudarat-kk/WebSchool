@@ -1,0 +1,209 @@
+// --- Variables (ชุดสีธีมม่วงพาสเทล) ---
+$purple-light-bg: #f3ebf9;    // สีม่วงอ่อนสำหรับแถบด้านบน
+$purple-primary: #8c6eb5;     // สีม่วงหลักของธีม
+$purple-hover: #b39ddb;       // สีม่วงสว่างขึ้นตอนชี้
+$purple-border: #e2d7ee;      // เพิ่มเส้นขอบสีม่วงพาสเทลจางๆ สำหรับช่องกรอกข้อมูล
+$input-bg: #ffffff;           // สีพื้นหลัง input (เปลี่ยนเป็นสีขาวเรียบร้อย)
+$text-dark: #333333;
+$btn-green: #a2e8bb;          // สีเขียวของปุ่ม
+$btn-green-hover: #8cd6a7;
+
+// --- Backdrop พื้นหลังมืดโปร่งแสงด้านหลัง Popup ---
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  font-family: 'Sarabun', 'Kanit', sans-serif;
+}
+
+// --- Container โครงสร้างกล่อง Popup ---
+.modal-container {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 600px; /* ขนาดปานกลางเพื่อให้พอดีและสมดุลกับทั้งสองฟอร์ม */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+// --- Header แถบสีม่วงอ่อนด้านบน ---
+.modal-header-bar {
+  background-color: $purple-light-bg;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+}
+
+// --- Area ส่วนเนื้อหาภายใน Popup ---
+.modal-content {
+  padding: 24px 32px 32px 32px;
+  position: relative;
+
+  // ปุ่มปิดตัว X
+  .btn-close {
+    position: absolute;
+    top: -40px; /* ขยับขึ้นไปอยู่ระดับเดียวกับแถบโลโก้ด้านบน */
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #555;
+    
+    
+    &:hover { color: #000; }
+  }
+}
+
+// --- ส่วนเลือกหัวข้อ (Tabs) สำหรับคลิกสลับฟอร์ม ---
+.modal-tabs {
+  display: flex;
+  gap: 15px;
+  border-bottom: 2px solid #eeeeee;
+  margin-bottom: 24px;
+
+  button {
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #888888;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $purple-primary;
+    }
+
+    // สไตล์ของ Tab ที่กําลังเปิดใช้งาน (Active)
+    &.active {
+      color: $purple-primary;
+      font-weight: bold;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: $purple-primary;
+        border-radius: 2px;
+      }
+    }
+  }
+}
+
+// --- Form Elements (ส่วนประกอบในฟอร์ม) ---
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  // จัดการแบ่งคอลัมน์ซ้าย-ขวา
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 15px;
+      font-weight: 600;
+      color: $text-dark;
+    }
+
+    // สไตล์ช่องกรอกข้อมูลโทนขาว-ม่วงพาสเทล
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid $purple-border; /* ใส่เส้นขอบสีม่วงพาสเทลจางๆ เพื่อเพิ่มมิติ */
+      border-radius: 6px;
+      background-color: $input-bg;      /* ใช้สีขาวตามที่คุณกำหนดไว้ */
+      box-sizing: border-box;
+      outline: none;
+      transition: all 0.2s ease;
+
+      // เมื่อผู้ใช้กดคลิกที่ช่องกรอก
+      &:focus {
+        border-color: $purple-primary;
+        box-shadow: 0 0 0 3px rgba($purple-primary, 0.15); /* เอฟเฟกต์แสงเรืองๆ รอบช่อง */
+      }
+    }
+
+    // ฟิลด์หน่วยกิต (ความกว้างสั้นลง)
+    &.short-input {
+      max-width: 150px;
+    }
+  }
+}
+
+// ซ่อนลูกศรเดิมของตัวเลือกแล้วใส่ลูกศร Custom
+.select-wrapper {
+  position: relative;
+  
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding-right: 30px !important;
+  }
+  
+  &::after {
+    content: "▼";
+    font-size: 10px;
+    color: #666;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+}
+
+// --- Buttons (ส่วนของปุ่มกดยืนยัน) ---
+.form-actions {
+  display: flex;
+  margin-top: 15px;
+
+  &.right { justify-content: flex-end; } /* ชิดขวาสำหรับหน้าเพิ่มรายวิชา */
+  &.center { justify-content: center; }  /* จัดกึ่งกลางสำหรับหน้าเพิ่มหลักสูตร */
+
+  .btn-submit {
+    background-color: $btn-green;
+    color: #1a4d2e;
+    border: none;
+    padding: 8px 28px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover { background-color: $btn-green-hover; }
+  }
+
+  .btn-submit-wide {
+    @extend .btn-submit;
+    padding: 10px 45px;
+  }
+}

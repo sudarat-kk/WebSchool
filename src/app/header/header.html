@@ -7,7 +7,7 @@
   <nav class="desktop-nav">
     <ul class="menu-list">
       <li class="dropdown" *ngFor="let menu of menuData">
-        <a mat-button [class.active-link]="isActive(menu.path)" style="cursor: default;">
+        <a mat-button [class.active-link]="isActive(menu.path)" style="cursor: default">
           {{ menu.title }} ▾
         </a>
 
@@ -68,7 +68,8 @@
   </ng-container>
 </mat-menu>
 
-<mat-menu #courseSubMenu="matMenu">
+<!-- สเต็ปที่ 2: เมนูย่อยชั้นที่ 2 เช่น ชั้นนายพัน เหล่า ส. (เพิ่ม class="mobile-step-menu-l2") -->
+<mat-menu #courseSubMenu="matMenu" class="mobile-step-menu-l2">
   <ng-template matMenuContent let-submenus="submenus" let-path="path">
     <!-- ย้ายคอมเมนต์มาไว้ข้างนอกแบบนี้แทนครับ -->
     <button
@@ -99,7 +100,8 @@
   </ng-template>
 </mat-menu>
 
-<mat-menu #simpleMenu="matMenu">
+<!-- สำหรับ Simple Menu ทั่วไปที่ไม่มีชั้นย่อย (เพิ่ม class="mobile-step-menu-l2") -->
+<mat-menu #simpleMenu="matMenu" class="mobile-step-menu-l2">
   <ng-template matMenuContent let-simpleItems="simpleItems" let-path="path">
     <a mat-menu-item *ngFor="let item of simpleItems" [routerLink]="path">
       {{ item }}

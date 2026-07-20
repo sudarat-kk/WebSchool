@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, inject, ChangeDetectorRef } from '@angular/core';
+
+// Angular Material
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
+
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CourseService } from '../services/course.service';
@@ -12,16 +15,16 @@ import { Router } from '@angular/router';
   selector: 'app-header',
   standalone: true,
   imports: [
+    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
     MatMenuModule,
-    CommonModule,
     RouterLink,
     RouterLinkActive,
   ],
   templateUrl: './header.html',
-  styleUrl: './header.scss',
+  styleUrls: ['./header.scss'],
 })
 export class Header implements OnInit {
   // สร้าง Array มารอรับข้อมูลจาก Backend
