@@ -6,6 +6,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CourseService } from '../services/course.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -28,14 +29,17 @@ export class Header implements OnInit {
   menuData: any[] = [
     {
       title: 'สำหรับผู้เรียน',
+      path: '/student',
       submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
       title: 'สำหรับครู-อาจารย์',
+      path: '/teacher',
       submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
       title: 'สำหรับคณะกับกำหลักสูตร',
+      path: '/admin',
       submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
@@ -70,7 +74,10 @@ export class Header implements OnInit {
     },
   ];
 
-  constructor(private courseService: CourseService) {}
+  constructor(
+    private courseService: CourseService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.fetchCourses();
@@ -107,5 +114,26 @@ export class Header implements OnInit {
         console.error('API Error:', error);
       },
     });
+  }
+
+  goToPage(path: string, courseName: string, batch: any): void {
+    if (!path) {
+      console.error('ไม่พบ Path ปลายทาง เช็คว่าใส่ path ใน menuData หรือยัง!');
+      return;
+    }
+
+    // สั่งเปลี่ยนหน้าและแนบ Query Params ไปด้วย
+    this.router.navigate([path], {
+      queryParams: {
+        batchId: batch.batch_id,
+        title: courseName + ' ' + batch.batch_name,
+      },
+    });
+  }
+
+  // ใช้เช็คว่า Menu นี้กำลัง Active อยู่หรือไม่ โดยเทียบจาก URL
+  isActive(path: string): boolean {
+    if (!path) return false;
+    return this.router.url.includes(path);
   }
 }

@@ -1,0 +1,106 @@
+<div class="score-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <button mat-icon-button class="back-button" routerLink="/">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <h1 class="page-title">ผลการเรียนออนไลน์</h1>
+    <button class="logout-btn" (click)="onLogout()">
+      <mat-icon>logout</mat-icon>
+      ออกจากระบบ
+    </button>
+  </div>
+
+  <!-- Student Info Card -->
+  <div class="score-content" *ngIf="studentData">
+    <div class="student-info-card">
+      <div class="avatar-circle">
+        <mat-icon>account_circle</mat-icon>
+      </div>
+      <div class="student-details">
+        <p class="student-name">{{ studentData.rank_name }} {{ studentData.first_name }} {{ studentData.last_name }}</p>
+        <p class="student-meta">รุ่นที่ {{ studentData.batch_id }}</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>กำลังโหลดข้อมูลคะแนน...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-card" *ngIf="errorMessage && !isLoading">
+      <mat-icon>error_outline</mat-icon>
+      <div class="error-body">
+        <p>{{ errorMessage }}</p>
+        <button class="retry-btn" (click)="loadScores(studentData!.student_id, studentData!.batch_id)">
+          <mat-icon>refresh</mat-icon> ลองใหม่
+        </button>
+      </div>
+    </div>
+
+    <!-- Score Content -->
+    <div *ngIf="!isLoading && !errorMessage">
+
+      <!-- Group Summary Cards -->
+      <div class="section-title">สรุปคะแนนรวมตามกลุ่มวิชา</div>
+      <div class="summary-grid">
+        <div class="summary-card" *ngFor="let summary of groupSummaries">
+          <div class="summary-header">
+            <span class="summary-group-name">{{ summary.group_name }}</span>
+            <span class="summary-credits">{{ summary.credits }} หน่วยกิต</span>
+          </div>
+          <div class="progress-row">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill"
+                [style.width.%]="getPercentage(summary)"
+                [class.high]="getPercentage(summary) >= 75"
+                [class.mid]="getPercentage(summary) >= 50 && getPercentage(summary) < 75"
+                [class.low]="getPercentage(summary) < 50">
+              </div>
+            </div>
+            <span class="percentage-label">{{ summary.group_percentage }}%</span>
+          </div>
+          <div class="score-detail-text">
+            {{ summary.group_raw_score }} / {{ summary.group_max_score }} คะแนน
+          </div>
+        </div>
+      </div>
+
+      <!-- Subject Detail Tables by Group -->
+      <div class="section-title" style="margin-top: 32px;">รายละเอียดคะแนนรายวิชา</div>
+      <div class="group-table-block" *ngFor="let groupName of groupNames">
+        <div class="group-table-header">{{ groupName }}</div>
+        <table class="score-table">
+          <thead>
+            <tr>
+              <th class="col-subject">รายวิชา</th>
+              <th class="col-score">คะแนนที่ได้</th>
+              <th class="col-max">คะแนนเต็ม</th>
+              <th class="col-pct">เปอร์เซ็นต์</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let subject of groupedSubjects[groupName]">
+              <td class="col-subject">{{ subject.subject_name }}</td>
+              <td class="col-score text-center">{{ subject.raw_score }}</td>
+              <td class="col-max text-center">{{ subject.max_score }}</td>
+              <td class="col-pct text-center">
+                <span class="pct-badge"
+                  [class.high]="(+subject.raw_score / +subject.max_score * 100) >= 75"
+                  [class.mid]="(+subject.raw_score / +subject.max_score * 100) >= 50 && (+subject.raw_score / +subject.max_score * 100) < 75"
+                  [class.low]="(+subject.raw_score / +subject.max_score * 100) < 50">
+                  {{ (+subject.max_score > 0 ? (+subject.raw_score / +subject.max_score * 100).toFixed(1) : '0.0') }}%
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+</div>

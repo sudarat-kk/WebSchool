@@ -1,0 +1,76 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+// ==========================================
+// 1. Interfaces สำหรับ Authentication (Login)
+// ==========================================
+export interface StudentData {
+  student_id: number;
+  batch_id: number;
+  first_name: string;
+  last_name: string;
+  rank_name: string;
+}
+
+export interface StudentLoginRequest {
+  batch_id: number;
+  student_code: string;
+  password: string;
+}
+
+export interface StudentLoginResponse {
+  success: boolean;
+  message: string;
+  token?: string;
+  studentData?: StudentData;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+
+  constructor(private http: HttpClient) { }
+
+  // ฟังก์ชันยิง API Login
+  studentLogin(payload: StudentLoginRequest): Observable<StudentLoginResponse> {
+    return this.http.post<StudentLoginResponse>(
+      `${environment.apiUrl}/student-login`,
+      payload
+    );
+  }
+
+  // บันทึก Token ลง localStorage
+  saveToken(token: string): void {
+    localStorage.setItem('student_token', token);
+  }
+
+  // ดึง Token จาก localStorage
+  getToken(): string | null {
+    return localStorage.getItem('student_token');
+  }
+
+  // บันทึกข้อมูลนักเรียนลง localStorage
+  saveStudentData(data: StudentData): void {
+    localStorage.setItem('student_data', JSON.stringify(data));
+  }
+
+  // ดึงข้อมูลนักเรียนจาก localStorage
+  getStudentData(): StudentData | null {
+    const data = localStorage.getItem('student_data');
+    return data ? JSON.parse(data) : null;
+  }
+
+  // ออกจากระบบ
+  logout(): void {
+    localStorage.removeItem('student_token');
+    localStorage.removeItem('student_data');
+  }
+
+  // ตรวจสอบว่า Login อยู่หรือไม่
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+}
