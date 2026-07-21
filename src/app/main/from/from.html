@@ -1,1 +1,140 @@
-<p>from works!</p>
+<div class="admin-page">
+  
+  <!-- ⚡ 1. แถบ Header สีม่วงพาสเทลพร้อมเส้นแบ่งขึงเต็มขอบจอ 100% -->
+  <div class="admin-header-title-container">
+    <div class="header-content-wrapper">
+      <button mat-icon-button routerLink="/admin" class="btn-header-back" title="ย้อนกลับไปหน้าผู้ดูแลระบบ">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <h2 class="main-content-title">จัดการแบบฟอร์ม</h2>
+    </div>
+  </div>
+
+  <!-- 2. กล่องควบคุมเนื้อหาหลักด้านล่าง (900px) -->
+  <div class="content-container">
+    
+    <!-- ส่วนที่ 1: หน้าจัดการ/สร้างแบบฟอร์ม -->
+    <div class="management-section data-entry-section">
+      <p class="instruction-text">หน้านี้เป็นส่วนที่ใช้สำหรับผู้ดูแลระบบในการจัดการลิงก์แบบประเมินต่างๆ</p>
+      
+      <h3 class="mode-indicator" [class.edit-mode]="isEditMode">
+        {{ isEditMode ? '📝 กำลังอยู่ในโหมดแก้ไขข้อมูล' : '✨ สร้างแบบฟอร์มใหม่' }}
+      </h3>
+
+      <!-- รวมกลุ่มหลักสูตรและรุ่นนักเรียนในแถวเดียวกัน -->
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label class="input-label">ผูกกับหลักสูตร</label>
+          <select class="custom-input" [(ngModel)]="formData.course">
+            <option value="" disabled selected>เลือกหลักสูตร</option>
+            <option value="course1">หลักสูตร A</option>
+            <option value="course2">หลักสูตร B</option>
+          </select>
+        </div>
+
+        <div class="form-group flex-1">
+          <label class="input-label">รุ่นนักเรียน (ที่เข้าข่ายการประเมินนี้)</label>
+          <input type="text" class="custom-input" placeholder="เช่น รุ่น 67" [(ngModel)]="formData.generation"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="input-label">ประเภทแบบฟอร์ม / ลิงก์ประเมิน</label>
+        <select class="custom-input" [(ngModel)]="formData.formType">
+          <option value="" disabled selected>เลือกประเภท</option>
+          <option value="eval1">แบบประเมินความพึงพอใจ</option>
+        </select>
+      </div>
+
+      <!-- ปุ่มกดสร้างแบบฟอร์มเปิดแท็บใหม่ของ Google Forms -->
+      <div class="form-group center-button">
+        <a mat-stroked-button href="https://forms.new" target="_blank" class="btn-create-form">
+          <mat-icon>add_circle_outline</mat-icon>
+          กดสร้างแบบฟอร์ม
+        </a>
+      </div>
+
+      <div class="form-group">
+        <label class="input-label">วางลิงก์ <b>GOOGLE FORM (URL)</b></label>
+        <input type="text" class="custom-input" placeholder="https://docs.google.com/forms/..." [(ngModel)]="formData.googleFormUrl"/>
+      </div>
+
+      <div class="form-group">
+        <label class="input-label">ชื่อฟอร์มประเมิน</label>
+        <input type="text" class="custom-input" placeholder="ชื่อของแบบประเมิน" [(ngModel)]="formData.formName"/>
+      </div>
+
+      <div class="form-group">
+        <label class="input-label">เกณฑ์ชี้แจงที่จะประเมิน</label>
+        <textarea class="custom-input" placeholder="รายละเอียดเกณฑ์การประเมิน" rows="3" [(ngModel)]="formData.criteria"></textarea>
+      </div>
+
+      <!-- ส่วนปุ่มกึ่งกลางหน้าจอ -->
+      <div class="final-action">
+        <!-- โหมดสร้างปกติ (นำปุ่มย้อนกลับออกแล้ว) -->
+        <div *ngIf="!isEditMode" class="action-buttons-group">
+          <button mat-raised-button class="btn-submit-form" (click)="onCreateForm()">
+            สร้างและแชร์แบบฟอร์มประเมินนี้
+          </button>
+        </div>
+        
+        <!-- โหมดเมื่อคลิกแก้ไขข้อมูลเดิม -->
+        <div *ngIf="isEditMode" class="edit-buttons-group">
+          <button mat-raised-button class="btn-submit-form btn-update" (click)="onUpdateForm()">
+            บันทึกการแก้ไขแบบฟอร์ม
+          </button>
+          <button mat-stroked-button class="btn-cancel" (click)="resetForm()">
+            ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ส่วนที่ 2: รายการแบบฟอร์มที่มีในระบบ -->
+    <div class="management-section list-section">
+      <h3 class="section-title">รายการแบบฟอร์มที่มี</h3>
+      
+      <div class="search-filter-bar">
+        <div class="search-input-wrapper">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input type="text" class="custom-input rounded-search" placeholder="ค้นหาชื่อแบบฟอร์ม ลิงก์"/>
+        </div>
+        
+        <select class="custom-input filter-dropdown">
+          <option value="all">แสดงทุกรุ่น</option>
+        </select>
+      </div>
+
+      <div class="form-list-table">
+        <div class="table-header">
+          <div class="col-gen">รุ่น</div>
+          <div class="col-details">รายละเอียดลิงก์ประเมินออนไลน์</div>
+          <div class="col-actions">การจัดการ</div>
+        </div>
+        
+        <div class="table-row">
+          <div class="col-gen row-gen">รุ่น 67</div>
+          <div class="col-details row-details">
+            <span class="form-name">แบบประเมินความพึงพอใจ - หลักสูตร A (รุ่น 67)</span>
+            <div class="status-toggle">
+              <mat-slide-toggle color="primary" [checked]="true">เปิดใช้งาน</mat-slide-toggle>
+            </div>
+          </div>
+          <div class="col-actions row-actions">
+            <button mat-icon-button class="btn-copy" title="คัดลอกลิงก์">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-icon-button class="btn-view" title="แก้ไขข้อมูล" 
+                    (click)="onEditAction({id: '101', name: 'แบบประเมินความพึงพอใจ - หลักสูตร A', gen: 'รุ่น 67', url: 'https://docs.google.com/forms/d/example', criteria: 'ประเมินความพึงพอใจทั่วไป'})">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button class="btn-delete" title="ลบแบบฟอร์ม">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
