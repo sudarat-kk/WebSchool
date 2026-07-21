@@ -14,18 +14,33 @@
     <div class="management-section">
       <h3 class="section-title">เมนูการจัดการ</h3>
       
+      <!-- การ์ดที่ 1: แบบกรอกคะแนนนักเรียน (ของเดิม) -->
       <div class="action-card">
         <div class="card-details">
           <h4 class="card-title">แบบกรอกคะแนนนักเรียน</h4>
           <p class="card-subtitle">สำหรับเข้าสู่หน้าบันทึกและจัดการคะแนนในระบบ</p>
         </div>
         
-        <!-- ใช้ routerLink ชี้ไปที่ /admin/scoremanagement ตามที่เซ็ตไว้ -->
-        <button mat-raised-button color="primary" routerLink="/admin/scoremanagement" class="btn-navigate">
+        <button mat-raised-button color="primary" routerLink="/admin/ScoreList" class="btn-navigate">
           <mat-icon class="btn-icon">edit</mat-icon>
           ไปยังหน้ากรอกคะแนน
         </button>
       </div>
+
+      <!--  บาร์การ์ดที่ 2: เพิ่มการ์ดสำหรับไปยังหน้าแบบฟอร์ม (ธีมม่วงพาสเทล) -->
+      <div class="action-card form-management-card">
+        <div class="card-details">
+          <h4 class="card-title">จัดการและสร้างแบบฟอร์มประเมิน</h4>
+          <p class="card-subtitle">สร้าง ผูกหลักสูตร วางลิงก์ Google Form และเปิด-ปิดใช้งานแบบประเมิน</p>
+        </div>
+        
+        <!-- ใช้ routerLink ชี้ไปยัง Path หน้าฟอร์มที่คุณกำหนดไว้ใน Routing -->
+        <button mat-raised-button color="primary" routerLink="/admin/form" class="btn-navigate btn-purple">
+          <mat-icon class="btn-icon">assignment</mat-icon>
+          ไปยังหน้าจัดการแบบฟอร์ม
+        </button>
+      </div>
+
     </div>
 
   </div>

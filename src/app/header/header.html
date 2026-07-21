@@ -1,10 +1,12 @@
 <mat-toolbar class="school-header">
+  <!-- 1. ส่วนโลโก้ (แสดงผลทุกหน้า ทั้งนักเรียนและแอดมิน) -->
   <div class="logo-area" routerLink="/" style="cursor: pointer">
     <img src="assets/image/logo.png" alt="School Logo" class="logo-img" />
     <span class="school-title">Evaluation Signalschool</span>
   </div>
 
-  <nav class="desktop-nav">
+  <!-- 2. เมนูสำหรับคอมพิวเตอร์ (ซ่อนเมื่อเป็นแอดมิน ด้วย *ngIf="!isAdmin") -->
+  <nav class="desktop-nav" *ngIf="!isAdmin">
     <ul class="menu-list">
       <li class="dropdown" *ngFor="let menu of menuData">
         <a mat-button [routerLink]="menu.path" routerLinkActive="active-link">
@@ -14,13 +16,12 @@
         <ul class="dropdown-menu" *ngIf="menu.submenus">
           <li class="dropdown-submenu" *ngFor="let sub of menu.submenus">
             <a href="javascript:void(0)">{{ sub.course_name }} <span class="arrow">❯</span></a>
-            <!-- โครงสร้าง class เดิม แต่ปรับตัวแปรลูปให้ใช้ batches ของ API -->
 
             <ul class="submenu-side">
               <li *ngFor="let batch of sub.batches">
-                <a [routerLink]="menu.path" [queryParams]="{ batchId: batch.batch_id }">{{
-                  batch.batch_name
-                  }}</a>
+                <a [routerLink]="menu.path" [queryParams]="{ batchId: batch.batch_id }">
+                  {{ batch.batch_name }}
+                </a>
               </li>
             </ul>
           </li>
@@ -35,21 +36,19 @@
     </ul>
   </nav>
 
-  <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="mobileMainMenu">
+  <!-- 3. ปุ่มเมนูบนมือถือ (ซ่อนเมื่อเป็นแอดมิน ด้วย *ngIf="!isAdmin") -->
+  <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="mobileMainMenu" *ngIf="!isAdmin">
     <mat-icon>menu</mat-icon>
   </button>
 </mat-toolbar>
 
-
-<!-- ส่วน Mobile Menu -->
+<!-- ส่วนที่เหลือปล่อยไว้ตามเดิมได้เลยครับ... -->
 <mat-menu #mobileMainMenu="matMenu">
-
   <ng-container *ngFor="let menu of menuData">
     <button mat-menu-item *ngIf="menu.submenus" [matMenuTriggerFor]="courseSubMenu"
       [matMenuTriggerData]="{ submenus: menu.submenus, path: menu.path }">
       {{ menu.title }}
     </button>
-
     <button mat-menu-item *ngIf="menu.simpleItems" [matMenuTriggerFor]="simpleMenu"
       [matMenuTriggerData]="{ simpleItems: menu.simpleItems, path: menu.path }">
       {{ menu.title }}
@@ -57,7 +56,6 @@
   </ng-container>
 </mat-menu>
 
-<!-- สเต็ปที่ 2: เมนูย่อยชั้นที่ 2 เช่น ชั้นนายพัน เหล่า ส. (เพิ่ม class="mobile-step-menu-l2") -->
 <mat-menu #courseSubMenu="matMenu" class="mobile-step-menu-l2">
   <ng-template matMenuContent let-submenus="submenus" let-path="path">
     <button mat-menu-item *ngFor="let sub of submenus" [matMenuTriggerFor]="genSubMenu"
@@ -68,7 +66,6 @@
 </mat-menu>
 
 <mat-menu #genSubMenu="matMenu">
-  <!-- รับค่า batches มาวนลูปแสดงผลใน Mobile Menu -->
   <ng-template matMenuContent let-batches="batches" let-path="path">
     <a mat-menu-item *ngFor="let batch of batches" [routerLink]="path" [queryParams]="{ batchId: batch.batch_id }">
       {{ batch.batch_name }}
@@ -76,7 +73,6 @@
   </ng-template>
 </mat-menu>
 
-<!-- สำหรับ Simple Menu ทั่วไปที่ไม่มีชั้นย่อย (เพิ่ม class="mobile-step-menu-l2") -->
 <mat-menu #simpleMenu="matMenu" class="mobile-step-menu-l2">
   <ng-template matMenuContent let-simpleItems="simpleItems" let-path="path">
     <a mat-menu-item *ngFor="let item of simpleItems" [routerLink]="path">

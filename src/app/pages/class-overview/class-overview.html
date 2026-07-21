@@ -1,0 +1,103 @@
+<div class="class-overview-page">
+  <!-- 🟪 หัวข้อบนสุด: ภาพรวมผลการเรียนทั้งรุ่น -->
+  <div class="page-header">
+    <button mat-icon-button class="back-button" routerLink="/admin">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <h1 class="page-title">ภาพรวมผลการเรียนทั้งรุ่น</h1>
+    <div class="header-spacer"></div>
+  </div>
+
+  <div class="page-wrapper">
+    
+    <!-- 🔍 เมนู: สรุปผลการเรียนรวม (เกรดเฉลี่ย) สามารถเลือกเฉพาะรุ่นได้ -->
+    <div class="center-content">
+      <div class="course-container">
+        <div class="menu-sub-title">
+          <mat-icon>analytics</mat-icon> เมนู: สรุปผลการเรียนรวม (เกรดเฉลี่ย)
+        </div>
+        
+        <!-- ส่วนเลือกรุ่นสำหรับฟิลเตอร์ข้อมูล -->
+        <div class="form-group">
+          <label class="form-label">เลือกรุ่น</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="selectedBatch" (change)="onBatchChange()">
+              <option value="">กรุณาเลือกรุ่น</option>
+              @for (batch of batches; track batch.id) {
+                <option [value]="batch.id">{{ batch.name }}</option>
+              }
+            </select>
+            <span class="arrow-icon">▼</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⚙️ แถบปุ่ม Action หลักบนตาราง -->
+    <div class="table-actions-bar">
+      <div></div>
+      <div class="action-buttons-inline">
+        <button class="btn-inline btn-outline" (click)="reProcess()">
+          <mat-icon>refresh</mat-icon> ประมวลผลใหม่
+        </button>
+        <button class="btn-inline btn-excel" (click)="exportToExcel()">
+          <mat-icon>description</mat-icon> ส่งออก Excel
+        </button>
+        <button class="btn-inline btn-print" (click)="printReport()">
+          <mat-icon>print</mat-icon> พิมพ์รายงาน
+        </button>
+      </div>
+    </div>
+
+    <!-- 📊 ตารางคะแนนสรุปผลภาพรวมรายรุ่น -->
+    <div class="table-responsive">
+      <table class="score-table">
+        <thead class="highlight-top-bar">
+          <tr>
+            <th>ลำดับ</th>
+            <th>รหัสประจำตัว</th>
+            <th>ยศ ชื่อ-นามสกุล</th>
+            <th>วิชาทหารสื่อสาร (2 นก.)</th>
+            <th>3 วิชารวมกัน (2 นก.)</th>
+            <th>วิชาวิทยุ (1 นก.)</th>
+            <th>เกรดเฉลี่ยรวม (GPA)</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (student of students; track student.id; let i = $index) {
+            <tr>
+              <td>{{ i + 1 }}</td>
+              <td>{{ student.code }}</td>
+              <td class="text-left">{{ student.rank }} {{ student.name }}</td>
+              
+              <!-- 💡 อัปเดตการแสดงผลรายวิชาเป็นแบบโครงสร้าง Object รองรับวิชาเยอะๆ -->
+              <td class="text-left font-sm">
+                <div class="subject-tags-container">
+                  @for (sub of student.subjects; track sub.name) {
+                    <span class="badge-subject">
+                      {{ sub.name }} <strong class="text-purple-dark">({{ sub.credit }} นก.)</strong>
+                    </span>
+                  }
+                </div>
+              </td>
+              
+              <td>{{ student.totalCredit || '0' }}</td>
+              <td class="text-bold text-purple-dark">{{ student.gpa || '0.00' }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="student.isPassed ? 'pass' : 'fail'">
+                  {{ student.isPassed ? 'ผ่านเกณฑ์' : 'ไม่ผ่านเกณฑ์' }}
+                </span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-row">กรุณาเลือกรุ่นเพื่อแสดงข้อมูลสรุปผลการเรียนรวมของรุ่นชั้น</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </div> 
+</div>
