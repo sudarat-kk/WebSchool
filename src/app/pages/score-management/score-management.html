@@ -164,11 +164,26 @@
               <button class="btn-cancel" (click)="onCancel()" [disabled]="isSaving || isLoading">
                 <mat-icon>close</mat-icon> ยกเลิก
               </button>
-              <button class="btn-save" (click)="onSaveScores()" [disabled]="isSaving || isLoading">
-                <mat-icon>{{ isSaving ? 'hourglass_empty' : 'save' }}</mat-icon>
-                {{ isSaving ? 'กำลังบันทึก...' : 'บันทึกคะแนนทั้งหมด' }}
+              <button class="btn-save" (click)="onSaveScores()" [disabled]="isSaving || isLoading || isSaved">
+                <mat-icon>{{ isSaving ? 'hourglass_empty' : (isSaved ? 'check_circle' : 'save') }}</mat-icon>
+                {{ isSaving ? 'กำลังบันทึก...' : (isSaved ? 'บันทึกแล้ว' : 'บันทึกคะแนนทั้งหมด') }}
+              </button>
+              <button
+                *ngIf="isSaved && hasNextSubject"
+                class="btn-next-subject"
+                (click)="goToNextSubject()"
+              >
+                <mat-icon>arrow_forward</mat-icon>
+                วิชาถัดไป
               </button>
             </div>
+          </div>
+
+          <!-- แบนเนอร์บันทึกสำเร็จ -->
+          <div class="save-success-msg" *ngIf="isSaved">
+            <mat-icon>check_circle</mat-icon>
+            บันทึกคะแนน {{ filledCount }} คน เรียบร้อยแล้ว!
+            <span *ngIf="!hasNextSubject" class="all-done-hint"> — ครบทุกวิชาแล้ว 🎉</span>
           </div>
 
           <div class="save-error-msg" *ngIf="saveError">

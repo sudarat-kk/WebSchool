@@ -340,6 +340,26 @@ $pink-btn-hover: #960055;
       transition: background-color 0.2s;
 
       &:hover { background-color: $pink-btn-hover; }
+      &:disabled { opacity: 0.6; cursor: default; }
+      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    }
+
+    .btn-next-subject {
+      background-color: #2e7d32;
+      color: $white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      animation: slideIn 0.3s ease;
+      transition: background-color 0.2s;
+
+      &:hover { background-color: #1b5e20; }
       mat-icon { font-size: 18px; width: 18px; height: 18px; }
     }
   }
@@ -352,6 +372,31 @@ $pink-btn-hover: #960055;
   gap: 8px;
   padding: 16px 24px;
   font-size: 0.9rem;
+}
+
+.save-success-msg {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-top: 1px solid #c8e6c9;
+  animation: slideIn 0.3s ease;
+
+  mat-icon { color: #2e7d32; }
+
+  .all-done-hint {
+    color: #1b5e20;
+    font-style: italic;
+  }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 // สถานะว่าง

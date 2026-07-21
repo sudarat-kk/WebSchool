@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,9 +12,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 
 import { DropdownService } from '../../services/dropdown.service';
-import { ScoreService, SingleScoreRequest } from '../../services/score.service';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { ScoreService } from '../../services/score.service';
+import { CourseService, CourseGroup } from '../../services/course.service';
 
 interface Course {
   id: number;
@@ -59,6 +58,7 @@ interface StudentScore {
 })
 export class ScoreManagement implements OnInit {
   courses: Course[] = [];
+  courseGroups: CourseGroup[] = []; // เก็บข้อมูลหลักสูตรดิบจาก API พร้อม batches
   batches: Batch[] = [];
   subjects: Subject[] = [];
 
@@ -75,12 +75,14 @@ export class ScoreManagement implements OnInit {
   saveError: string = '';
   isSaving: boolean = false;
   isLoading: boolean = false;
+  isSaved: boolean = false; // บันทึกสำเร็จแล้ว → แสดงปุ่มวิชาถัดไป
 
   constructor(
     private dialog: MatDialog,
     private dropdownService: DropdownService,
     private scoreService: ScoreService,
-    private http: HttpClient,
+    private courseService: CourseService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -88,25 +90,18 @@ export class ScoreManagement implements OnInit {
   }
 
   loadCourses() {
-    this.dropdownService.getCourses().subscribe({
+    this.courseService.getCourses().subscribe({
       next: (res) => {
-        if (res && res.data) {
-          // Adjust based on actual API response structure
-          this.courses = res.data;
+        if (res?.success && res.data) {
+          this.courseGroups = res.data;
+          this.courses = res.data.map((c: any) => ({
+            id: c.batches?.[0]?.course_id || c.course_name,
+            course_name: c.course_name
+          }));
+          this.cdr.detectChanges();
         }
       },
       error: (err) => console.error('Failed to load courses', err),
-    });
-  }
-
-  loadBatches(courseId?: string | null) {
-    this.dropdownService.getBatches(courseId).subscribe({
-      next: (res) => {
-        if (res && res.data) {
-          this.batches = res.data;
-        }
-      },
-      error: (err) => console.error('Failed to load batches', err),
     });
   }
 
@@ -121,19 +116,30 @@ export class ScoreManagement implements OnInit {
     });
   }
 
-  loadStudents(batchId: number) {
-    // Assuming there's an endpoint like this. If not, this might need adjustment.
-    this.http.get<any>(`${environment.apiUrl}/students?batch_id=${batchId}`).subscribe({
+  loadStudents(batchId: number, subjectId: number) {
+    this.isLoading = true;
+    this.scoreService.getAdminSubjectScores(batchId, subjectId).subscribe({
       next: (res) => {
-        if (res && res.data) {
-          this.studentList = res.data.map((s: any) => ({
-            ...s,
-            raw_score: null,
+        if (res?.success && res.data) {
+          this.studentList = res.data.map((s) => ({
+            student_id: s.student_id,
+            student_code: s.student_code,
+            rank_name: s.rank_name || '',
+            first_name: s.first_name,
+            last_name: s.last_name,
+            raw_score: s.raw_score ?? null,
           }));
+          if (res.max_score) {
+            this.inputMaxScore = res.max_score;
+          }
           this.updateStats();
         }
+        this.isLoading = false;
       },
-      error: (err) => console.error('Failed to load students', err),
+      error: (err) => {
+        console.error('Failed to load students', err);
+        this.isLoading = false;
+      },
     });
   }
 
@@ -166,9 +172,21 @@ export class ScoreManagement implements OnInit {
     this.subjects = [];
     this.studentList = [];
     this.updateStats();
-    
+
     if (this.selectedCourse && this.selectedCourse !== 'all') {
-      this.loadBatches(this.selectedCourse);
+      // หารุ่นจากข้อมูลที่เก็บไว้ใน courseGroups โดยตรง ไม่ต้องเรียก API ใหม่
+      const courseGroup = this.courseGroups.find(c =>
+        c.batches?.[0]?.course_id == this.selectedCourse
+        || c.course_name === this.selectedCourse
+      );
+      if (courseGroup) {
+        this.batches = courseGroup.batches.map(b => ({
+          id: b.batch_id,
+          batch_name: b.batch_name
+        }));
+      } else {
+        this.batches = [];
+      }
     } else {
       this.batches = [];
     }
@@ -180,14 +198,19 @@ export class ScoreManagement implements OnInit {
     this.updateStats();
     if (this.selectedBatch) {
       this.loadSubjects(this.selectedBatch);
-      this.loadStudents(this.selectedBatch);
     } else {
       this.subjects = [];
     }
   }
 
   onSubjectChange() {
+    this.studentList = [];
+    this.isSaved = false;
+    this.saveError = '';
     this.updateStats();
+    if (this.selectedBatch && this.selectedSubjectId) {
+      this.loadStudents(this.selectedBatch, this.selectedSubjectId);
+    }
   }
 
   onMaxScoreConfirm() {
@@ -232,8 +255,8 @@ export class ScoreManagement implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result && this.selectedBatch) {
-        this.loadStudents(this.selectedBatch);
+      if (result && this.selectedBatch && this.selectedSubjectId) {
+        this.loadStudents(this.selectedBatch, this.selectedSubjectId);
       }
     });
   }
@@ -248,43 +271,54 @@ export class ScoreManagement implements OnInit {
       return;
     }
 
-    this.isSaving = true;
-    this.saveError = '';
-
-    // Looop through students and save scores (or use bulk endpoint if one exists for multiple students)
-    let completed = 0;
-    let hasError = false;
     const studentsToSave = this.studentList.filter((s) => s.raw_score !== null);
 
     if (studentsToSave.length === 0) {
-      this.isSaving = false;
       this.saveError = 'ไม่มีคะแนนให้บันทึก';
       return;
     }
 
-    studentsToSave.forEach((student) => {
-      const payload: SingleScoreRequest = {
-        student_id: student.student_id,
-        batch_id: this.selectedBatch,
-        setting_id: this.selectedSubjectId,
-        raw_score: student.raw_score!,
-      };
+    this.isSaving = true;
+    this.saveError = '';
 
-      this.scoreService.saveSingleScore(payload).subscribe({
-        next: () => {
-          completed++;
-          if (completed === studentsToSave.length && !hasError) {
-            this.isSaving = false;
-            alert('บันทึกคะแนนเรียบร้อยแล้ว!');
-          }
-        },
-        error: (err) => {
-          hasError = true;
-          this.isSaving = false;
-          this.saveError = 'เกิดข้อผิดพลาดในการบันทึกคะแนนบางส่วน';
-          console.error(err);
-        },
-      });
+    const payload = {
+      batch_id: this.selectedBatch,
+      subject_id: this.selectedSubjectId,
+      scores: studentsToSave.map((s) => ({
+        student_id: s.student_id,
+        raw_score: s.raw_score,
+      })),
+    };
+
+    this.scoreService.saveAdminBulkScores(payload).subscribe({
+      next: (res) => {
+        this.isSaving = false;
+        this.isSaved = true;
+        this.saveError = '';
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.saveError = 'เกิดข้อผิดพลาดในการบันทึกคะแนน';
+        console.error(err);
+      },
     });
+  }
+
+  goToNextSubject() {
+    const currentIndex = this.subjects.findIndex(
+      (s) => s.subject_id === this.selectedSubjectId
+    );
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < this.subjects.length) {
+      this.selectedSubjectId = this.subjects[nextIndex].subject_id;
+      this.onSubjectChange();
+    }
+  }
+
+  get hasNextSubject(): boolean {
+    const currentIndex = this.subjects.findIndex(
+      (s) => s.subject_id === this.selectedSubjectId
+    );
+    return currentIndex >= 0 && currentIndex < this.subjects.length - 1;
   }
 }
