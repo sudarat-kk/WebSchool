@@ -9,32 +9,40 @@ import { ScoreManagement } from './pages/score-management/score-management';
 import { From } from './main/from/from';
 import { ScoreList } from './pages/score-list/score-list';
 import { ClassOverview } from './pages/class-overview/class-overview';
+import { AdminLogin } from './pages/admin-login/admin-login';
 
 export const routes: Routes = [
-  // 1. หน้าแรก
+  // หน้าแรก
   { path: '', component: Home },
+
+  // ส่วนของนักเรียน
   {
     path: 'student',
     children: [
       { path: '', component: Student }, // เข้าด้วย /student
       { path: 'login', component: Login }, // เข้าด้วย /student/login
-      { path: '', component: Home },
-      { path: 'student', component: Student },
-      { path: 'teacher', component: Teacher },
-      { path: 'admin', component: Admin },
     ],
   },
+
+  // ส่วนของครู
+  { path: 'teacher', component: Teacher },
+
+  // ส่วนของแอดมิน
   {
     path: 'admin',
     children: [
-      { path: '', component: Admin },
+      { path: '', component: Admin }, // เข้าด้วย /admin
+      { path: 'login', component: AdminLogin }, // เข้าด้วย /admin/login
       { path: 'scoremanagement', component: ScoreManagement },
-
-      // 💡 เปลี่ยนตรงนี้จาก 'scorelist' เป็น 'ScoreList' ให้ตรงกับที่ Error ฟ้องครับ
       { path: 'ScoreList', component: ScoreList },
-
       { path: 'form', component: From },
       { path: 'classoverview', component: ClassOverview },
     ],
   },
+
+  // ส่วนของคะแนน (ทั่วไป)
+  { path: 'score', component: Score },
+
+  // กรณีพิมพ์ URL ผิดให้เด้งกลับหน้าแรก
+  { path: '**', redirectTo: '' }
 ];
