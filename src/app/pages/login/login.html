@@ -15,23 +15,34 @@
         <div class="login-container">
             <mat-form-field appearance="outline" class="password-field">
                 <mat-label>รหัสนักเรียน</mat-label>
-                <input matInput type="text" placeholder="กรอกรหัสนักเรียนของคุณ">
+                <input matInput type="text" placeholder="กรอกรหัสนักเรียนของคุณ"
+                    [(ngModel)]="studentCode">
                 <mat-icon matSuffix>account_circle</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="password-field">
                 <mat-label>กรอกเลข 4 ตัว หลังของบัตรประจำตัวประชาชน</mat-label>
-                <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="กรอกรหัสผ่านของคุณ">
+                <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="กรอกรหัสผ่านของคุณ"
+                    [(ngModel)]="password">
 
                 <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword"
                     [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
                     <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </button>
             </mat-form-field>
+
+            <!-- แสดงข้อความ error -->
+            <p class="error-message" *ngIf="errorMessage">
+                <mat-icon class="error-icon">error_outline</mat-icon>
+                {{ errorMessage }}
+            </p>
         </div>
 
         <div class="action-container">
-            <button mat-flat-button class="search-btn">ค้นหา</button>
+            <button mat-flat-button class="search-btn" (click)="onLogin()" [disabled]="isLoading">
+                <span *ngIf="!isLoading">ค้นหา</span>
+                <span *ngIf="isLoading">กำลังตรวจสอบ...</span>
+            </button>
         </div>
 
         <div class="support-footer">

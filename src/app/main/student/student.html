@@ -3,21 +3,27 @@
     <button mat-icon-button class="back-button" routerLink="/">
       <mat-icon>chevron_left</mat-icon>
     </button>
-    <h1 class="course-title">หลักสูตรชั้นนายพัน เหล่า ส. รุ่นที่ 63</h1>
+    <!-- เปลี่ยนเป็นดึงข้อมูลจากตัวแปรแบบนี้ -->
+    <h1 class="course-title">{{ pageTitle }}</h1>
   </div>
 
   <div class="alert-title-container">
-    <a routerLink="/student/login" class="alert-title">
+    <a [routerLink]="['/student/login']" [queryParams]="{ batchId: currentBatchId }" class="alert-title">
       ระบบแจ้งผลคะแนนผู้เรียน
       <mat-icon class="alert-icon">warning</mat-icon>
     </a>
   </div>
 
   <div class="chart-container">
-    <iframe width="80%" height="450"
+    <iframe
+      width="80%"
+      height="450"
       src="https://lookerstudio.google.com/embed/reporting/b482bd10-b6da-447f-8651-b8ba6a71b73f/page/p_9vcxiz9lxd"
-      frameborder="0" style="border:0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" allowfullscreen
-      sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+      frameborder="0"
+      style="border: 0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05)"
+      allowfullscreen
+      sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+    >
     </iframe>
   </div>
 
@@ -34,7 +40,12 @@
     </div>
     <div class="filter-right">
       <div class="search-wrapper">
-        <input type="text" class="search-input" placeholder="ค้นหารายวิชา" (input)="onSearch($event)" />
+        <input
+          type="text"
+          class="search-input"
+          placeholder="ค้นหารายวิชา"
+          (input)="onSearch($event)"
+        />
         <mat-icon class="search-icon">search</mat-icon>
       </div>
     </div>

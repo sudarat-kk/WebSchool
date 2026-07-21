@@ -1,6 +1,4 @@
 import { Component, OnInit, ElementRef, inject, ChangeDetectorRef } from '@angular/core';
-
-
 // Angular Material
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,7 +10,6 @@ import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/ro
 import { filter } from 'rxjs/operators';
 import { CourseService } from '../services/course.service';
 
-
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -23,27 +20,29 @@ import { CourseService } from '../services/course.service';
     MatToolbarModule,
     MatMenuModule,
     RouterLink,
-    RouterLinkActive
+    RouterLinkActive,
   ],
   templateUrl: './header.html',
-  styleUrls: ['./header.scss']
+  styleUrls: ['./header.scss'],
 })
 export class Header implements OnInit {
-
   isAdmin = false;
   // สร้าง Array มารอรับข้อมูลจาก Backend
   // โครงสร้างเมนูของคุณ (แก้ไขตามที่มีอยู่จริง)
   menuData: any[] = [
     {
       title: 'สำหรับผู้เรียน',
+      path: '/student',
       submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
       title: 'สำหรับครู-อาจารย์',
+      path: '/teacher',
       submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
       title: 'สำหรับคณะกับกำหลักสูตร',
+      path: '/admin',
       submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
@@ -78,16 +77,19 @@ export class Header implements OnInit {
     },
   ];
 
-  constructor(private courseService: CourseService, private router: Router) {
+  constructor(
+    private courseService: CourseService,
+    private router: Router,
+  ) {
     // เช็ก URL ตั้งแต่เปิดหน้าเว็บครั้งแรก
     this.checkRoute(this.router.url);
 
     // ดักฟังทุกครั้งที่ผู้ใช้งานคลิกเปลี่ยนหน้าเว็บในระบบ
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      this.checkRoute(event.url);
-    });
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.checkRoute(event.url);
+      });
   }
 
   ngOnInit(): void {
@@ -95,17 +97,17 @@ export class Header implements OnInit {
   }
 
   // ⚡ แก้ไขฟังก์ชัน checkRoute ในไฟล์ header.ts ของคุณให้เป็นแบบนี้
-private checkRoute(url: string): void {
-  if (!url) return;
-  
-  // แปลงเป็นตัวพิมพ์เล็กทั้งหมดเพื่อป้องกัน Error จากพิมพ์เล็กพิมพ์ใหญ่ เช่น /Admin หรือ /Admin/dashboard
-  const lowerUrl = url.toLowerCase();
-  
-  this.isAdmin = lowerUrl.includes('/admin') || lowerUrl.includes('/teacher');
-  
-  // เปิดคอนโซลใน Browser (กด F12) ดูว่าหน้าปัจจุบัน URL คืออะไร และระบบมองว่าเป็นแอดมินไหม
-  console.log('Current URL:', lowerUrl, 'Is Admin?:', this.isAdmin);
-}
+  private checkRoute(url: string): void {
+    if (!url) return;
+
+    // แปลงเป็นตัวพิมพ์เล็กทั้งหมดเพื่อป้องกัน Error จากพิมพ์เล็กพิมพ์ใหญ่ เช่น /Admin หรือ /Admin/dashboard
+    const lowerUrl = url.toLowerCase();
+
+    this.isAdmin = lowerUrl.includes('/admin') || lowerUrl.includes('/teacher');
+
+    // เปิดคอนโซลใน Browser (กด F12) ดูว่าหน้าปัจจุบัน URL คืออะไร และระบบมองว่าเป็นแอดมินไหม
+    console.log('Current URL:', lowerUrl, 'Is Admin?:', this.isAdmin);
+  }
 
   fetchCourses(): void {
     this.courseService.getCourses().subscribe({
@@ -140,10 +142,24 @@ private checkRoute(url: string): void {
     });
   }
 
-  private setMockData(): void {
-    this.menuData = [
-      { id: 'menu_1', title: 'หน้าแรก (Mock)', path: '/', role: 'all' },
-      { id: 'menu_2', title: 'สำหรับผู้เรียน', path: '/student', role: 'student' }
-    ];
+  goToPage(path: string, courseName: string, batch: any): void {
+    if (!path) {
+      console.error('ไม่พบ Path ปลายทาง เช็คว่าใส่ path ใน menuData หรือยัง!');
+      return;
+    }
+
+    // สั่งเปลี่ยนหน้าและแนบ Query Params ไปด้วย
+    this.router.navigate([path], {
+      queryParams: {
+        batchId: batch.batch_id,
+        title: courseName + ' ' + batch.batch_name,
+      },
+    });
+  }
+
+  // ใช้เช็คว่า Menu นี้กำลัง Active อยู่หรือไม่ โดยเทียบจาก URL
+  isActive(path: string): boolean {
+    if (!path) return false;
+    return this.router.url.includes(path);
   }
 }
