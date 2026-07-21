@@ -1,0 +1,275 @@
+$primary-purple: #8e44ad;
+$pastel-bg: #f5f0f9;          
+$pastel-card: #ffffff;        
+$pastel-purple-light: #f0e6f7; 
+$border-purple: #dcd0ea;
+$text-dark: #2c3e50;
+$text-muted: #7f8c8d;
+$white: #ffffff;
+
+.class-overview-page {
+  font-family: 'Prompt', 'Sarabun', sans-serif;
+  background-color: $pastel-bg; 
+  min-height: 100vh;
+  padding: 0 0 30px 0;
+
+  .page-header {
+    background-color: #ede4f7;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid $border-purple;
+    margin-bottom: 30px;
+    width: 100%;
+    box-sizing: border-box;
+
+    .back-button {
+      color: $primary-purple;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: $text-dark;
+      margin: 0;
+      text-align: center;
+      flex: 1;
+    }
+
+    .header-spacer { width: 40px; }
+  }
+}
+
+.page-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: $pastel-card;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(142, 68, 173, 0.05); 
+}
+
+.center-content {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  .course-container {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    .menu-sub-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: $primary-purple;
+      background-color: $pastel-purple-light;
+      padding: 12px 16px;
+      border-radius: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .form-label {
+        font-size: 15px;
+        font-weight: 500;
+        color: $text-dark;
+      }
+
+      .select-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        select {
+          width: 100%;
+          padding: 14px 18px;
+          font-size: 15px;
+          border: 1.5px solid $border-purple;
+          border-radius: 12px;
+          background-color: $white;
+          appearance: none;
+          color: $text-dark;
+          outline: none;
+          cursor: pointer;
+
+          &:focus {
+            border-color: $primary-purple;
+            box-shadow: 0 0 0 4px rgba(142, 68, 173, 0.15);
+          }
+        }
+
+        .arrow-icon {
+          position: absolute;
+          right: 18px;
+          color: $primary-purple;
+          font-size: 12px;
+          pointer-events: none;
+        }
+      }
+    }
+  }
+}
+
+.table-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .action-buttons-inline {
+    display: flex;
+    gap: 10px;
+
+    .btn-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+
+      &.btn-outline {
+        border-color: $border-purple;
+        background-color: $white;
+        color: $primary-purple;
+        &:hover { background-color: $pastel-purple-light; }
+      }
+      &.btn-excel {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        &:hover { background-color: #c8e6c9; }
+      }
+      &.btn-print {
+        background-color: #f5f5f5;
+        color: #424242;
+        &:hover { background-color: #e0e0e0; }
+      }
+    }
+  }
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid $border-purple;
+  border-radius: 14px;
+}
+
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  background-color: $white;
+
+  thead.highlight-top-bar {
+    border-top: 4px solid $primary-purple; 
+    tr {
+      background-color: $pastel-purple-light;
+      th {
+        color: $text-dark;
+        font-weight: 600;
+        padding: 16px 10px;
+        border: 1px solid $border-purple;
+      }
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid $border-purple;
+    &:hover { background-color: rgba($pastel-purple-light, 0.2); }
+
+    td {
+      padding: 14px 10px;
+      color: $text-dark;
+      border: 1px solid rgba($border-purple, 0.5);
+      &.text-left { text-align: left; padding-left: 20px; }
+      &.text-bold { font-weight: 600; }
+      .font-sm { font-size: 13px; }
+      .text-purple-dark { color: $primary-purple; }
+
+      // คอนเทนเนอร์จัดเรียงแถวรายวิชาย่อยจำนวนมาก
+      .subject-tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        max-width: 480px;
+      }
+
+      .badge-subject {
+        display: inline-flex;
+        align-items: center;
+        background-color: rgba($pastel-purple-light, 0.4);
+        border: 1px solid $border-purple;
+        color: $text-dark;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        white-space: nowrap;
+
+        strong {
+          margin-left: 4px;
+        }
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        &.pass { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        &.fail { background-color: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+      }
+    }
+    .empty-row { padding: 45px; color: $text-muted; font-style: italic; }
+  }
+}
+
+.page-footer-status {
+  max-width: 1400px;
+  margin: 20px auto 0 auto;
+  display: flex;
+  justify-content: flex-start;
+
+  .process-status-bottom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background-color: rgba($pastel-purple-light, 0.5);
+    border: 1px solid $border-purple;
+    border-radius: 10px;
+    font-size: 14px;
+    color: $text-dark;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; color: $primary-purple; }
+    .text-purple { color: $primary-purple; font-weight: 600; }
+  }
+}

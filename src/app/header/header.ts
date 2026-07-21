@@ -1,5 +1,4 @@
 import { Component, OnInit, ElementRef, inject, ChangeDetectorRef } from '@angular/core';
-
 // Angular Material
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,9 +6,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { CourseService } from '../services/course.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -27,6 +26,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.scss'],
 })
 export class Header implements OnInit {
+  isAdmin = false;
   // สร้าง Array มารอรับข้อมูลจาก Backend
   // โครงสร้างเมนูของคุณ (แก้ไขตามที่มีอยู่จริง)
   menuData: any[] = [
@@ -80,10 +80,33 @@ export class Header implements OnInit {
   constructor(
     private courseService: CourseService,
     private router: Router,
-  ) {}
+  ) {
+    // เช็ก URL ตั้งแต่เปิดหน้าเว็บครั้งแรก
+    this.checkRoute(this.router.url);
+
+    // ดักฟังทุกครั้งที่ผู้ใช้งานคลิกเปลี่ยนหน้าเว็บในระบบ
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.checkRoute(event.url);
+      });
+  }
 
   ngOnInit(): void {
     this.fetchCourses();
+  }
+
+  // ⚡ แก้ไขฟังก์ชัน checkRoute ในไฟล์ header.ts ของคุณให้เป็นแบบนี้
+  private checkRoute(url: string): void {
+    if (!url) return;
+
+    // แปลงเป็นตัวพิมพ์เล็กทั้งหมดเพื่อป้องกัน Error จากพิมพ์เล็กพิมพ์ใหญ่ เช่น /Admin หรือ /Admin/dashboard
+    const lowerUrl = url.toLowerCase();
+
+    this.isAdmin = lowerUrl.includes('/admin') || lowerUrl.includes('/teacher');
+
+    // เปิดคอนโซลใน Browser (กด F12) ดูว่าหน้าปัจจุบัน URL คืออะไร และระบบมองว่าเป็นแอดมินไหม
+    console.log('Current URL:', lowerUrl, 'Is Admin?:', this.isAdmin);
   }
 
   fetchCourses(): void {

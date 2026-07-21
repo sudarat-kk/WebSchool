@@ -1,0 +1,350 @@
+// 1. VARIABLES & PALETTE (ธีมม่วงพาสเทล)
+$bg-page: #F8F6FC;         
+$bg-card: #FFFFFF;         
+$bg-input: #FFFFFF;        
+$bg-button-gray: #EFEFF1;  
+$color-text: #2D2D30;      
+$color-text-muted: #666668;
+
+$purple-pastel-light: #ECE6F8; 
+$purple-pastel-med: #D1C4E9;   
+$purple-pastel-dark: #9575CD;  
+$purple-pastel-hover: #7E57C2; 
+
+$color-danger: #FF5252;        
+
+// 2. MAIN CORE STYLES
+.admin-page {
+  font-family: 'Sarabun', sans-serif;
+  background-color: $bg-page;
+  min-height: 100vh;
+  color: $color-text;
+  width: 100%;
+
+  // ⚡ แถบ Header และเส้นแบ่ง ยาวกว้างสุดจอ 100% ไร้รอยต่อ
+  .admin-header-title-container {
+    width: 100%;
+    background-color: $purple-pastel-light; 
+    border-bottom: 1px solid $purple-pastel-med; 
+    padding: 14px 0;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: center;
+    position: relative; 
+    box-shadow: 0 2px 8px rgba(149, 117, 205, 0.04);
+
+    .header-content-wrapper {
+      width: 100%;
+      max-width: 900px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+    }
+
+    // 🎯 ปุ่มย้อนกลับตรึงอยู่ฝั่งซ้ายสุดของหน้าจอคอม
+    .btn-header-back {
+      position: absolute;
+      left: 24px; 
+      top: 50%;
+      transform: translateY(-50%); 
+      color: $purple-pastel-dark; 
+      transition: background-color 0.2s, transform 0.2s;
+
+      mat-icon {
+        font-size: 28px; 
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &:hover {
+        background-color: rgba(149, 117, 205, 0.1);
+        transform: translateY(-50%) scale(1.05);
+      }
+    }
+
+    .main-content-title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      color: $color-text;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .content-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 16px 24px 16px;
+
+    .management-section {
+      background-color: $bg-card;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid $purple-pastel-light;
+      box-shadow: 0 4px 20px rgba(149, 117, 205, 0.06); 
+
+      .instruction-text {
+        color: $color-text-muted;
+        font-size: 15px;
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: $purple-pastel-dark;
+        border-left: 4px solid $purple-pastel-dark;
+        padding-left: 10px;
+      }
+    }
+  }
+}
+
+// SHARED CUSTOM INPUT (กล่องกรอกสี่เหลี่ยมสีขาว)
+.custom-input {
+  width: 100%;
+  background-color: $bg-input !important;
+  border: 1px solid $purple-pastel-med !important;
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 15px;
+  color: $color-text;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+
+  &:focus {
+    border-color: $purple-pastel-dark !important;
+    box-shadow: 0 0 0 3px rgba($purple-pastel-dark, 0.15) !important;
+  }
+
+  &::placeholder {
+    color: #B2B2B5;
+  }
+}
+
+select.custom-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%239575CD' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  padding-right: 40px !important;
+}
+
+// 3. DATA ENTRY STYLES
+.data-entry-section {
+  .form-row {
+    display: flex;
+    gap: 16px; 
+    width: 100%;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+
+  .flex-1 {
+    flex: 1;
+  }
+
+  .mode-indicator {
+    font-size: 15px;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-bottom: 20px;
+    background-color: #F0F9F0;
+    padding: 8px 16px;
+    border-radius: 6px;
+    display: inline-block;
+
+    &.edit-mode {
+      color: #FF9800;
+      background-color: #FFF3E0;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+
+    .input-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      b { font-weight: 700; }
+    }
+
+    &.center-button {
+      display: flex;
+      justify-content: center;
+      margin: 16px 0 24px 0;
+    }
+  }
+
+  .btn-create-form {
+    background-color: $bg-button-gray !important;
+    border: 1px solid #D1D1D6 !important;
+    color: $color-text !important;
+    font-weight: 500;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+
+    mat-icon {
+      font-size: 18px;
+      margin-right: 6px;
+      color: $purple-pastel-dark;
+    }
+  }
+
+  .final-action {
+    display: block;
+    text-align: center; 
+    margin-top: 32px;
+
+    .action-buttons-group, .edit-buttons-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-submit-form {
+      width: 100%;
+      max-width: 280px; 
+      background-color: $purple-pastel-dark !important;
+      color: white !important;
+      font-size: 15px;    
+      font-weight: 600;
+      padding: 10px 0;    
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+      margin: 0 auto;
+
+      &:hover {
+        background-color: $purple-pastel-hover !important;
+      }
+
+      &.btn-update {
+        background-color: #FF9800 !important; 
+        &:hover { background-color: #E65100 !important; }
+      }
+    }
+
+    .btn-cancel {
+      width: 100%;
+      max-width: 280px; 
+      padding: 10px 0;   
+      border: 1px solid #D1D1D6 !important;
+      color: $color-text-muted !important;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+  }
+}
+
+// 4. LIST & MANAGEMENT STYLES
+.list-section {
+  .search-filter-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .search-input-wrapper {
+      flex: 1;
+      position: relative;
+      .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: $color-text-muted;
+      }
+      .rounded-search {
+        padding-left: 44px !important;
+        border-radius: 24px !important;
+      }
+    }
+    .filter-dropdown {
+      width: 160px;
+    }
+  }
+
+  .form-list-table {
+    width: 100%;
+    .col-gen { width: 15%; text-align: center; }
+    .col-details { width: 55%; padding-left: 16px; }
+    .col-actions { width: 30%; text-align: center; }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      background-color: $purple-pastel-light;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .table-row {
+      display: flex;
+      align-items: center;
+      background-color: #F9F9FB;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #EAEAEA;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: rgba($purple-pastel-light, 0.4);
+        border-color: $purple-pastel-med;
+      }
+
+      .row-gen { font-weight: 600; font-size: 15px; }
+
+      .row-details {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        .form-name { font-weight: 500; font-size: 15px; }
+        .status-toggle {
+          ::v-deep {
+            .mat-slide-toggle.mat-checked {
+              .mat-slide-toggle-thumb { background-color: $purple-pastel-dark; }
+              .mat-slide-toggle-bar { background-color: rgba($purple-pastel-dark, 0.4); }
+            }
+          }
+        }
+      }
+
+      .row-actions {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        .btn-copy, .btn-view {
+          color: $color-text-muted;
+          &:hover { color: $purple-pastel-dark; }
+        }
+        .btn-delete {
+          color: $color-danger;
+          &:hover { color: darkred; }
+        }
+      }
+    }
+  }
+}
