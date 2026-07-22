@@ -47,4 +47,11 @@ export class DropdownService {
       headers: this.getAdminHeaders(),
     });
   }
+
+  // 4. ดึงกลุ่มวิชา (ต้องระบุรุ่น)
+  getSubjectGroups(batchId: number): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/dropdown/subject-groups?batch_id=${batchId}`, {
+      headers: this.getAdminHeaders(),
+    });
+  }
 }
