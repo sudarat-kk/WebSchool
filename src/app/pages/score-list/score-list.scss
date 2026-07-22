@@ -358,3 +358,71 @@ $white: #ffffff;
     }
   }
 }
+
+// Loading / Error states
+.loading-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px;
+  color: #8e44ad;
+  font-size: 1rem;
+
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+}
+
+.error-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  background-color: #fce4e4;
+  color: #c62828;
+  border-radius: 8px;
+  margin: 0 0 16px 0;
+  font-size: 0.9rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+// Grade cell coloring
+.grade-cell {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+// Disabled buttons
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+// Dynamic Subject Columns
+.subject-col-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.subject-col-max {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  font-weight: normal;
+  margin-top: 4px;
+}
+
+.subject-score-cell {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.total-score-col {
+  font-weight: 600;
+  color: #8e44ad;
+}

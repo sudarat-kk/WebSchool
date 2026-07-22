@@ -4,156 +4,181 @@
             <mat-icon>chevron_left</mat-icon>
         </button>
         <h1 class="page-title">ประมวลผลการเรียน</h1>
-        <div class="header-spacer"></div> <!-- เพื่อช่วยพยุงบาลานซ์ให้อักษรอยู่กึ่งกลางพอดี -->
+        <div class="header-spacer"></div>
     </div>
 
     <div class="page-wrapper">
 
-        <!-- 🔍 ส่วนเนื้อหาหลัก: Dropdown ตัวกรองข้อมูล -->
+        <!-- 🔍 ส่วน Dropdown ตัวกรองข้อมูล -->
         <div class="center-content">
             <div class="course-container">
-                <!-- ส่วนที่ 1: เลือกโครงสร้างหลักสูตร -->
+                <!-- 1: เลือกโครงสร้างหลักสูตร -->
                 <div class="form-group">
                     <label class="form-label">เลือกโครงสร้างหลักสูตร</label>
                     <div class="select-wrapper">
-                        <select [(ngModel)]="selectedStructure" (change)="onStructureChange()">
+                        <select [(ngModel)]="selectedCourse" (change)="onCourseChange()">
                             <option value="all">แสดงทั้งหมด</option>
+                            @for (cg of courseGroups; track cg.course_name) {
+                                <option [value]="cg.batches?.[0]?.course_id || cg.course_name">
+                                    {{ cg.course_name }}
+                                </option>
+                            }
                         </select>
                         <span class="arrow-icon">▼</span>
                     </div>
                 </div>
 
-                <!-- ส่วนที่ 2: เลือกรุ่น -->
+                <!-- 2: เลือกรุ่น -->
                 <div class="form-group">
                     <label class="form-label">เลือกรุ่น</label>
                     <div class="select-wrapper">
-                        <select [(ngModel)]="selectedBatch" (change)="onBatchChange()">
-                            <option value="">กรุณาเลือกรุ่น</option>
+                        <select [(ngModel)]="selectedBatch" (change)="onBatchChange()" [disabled]="selectedCourse === 'all' || !selectedCourse">
+                            <option [value]="null">กรุณาเลือกรุ่น</option>
                             @for (batch of batches; track batch.id) {
-                            <option [value]="batch.id">{{ batch.name }}</option>
+                                <option [value]="batch.id">{{ batch.name }}</option>
                             }
                         </select>
                         <span class="arrow-icon">▼</span>
                     </div>
                 </div>
 
-                <!-- ส่วนที่ 3: รายวิชาในหลักสูตร -->
-                <div class="form-group">
-                    <label class="form-label">รายวิชาในหลักสูตร</label>
-                    <div class="select-wrapper">
-                        <select [(ngModel)]="selectedSubject" (change)="onSubjectChange()">
-                            <option value="">กรุณาเลือกวิชา</option>
-                            @for (subject of subjects; track subject.id) {
-                            <option [ngValue]="subject">
-                                {{ subject.code }} {{ subject.name }} [{{ subject.group }}] - {{ subject.credit }}
-                                หน่วยกิต
-                            </option>
-                            }
-                        </select>
-                        <span class="arrow-icon">▼</span>
-                    </div>
-                </div>
+                <!-- 3: เลือกรายวิชา -->
+                <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>รายวิชาในหลักสูตร</mat-label>
+                    <mat-select [(ngModel)]="selectedSubjectId" (selectionChange)="onSubjectChange()" [disabled]="!selectedBatch">
+                        <mat-option [value]="null">กรุณาเลือกวิชา</mat-option>
+                        @for (subject of subjectsList; track subject.id) {
+                            <mat-option [value]="subject.id">
+                                {{ subject.subject_name }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
             </div>
         </div>
 
-        <!-- 📊 ข้อมูลสรุปหมวดวิชา / วิชาย่อยที่ประกอบกัน -->
+        <!-- 📊 ข้อมูลสรุปหมวดวิชา (จาก API) -->
+        @if (groupSummary) {
         <div class="subject-summary-card">
             <h3 class="summary-title">
-                <mat-icon>assignment</mat-icon> ข้อมูลสรุปสัดส่วนคะแนนหมวดวิชา
+                <mat-icon>assignment</mat-icon> ข้อมูลสรุปสัดส่วนคะแนน — {{ groupSummary.group_name }}
             </h3>
             <div class="summary-grid">
-                <div class="summary-sub-item">
-                    <span class="label">1. การอำนวยการทางการสื่อสาร:</span>
-                    <span class="points"><strong>50</strong> คะแนน</span>
-                </div>
-                <div class="summary-sub-item">
-                    <span class="label">2. หลักพื้นฐานการรบ:</span>
-                    <span class="points"><strong>100</strong> คะแนน</span>
-                </div>
-                <div class="summary-sub-item">
-                    <span class="label">3. ระเบียบการนำหน่วย:</span>
-                    <span class="points"><em>(คะแนนตามส่วนที่เหลือ)</em></span>
-                </div>
                 <div class="summary-sub-item total-highlight">
                     <span class="label">คะแนนรวมทั้งหมด:</span>
-                    <span class="points"><strong>200</strong> คะแนน</span>
+                    <span class="points"><strong>{{ groupSummary.total_max_score }}</strong> คะแนน</span>
+                </div>
+                <div class="summary-sub-item total-highlight">
+                    <span class="label">หน่วยกิต:</span>
+                    <span class="points"><strong>{{ groupSummary.total_credit }}</strong> หน่วยกิต</span>
                 </div>
             </div>
         </div>
+        }
 
-        <!-- ⚙️ แถบปุ่ม Action หลักบนตาราง -->
+        <!-- ⚙️ แถบปุ่ม Action -->
         <div class="table-actions-bar">
             <div></div>
             <div class="action-buttons-inline">
-                <button class="btn-inline btn-outline" (click)="reProcess()">
+                <button class="btn-inline btn-outline" (click)="reProcess()" [disabled]="isLoading || !selectedSubjectId">
                     <mat-icon>refresh</mat-icon> ประมวลผลใหม่
                 </button>
-                <button class="btn-inline btn-excel" (click)="exportToExcel()">
+                <button class="btn-inline btn-excel" (click)="exportToExcel()" [disabled]="!students.length">
                     <mat-icon>description</mat-icon> ส่งออก Excel
                 </button>
-                <button class="btn-inline btn-print" (click)="printReport()">
+                <button class="btn-inline btn-print" (click)="printReport()" [disabled]="!students.length">
                     <mat-icon>print</mat-icon> พิมพ์รายงาน
                 </button>
             </div>
         </div>
 
+        <!-- Loading -->
+        @if (isLoading) {
+        <div class="loading-row">
+            <mat-icon class="spin">autorenew</mat-icon> กำลังโหลดข้อมูล...
+        </div>
+        }
+
+        <!-- Error -->
+        @if (errorMsg) {
+        <div class="error-row">
+            <mat-icon>error_outline</mat-icon> {{ errorMsg }}
+        </div>
+        }
+
         <!-- ตารางคะแนน -->
         <div class="table-responsive">
             <table class="score-table">
-                <thead>
-                    <tr>
-                        <th rowspan="2">ลำดับ</th>
-                        <th rowspan="2">รหัสประจำตัว</th>
-                        <th rowspan="2">ยศ ชื่อ-นามสกุล</th>
-                        <th>คะแนนรวม</th>
-                        <th rowspan="2">คิดเป็นร้อยละ</th>
-                        <th rowspan="2">เกรด</th>
-                        <th rowspan="2">ค่าประกอบ Index</th>
-                    </tr>
-                    <tr>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (student of students; track student.id; let i = $index) {
-                    <tr>
-                        <td>{{ i + 1 }}</td>
-                        <td>{{ student.code }}</td>
-                        <td class="text-left">{{ student.name }}</td>
-                        <td>
-                            <input type="number" class="input-score" [(ngModel)]="student.rawScore"
-                                (input)="calculateAllScores()" placeholder="0" min="0" max="200">
-                        </td>
-                        <td>{{ student.percentage || '-' }}</td>
-                        <td>{{ student.creditEarned || '-' }}</td>
-                        <td>{{ student.grade || '-' }}</td>
-                        <td>{{ student.indexValue || '-' }}</td>
-                    </tr>
-                    } @empty {
-                    <tr>
-                        <td colspan="8" class="empty-row">กรุณาเลือกข้อมูลตัวกรองให้ครบถ้วนเพื่อแสดงรายชื่อนักเรียน</td>
-                    </tr>
+              <thead>
+                <tr>
+                  <th style="min-width: 60px;">ลำดับ</th>
+                  <th style="min-width: 100px;">รหัสประจำตัว</th>
+                  <th style="min-width: 180px;">ยศ ชื่อ-นามสกุล</th>
+                  
+                  <!-- 🌟 วนลูปสร้างคอลัมน์ "ชื่อวิชา" แทนที่คอลัมน์คะแนนรวม 🌟 -->
+                  @for (subj of groupSummary?.subjects; track subj.subject_id) {
+                    <th style="min-width: 140px;">
+                      <div class="subject-col-title">{{ subj.subject_name }}</div>
+                      <div class="subject-col-max">(เต็ม {{ subj.max_score }})</div>
+                    </th>
+                  }
+                  
+                  <th style="min-width: 110px;">คิดเป็นร้อยละ</th>
+                  <th style="min-width: 80px;">เกรด</th>
+                  <th style="min-width: 120px;">ค่าประกอบ Index</th>
+                </tr>
+              </thead>
+              
+              <tbody>
+                @for (student of students; track student.student_id; let i = $index) {
+                  <tr>
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ student.student_code }}</td>
+                    <td class="text-left">{{ student.full_name }}</td>
+                    
+                    <!-- 🌟 วนลูปดึง "คะแนน" ของแต่ละวิชามาแสดงให้ตรงคอลัมน์ 🌟 -->
+                    @for (subj of groupSummary?.subjects; track subj.subject_id) {
+                      <td class="subject-score-cell">
+                        <!-- ถ้าไม่มีคะแนนให้แสดงเครื่องหมายขีด (-) -->
+                        {{ student.subject_scores[subj.subject_id] !== undefined ? student.subject_scores[subj.subject_id] : '-' }}
+                      </td>
                     }
-                </tbody>
+                    
+                    <td>{{ student.percent }}%</td>
+                    <td class="grade-cell">{{ student.grade }}</td>
+                    <td>{{ student.index_value }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td [attr.colspan]="(groupSummary?.subjects?.length || 0) + 6" class="empty-row">
+                        @if (!selectedSubjectId) {
+                            กรุณาเลือกข้อมูลตัวกรองให้ครบถ้วนเพื่อแสดงรายชื่อนักเรียน
+                        } @else if (!isLoading) {
+                            ไม่พบข้อมูลนักเรียน
+                        }
+                    </td>
+                  </tr>
+                }
+              </tbody>
             </table>
         </div>
 
     </div>
 
-    <!-- 🎯 สถานะประมวลผลล่าสุดด้านล่างตาราง -->
+    <!-- 🎯 สถานะประมวลผลล่าสุด -->
     <div class="page-footer-status">
         <div class="process-status-bottom">
             <mat-icon>history</mat-icon>
-            <span>สถานะประมวลผลล่าสุด: <strong class="text-purple">{{ lastProcessedTime || 'ยังไม่มีการประมวลผล'
-                    }}</strong></span>
+            <span>สถานะประมวลผลล่าสุด: <strong class="text-purple">{{ lastProcessedTime || 'ยังไม่มีการประมวลผล' }}</strong></span>
         </div>
     </div>
 
-    <!-- ➡️ โซนปุ่มหน้าถัดไปล่างสุด -->
+    <!-- ➡️ ปุ่มหน้าถัดไป -->
     <div class="navigation-container">
-        <!-- ปรับ routerLink ให้ชี้ไปที่ /admin/classoverview ได้เลยครับ -->
         <button class="btn-next" routerLink="/admin/classoverview">
             หน้าถัดไป
             <mat-icon>chevron_right</mat-icon>
         </button>
     </div>
+
 </div>

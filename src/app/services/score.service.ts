@@ -108,4 +108,14 @@ export class ScoreService {
       { headers: this.getHeaders() }
     );
   }
+
+  // 7. ประมวลผลคะแนนตามกลุ่มวิชา
+  getProcessGroupScores(batchId: number, groupId: number): Observable<any> {
+    const token = localStorage.getItem('admin_token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.get<any>(
+      `${environment.apiUrl}/score/process-group?batch_id=${batchId}&group_id=${groupId}`,
+      { headers }
+    );
+  }
 }
