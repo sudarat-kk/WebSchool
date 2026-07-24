@@ -13,10 +13,6 @@
         <mat-icon>add_box</mat-icon>
         เพิ่มหลักสูตร / เพิ่มวิชา
       </button>
-      <button class="btn-action btn-purple-dark" (click)="addStudent()">
-        <mat-icon>person_add</mat-icon>
-        เพิ่มนักเรียน
-      </button>
     </div>
 
     <!-- Tab Group -->
@@ -45,50 +41,40 @@
                 <mat-option value="all">แสดงทั้งหมด</mat-option>
                 <!-- 👈 แก้เป็น course.course_name -->
                 @for (course of courses; track course.id) {
-                  <mat-option [value]="course.id">{{ course.course_name }}</mat-option>
+                <mat-option [value]="course.id">{{ course.course_name }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="filter-field">
               <mat-label>เลือกรุ่น</mat-label>
-              <mat-select [(ngModel)]="selectedBatch" (selectionChange)="onBatchChange()" [disabled]="selectedCourse === 'all' || !selectedCourse">
+              <mat-select [(ngModel)]="selectedBatch" (selectionChange)="onBatchChange()"
+                [disabled]="selectedCourse === 'all' || !selectedCourse">
                 <!-- 👈 แก้เป็น batch.batch_name -->
                 @for (batch of batches; track batch.id) {
-                  <mat-option [value]="batch.id">{{ batch.batch_name }}</mat-option>
+                <mat-option [value]="batch.id">{{ batch.batch_name }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="filter-field">
               <mat-label>รายวิชาในหลักสูตร</mat-label>
-              <mat-select [(ngModel)]="selectedSubjectId" (selectionChange)="onSubjectChange()" [disabled]="!selectedBatch">
+              <mat-select [(ngModel)]="selectedSubjectId" (selectionChange)="onSubjectChange()"
+                [disabled]="!selectedBatch">
                 <!-- 👈 แก้เป็น subject.subject_id และ subject.subject_name -->
-                @for (subject of subjects; track subject.subject_id) {
-                  <mat-option [value]="subject.subject_id">
-                    {{ subject.subject_name }}
-                  </mat-option>
+                @for (subject of subjects; track $index) {
+                <mat-option [value]="subject?.subject_id">
+                  {{ subject?.subject_name }}
+                </mat-option>
                 }
               </mat-select>
             </mat-form-field>
 
             <!-- ✅ ช่องกรอกคะแนนเต็ม (แสดงเมื่อเลือกวิชาแล้ว) -->
-            <mat-form-field
-              appearance="outline"
-              class="filter-field max-score-field"
-              *ngIf="selectedSubjectId"
-            >
+            <mat-form-field appearance="outline" class="filter-field max-score-field" *ngIf="selectedSubjectId">
               <mat-label>คะแนนเต็ม (กรอกแล้วกด Enter)</mat-label>
-              <input
-                matInput
-                type="number"
-                [(ngModel)]="inputMaxScore"
-                min="1"
-                max="1000"
-                placeholder="100"
-                (keyup.enter)="onMaxScoreConfirm()"
-                (blur)="onMaxScoreConfirm()"
-              />
+              <input matInput type="number" [(ngModel)]="inputMaxScore" min="1" max="1000" placeholder="100"
+                (keyup.enter)="onMaxScoreConfirm()" (blur)="onMaxScoreConfirm()" />
               <mat-icon matSuffix>edit</mat-icon>
               <mat-hint>คะแนนเต็มของวิชานี้</mat-hint>
             </mat-form-field>
@@ -116,94 +102,92 @@
                 </thead>
                 <tbody>
                   <!-- 👈 แก้ track เป็น student.student_id -->
-                  @for (student of studentList; track student.student_id; let i = $index) {
-                    <tr
-                      [class.row-filled]="
-                        student.raw_score !== null &&
-                        student.raw_score !== undefined
-                      "
-                    >
-                      <td class="text-center">{{ i + 1 }}</td>
-                      <td class="text-center">{{ student.student_code }}</td>
-                      <td>
-                        {{ student.rank_name }} {{ student.first_name }} {{ student.last_name }}
-                      </td>
-                      <td class="text-center">
-                        <input
-                          type="number"
-                          class="score-input-field-simple"
-                          [(ngModel)]="student.raw_score"
-                          min="0"
-                          [max]="inputMaxScore"
-                          placeholder="0"
-                          (input)="onScoreInput(student)"
-                        />
-                      </td>
-                    </tr>
+                  @for (student of studentList; track $index; let i = $index) {
+                  <tr [class.row-filled]="student.raw_score !== null &&student.raw_score !== undefined">
+                    <td class="text-center">{{ i + 1 }}</td>
+                    <td class="text-center">{{ student.student_code }}</td>
+                    <td>
+                      {{ student.rank_name }} {{ student.first_name }} {{ student.last_name }}
+                    </td>
+                    <td class="text-center">
+                      <input type="number" class="score-input-field-simple" [ngModel]="student.raw_score"
+                        (ngModelChange)="onScoreChange(student, $event)" min="0" [max]="inputMaxScore"
+                        placeholder="0" />
+                    </td>
+                  </tr>
                   } @empty {
-                    <tr>
-                      <td colspan="4" class="empty-row">
-                        กรุณาเลือกรายวิชาเพื่อแสดงรายชื่อนักเรียน
-                      </td>
-                    </tr>
+                  <tr>
+                    <td colspan="4" class="empty-row">
+                      กรุณาเลือกรายวิชาเพื่อแสดงรายชื่อนักเรียน
+                    </td>
+                  </tr>
                   }
                 </tbody>
               </table>
             </div>
 
-          <!-- ส่วนท้ายตาราง สรุปด่วน และปุ่ม Action -->
-          <div class="bottom-actions-row" *ngIf="selectedSubjectId">
-            <div class="inline-summary">
-              <span>กรอกแล้ว: <b>{{ filledCount }} / {{ studentList.length }}</b> คน</span>
-              <span>เฉลี่ย: <b>{{ averageScore }}</b></span>
-              <span>สูงสุด: <b>{{ maxScoreValue ?? '-' }}</b></span>
-              <span>ต่ำสุด: <b>{{ minScoreValue ?? '-' }}</b></span>
+            <!-- ส่วนท้ายตาราง สรุปด่วน และปุ่ม Action -->
+            <div class="bottom-actions-row" *ngIf="selectedSubjectId">
+              <div class="inline-summary">
+                <span>กรอกแล้ว: <b>{{ filledCount }} / {{ studentList.length }}</b> คน</span>
+                <span>เฉลี่ย: <b>{{ averageScore }}</b></span>
+                <span>สูงสุด: <b>{{ maxScoreValue ?? '-' }}</b></span>
+                <span>ต่ำสุด: <b>{{ minScoreValue ?? '-' }}</b></span>
+              </div>
+
+              <div class="action-buttons">
+                <button class="btn-cancel" (click)="onCancel()" [disabled]="isSaving || isLoading">
+                  <mat-icon>close</mat-icon> ยกเลิก
+                </button>
+                <button class="btn-save" (click)="onSaveScores()" [disabled]="isSaving || isLoading || isSaved">
+                  <mat-icon>{{ isSaving ? 'hourglass_empty' : (isSaved ? 'check_circle' : 'save') }}</mat-icon>
+                  {{ isSaving ? 'กำลังบันทึก...' : (isSaved ? 'บันทึกแล้ว' : 'บันทึกคะแนนทั้งหมด') }}
+                </button>
+
+                <!-- ✅ ปุ่มย้อนกลับ -->
+                <button *ngIf="isSaved" type="button" class="btn-back-outline" (click)="goBack()">
+                  <mat-icon>arrow_back</mat-icon>
+                  <span>ย้อนกลับ</span>
+                </button>
+
+                <button *ngIf="isSaved" class="btn-edit-mode" (click)="enableEditMode()">
+                  <mat-icon>edit</mat-icon> แก้ไขคะแนน
+                </button>
+
+                <button *ngIf="isSaved && hasNextSubject" class="btn-next-subject" (click)="goToNextSubject()">
+                  <mat-icon>arrow_forward</mat-icon>
+                  วิชาถัดไป
+                </button>
+              </div>
             </div>
 
-            <div class="action-buttons">
-              <button class="btn-cancel" (click)="onCancel()" [disabled]="isSaving || isLoading">
-                <mat-icon>close</mat-icon> ยกเลิก
-              </button>
-              <button class="btn-save" (click)="onSaveScores()" [disabled]="isSaving || isLoading || isSaved">
-                <mat-icon>{{ isSaving ? 'hourglass_empty' : (isSaved ? 'check_circle' : 'save') }}</mat-icon>
-                {{ isSaving ? 'กำลังบันทึก...' : (isSaved ? 'บันทึกแล้ว' : 'บันทึกคะแนนทั้งหมด') }}
-              </button>
-              <button
-                *ngIf="isSaved && hasNextSubject"
-                class="btn-next-subject"
-                (click)="goToNextSubject()"
-              >
-                <mat-icon>arrow_forward</mat-icon>
-                วิชาถัดไป
-              </button>
+            <!-- แบนเนอร์บันทึกสำเร็จ -->
+            <div class="save-success-msg" *ngIf="isSaved">
+              <mat-icon>check_circle</mat-icon>
+              บันทึกคะแนน {{ filledCount }} คน เรียบร้อยแล้ว!
+              <span *ngIf="!hasNextSubject" class="all-done-hint"> — ครบทุกวิชาแล้ว 🎉</span>
             </div>
-          </div>
 
-          <!-- แบนเนอร์บันทึกสำเร็จ -->
-          <div class="save-success-msg" *ngIf="isSaved">
-            <mat-icon>check_circle</mat-icon>
-            บันทึกคะแนน {{ filledCount }} คน เรียบร้อยแล้ว!
-            <span *ngIf="!hasNextSubject" class="all-done-hint"> — ครบทุกวิชาแล้ว 🎉</span>
-          </div>
+            <div class="save-error-msg" *ngIf="saveError">
+              <mat-icon>error_outline</mat-icon> {{ saveError }}
+            </div>
 
-          <div class="save-error-msg" *ngIf="saveError">
-            <mat-icon>error_outline</mat-icon> {{ saveError }}
-          </div>
-          
-          <!-- placeholder ก่อนเลือกวิชา -->
-          <div class="empty-state" *ngIf="!selectedSubjectId">
-            <mat-icon>manage_search</mat-icon>
-            <p>เลือกหลักสูตร รุ่น และรายวิชาด้านบนเพื่อเริ่มกรอกคะแนน</p>
+            <!-- placeholder ก่อนเลือกวิชา -->
+            <div class="empty-state" *ngIf="!selectedSubjectId">
+              <mat-icon>manage_search</mat-icon>
+              <p>เลือกหลักสูตร รุ่น และรายวิชาด้านบนเพื่อเริ่มกรอกคะแนน</p>
+            </div>
           </div>
         </div>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
-</div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 
   <!-- ➡️ โซนปุ่มหน้าถัดไปล่างสุด (ผูกติด Flow ประมวลผล) -->
   <div class="navigation-container" style="display: flex; justify-content: flex-end; padding: 20px;">
-    <button class="btn-next" routerLink="/admin/ScoreList" style="display: flex; align-items: center; gap: 8px; padding: 12px 24px; background-color: #5c2082; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#3e105e'" onmouseout="this.style.backgroundColor='#5c2082'">
+    <button class="btn-next" routerLink="/admin/ScoreList"
+      style="display: flex; align-items: center; gap: 8px; padding: 12px 24px; background-color: #5c2082; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background-color 0.3s;"
+      onmouseover="this.style.backgroundColor='#3e105e'" onmouseout="this.style.backgroundColor='#5c2082'">
       หน้าถัดไป (ดูคะแนนแต่ละวิชา)
       <mat-icon>chevron_right</mat-icon>
     </button>

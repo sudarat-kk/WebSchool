@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddCourseDialog } from '../add-course-dialog/add-course-dialog';
-import { AddStudentDialog } from '../add-student-dialog/add-student-dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
@@ -14,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { DropdownService } from '../../services/dropdown.service';
 import { ScoreService } from '../../services/score.service';
 import { CourseService, CourseGroup } from '../../services/course.service';
+import { Location } from '@angular/common';
 
 interface Course {
   id: number;
@@ -57,6 +57,8 @@ interface StudentScore {
   styleUrl: './score-management.scss',
 })
 export class ScoreManagement implements OnInit {
+
+  
   courses: Course[] = [];
   courseGroups: CourseGroup[] = []; // เก็บข้อมูลหลักสูตรดิบจาก API พร้อม batches
   batches: Batch[] = [];
@@ -82,11 +84,16 @@ export class ScoreManagement implements OnInit {
     private dropdownService: DropdownService,
     private scoreService: ScoreService,
     private courseService: CourseService,
+    private location: Location,
     private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     this.loadCourses();
+  }
+
+  goBack() {
+    this.location.back();
   }
 
   loadCourses() {
@@ -96,9 +103,9 @@ export class ScoreManagement implements OnInit {
           this.courseGroups = res.data;
           this.courses = res.data.map((c: any) => ({
             id: c.batches?.[0]?.course_id || c.course_name,
-            course_name: c.course_name
+            course_name: c.course_name,
           }));
-          this.cdr.detectChanges();
+         this.cdr.markForCheck();
         }
       },
       error: (err) => console.error('Failed to load courses', err),
@@ -108,18 +115,27 @@ export class ScoreManagement implements OnInit {
   loadSubjects(batchId: number) {
     this.dropdownService.getSubjects(batchId).subscribe({
       next: (res) => {
+        setTimeout(() => {
         if (res && res.data) {
           this.subjects = res.data;
+        } else {
+          this.subjects = [];
         }
-      },
+        // ✅ แจ้ง Change Detection แบบปลอดภัย
+        this.cdr.markForCheck();
+      }, 0);
+    },
       error: (err) => console.error('Failed to load subjects', err),
     });
   }
 
   loadStudents(batchId: number, subjectId: number) {
-    this.isLoading = true;
-    this.scoreService.getAdminSubjectScores(batchId, subjectId).subscribe({
-      next: (res) => {
+  this.isLoading = true;
+
+  this.scoreService.getAdminSubjectScores(batchId, subjectId).subscribe({
+    next: (res) => {
+      // ✅ ใช้ setTimeout (Macrotask) เพื่อรอให้ Render Cycle เดิมทำงานจบก่อน 100%
+      setTimeout(() => {
         if (res?.success && res.data) {
           this.studentList = res.data.map((s) => ({
             student_id: s.student_id,
@@ -129,19 +145,27 @@ export class ScoreManagement implements OnInit {
             last_name: s.last_name,
             raw_score: s.raw_score ?? null,
           }));
+
           if (res.max_score) {
             this.inputMaxScore = res.max_score;
           }
           this.updateStats();
         }
         this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Failed to load students', err);
+        
+        // 💡 ใช้ detectChanges() บังคับซิงค์ View ทันที
+        this.cdr.detectChanges();
+      }, 0);
+    },
+    error: (err) => {
+      console.error('Failed to load students', err);
+      setTimeout(() => {
         this.isLoading = false;
-      },
-    });
-  }
+        this.cdr.markForCheck();
+      }, 0);
+    },
+  });
+}
 
   get validScores(): number[] {
     return this.studentList
@@ -152,18 +176,28 @@ export class ScoreManagement implements OnInit {
       );
   }
 
-  get averageScore(): string {
+  /*get averageScore(): string {
     const scores = this.validScores;
     if (scores.length === 0) return '-';
     const sum = scores.reduce((a, b) => a + Number(b), 0);
     return (sum / scores.length).toFixed(2);
-  }
+  }*/
+
+  // 1. สร้างตัวแปรธรรมดามารับค่า
+  averageScore: string = '-';
 
   updateStats() {
     const scores = this.validScores;
     this.filledCount = scores.length;
     this.maxScoreValue = scores.length > 0 ? Math.max(...scores) : null;
     this.minScoreValue = scores.length > 0 ? Math.min(...scores) : null;
+
+    if (scores.length === 0) {
+    this.averageScore = '-';
+  } else {
+    const sum = scores.reduce((a, b) => a + Number(b), 0);
+    this.averageScore = (sum / scores.length).toFixed(2);
+  }
   }
 
   onCourseChange() {
@@ -175,14 +209,14 @@ export class ScoreManagement implements OnInit {
 
     if (this.selectedCourse && this.selectedCourse !== 'all') {
       // หารุ่นจากข้อมูลที่เก็บไว้ใน courseGroups โดยตรง ไม่ต้องเรียก API ใหม่
-      const courseGroup = this.courseGroups.find(c =>
-        c.batches?.[0]?.course_id == this.selectedCourse
-        || c.course_name === this.selectedCourse
+      const courseGroup = this.courseGroups.find(
+        (c) =>
+          c.batches?.[0]?.course_id == this.selectedCourse || c.course_name === this.selectedCourse,
       );
       if (courseGroup) {
-        this.batches = courseGroup.batches.map(b => ({
+        this.batches = courseGroup.batches.map((b) => ({
           id: b.batch_id,
-          batch_name: b.batch_name
+          batch_name: b.batch_name,
         }));
       } else {
         this.batches = [];
@@ -203,15 +237,24 @@ export class ScoreManagement implements OnInit {
     }
   }
 
+  // ✅ เพิ่มฟังก์ชันรับค่าเมื่อมีการพิมพ์คะแนนเต็ม
+  onMaxScoreChange(newMaxScore: number) {
+    this.inputMaxScore = newMaxScore;
+  }
+
   onSubjectChange() {
+    setTimeout(() => {
     this.studentList = [];
     this.isSaved = false;
     this.saveError = '';
     this.updateStats();
+
     if (this.selectedBatch && this.selectedSubjectId) {
       this.loadStudents(this.selectedBatch, this.selectedSubjectId);
     }
-  }
+    this.cdr.detectChanges();
+  }, 0);
+}
 
   onMaxScoreConfirm() {
     // Optionally update max score on backend if required
@@ -229,10 +272,18 @@ export class ScoreManagement implements OnInit {
   }
 
   onScoreInput(student: StudentScore) {
+  setTimeout(() => {
     if (student.raw_score !== null && student.raw_score > this.inputMaxScore) {
       student.raw_score = this.inputMaxScore;
     }
+    
     this.updateStats();
+    this.cdr.markForCheck();
+  }, 0);
+}
+
+onScoreChange(student: StudentScore, newScore?: any) {
+    this.onScoreInput(student);
   }
 
   addCourse() {
@@ -248,18 +299,7 @@ export class ScoreManagement implements OnInit {
     });
   }
 
-  addStudent() {
-    const dialogRef = this.dialog.open(AddStudentDialog, {
-      width: '500px',
-      disableClose: true,
-    });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result && this.selectedBatch && this.selectedSubjectId) {
-        this.loadStudents(this.selectedBatch, this.selectedSubjectId);
-      }
-    });
-  }
 
   onCancel() {
     this.selectedSubjectId = null;
@@ -292,9 +332,12 @@ export class ScoreManagement implements OnInit {
 
     this.scoreService.saveAdminBulkScores(payload).subscribe({
       next: (res) => {
-        this.isSaving = false;
-        this.isSaved = true;
-        this.saveError = '';
+        queueMicrotask(() => {
+          this.isSaving = false;
+          this.isSaved = true;
+          this.saveError = '';
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
         this.isSaving = false;
@@ -304,10 +347,15 @@ export class ScoreManagement implements OnInit {
     });
   }
 
+// ✅ เพิ่มฟังก์ชันสำหรับกดปุ่ม "แก้ไขคะแนน"
+enableEditMode() {
+  this.isSaved = false;
+  this.saveError = '';
+  this.cdr.markForCheck();
+}
+
   goToNextSubject() {
-    const currentIndex = this.subjects.findIndex(
-      (s) => s.subject_id === this.selectedSubjectId
-    );
+    const currentIndex = this.subjects.findIndex((s) => s.subject_id === this.selectedSubjectId);
     const nextIndex = currentIndex + 1;
     if (nextIndex < this.subjects.length) {
       this.selectedSubjectId = this.subjects[nextIndex].subject_id;
@@ -316,9 +364,7 @@ export class ScoreManagement implements OnInit {
   }
 
   get hasNextSubject(): boolean {
-    const currentIndex = this.subjects.findIndex(
-      (s) => s.subject_id === this.selectedSubjectId
-    );
+    const currentIndex = this.subjects.findIndex((s) => s.subject_id === this.selectedSubjectId);
     return currentIndex >= 0 && currentIndex < this.subjects.length - 1;
   }
 }

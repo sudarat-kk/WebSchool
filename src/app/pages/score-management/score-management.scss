@@ -445,3 +445,71 @@ $pink-btn-hover: #960055;
     mat-icon { font-size: 20px; width: 20px; height: 20px; }
   }
 }
+
+.btn-edit-mode {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 20px; /* ปรับให้เท่ากัน */
+  background-color: #ff9800; /* สีส้ม */
+  color: $white;
+  border: none;
+  border-radius: 50px; /* ปรับเป็นทรงแคปซูลมนเท่ากัน */
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+
+  &:hover {
+    background-color: #e68a00;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ปุ่มย้อนกลับดีไซน์ทรงแคปซูล ขนาดกะทัดรัด */
+.btn-back-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 20px; /* เท่ากับ btn-next-subject */
+  background-color: #5a6578; /* สีเทาอมฟ้าพาสเทลตามรูป */
+  color: $white;
+  border: none;
+  border-radius: 50px; /* ทรงแคปซูลมนเท่ากัน */
+  font-size: 0.9rem; /* 14.4px เท่ากับวิชาถัดไป */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+
+  &:hover:not(:disabled) {
+    background-color: #4a5464;
+    box-shadow: 0 2px 8px rgba(90, 101, 120, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  mat-icon {
+    font-size: 18px; /* ขนาดเท่ากันทุกปุ่ม */
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

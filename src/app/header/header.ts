@@ -92,6 +92,8 @@ export class Header implements OnInit {
       });
   }
 
+  private cdr = inject(ChangeDetectorRef);
+
   ngOnInit(): void {
     this.fetchCourses();
   }
@@ -134,6 +136,7 @@ export class Header implements OnInit {
           if (committeeMenuIndex !== -1) {
             this.menuData[committeeMenuIndex].submenus = response.data;
           }
+          this.cdr.detectChanges();
         }
       },
       error: (error) => {
