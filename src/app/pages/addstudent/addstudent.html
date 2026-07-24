@@ -1,0 +1,160 @@
+<div class="admin-page">
+  <!-- แถบหัวข้อหน้าพร้อมปุ่มย้อนกลับ -->
+  <div class="page-header">
+    <button mat-icon-button class="back-button" type="button" (click)="onCancel()" title="ย้อนกลับ">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <h1 class="course-title">เพิ่มข้อมูลนักเรียน</h1>
+  </div>
+
+  <!-- เนื้อหาหลัก -->
+  <div class="content-container">
+
+    <!-- แท็บเลือกโหมด -->
+    <div class="modal-tabs">
+      <button type="button" [class.active]="activeTab === 'single'" (click)="switchTab('single')">
+        {{ isEditing ? '✏️ แก้ไขข้อมูลรายคน' : 'กรอกทีละคน' }}
+      </button>
+      <button type="button" [class.active]="activeTab === 'excel'" (click)="switchTab('excel')">
+        วางรายชื่อ (ก๊อปปี้ Excel)
+      </button>
+      <button type="button" [class.active]="activeTab === 'file'" (click)="switchTab('file')">
+        นำเข้าด้วยไฟล์
+      </button>
+    </div>
+
+    <!-- 📌 แท็บ 1: กรอกทีละคน / แก้ไข -->
+    <form *ngIf="activeTab === 'single'" class="modal-form" (ngSubmit)="onSubmitSingle()">
+      <div class="form-row">
+        <div class="form-group short-input">
+          <label for="rank">ยศ</label>
+          <input type="text" id="rank" name="rank" class="form-control" [(ngModel)]="studentForm.rank">
+        </div>
+        <div class="form-group">
+          <label for="firstName">ชื่อ</label>
+          <input type="text" id="firstName" name="firstName" class="form-control" [(ngModel)]="studentForm.firstName" required>
+        </div>
+        <div class="form-group">
+          <label for="lastName">นามสกุล</label>
+          <input type="text" id="lastName" name="lastName" class="form-control" [(ngModel)]="studentForm.lastName" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="studentCode">รหัสประจำตัวนักเรียน</label>
+          <input type="text" id="studentCode" name="studentCode" class="form-control" [(ngModel)]="studentForm.studentCode" required>
+        </div>
+        <div class="form-group">
+          <label for="password">รหัสผ่าน {{ isEditing ? '(เว้นว่างหากไม่เปลี่ยน)' : '' }}</label>
+          <input type="password" id="password" name="password" class="form-control" [(ngModel)]="studentForm.password">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="affiliation">สังกัด</label>
+        <input type="text" id="affiliation" name="affiliation" class="form-control" [(ngModel)]="studentForm.affiliation">
+      </div>
+
+      <div class="form-actions center">
+        <button type="button" class="btn-gray" (click)="isEditing ? resetForm() : onCancel()">
+          {{ isEditing ? 'ยกเลิกการแก้ไข' : 'ยกเลิก' }}
+        </button>
+        <button type="submit" class="btn-purple btn-wide">
+          {{ isEditing ? 'อัปเดตข้อมูล' : 'ยืนยันการเพิ่มรายคน' }}
+        </button>
+      </div>
+    </form>
+
+    <!-- 📌 แท็บ 2: วางรายชื่อ (ก๊อปปี้ Excel) -->
+    <form *ngIf="activeTab === 'excel'" class="modal-form" (ngSubmit)="onSubmitExcel()">
+      <div class="form-group">
+        <label for="pasteData">วางรายชื่อที่คัดลอก (ยศ [tab] ชื่อ [tab] นามสกุล [tab] รหัส [tab] สังกัด)</label>
+        <textarea id="pasteData" name="pasteData" rows="6" class="form-control textarea-gray" [(ngModel)]="excelData" placeholder="วางข้อมูลที่ก๊อปปี้จาก Excel ลงที่นี่..."></textarea>
+      </div>
+
+      <div class="form-actions space-between">
+        <button type="button" class="btn-gray" (click)="onCancel()">ยกเลิก</button>
+        <div class="right-buttons">
+          <button type="submit" class="btn-purple">นำเข้าข้อมูล</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- 📌 แท็บ 3: นำเข้าด้วยไฟล์ -->
+    <form *ngIf="activeTab === 'file'" class="modal-form" (ngSubmit)="onSubmitExcel()">
+      <div class="file-upload-zone">
+        <div class="upload-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </div>
+        
+        <p class="upload-text" *ngIf="!selectedFileName">ลากไฟล์รายชื่อ <strong>.csv</strong> หรือ <strong>.txt</strong> วางในช่องนี้ หรือคลิกเพื่อเลือกไฟล์</p>
+        <p class="upload-text" *ngIf="selectedFileName" style="color: #673ab7;">
+          ไฟล์ที่เลือก: <strong>{{ selectedFileName }}</strong>
+        </p>
+        
+        <input type="file" accept=".csv, .txt" class="file-input-hidden" (change)="onFileSelected($event)">
+      </div>
+
+      <div class="form-actions center">
+        <button type="button" class="btn-gray" (click)="onCancel()">ยกเลิก</button>
+        <button type="submit" class="btn-purple btn-wide">เพิ่มข้อมูลจากไฟล์</button>
+      </div>
+    </form>
+
+    <!-- 📊 ส่วนตารางรายชื่อนักเรียน (Student List Table) -->
+    <div class="student-list-section">
+      <div class="section-header">
+        <h3>รายชื่อนักเรียนในระบบ ({{ students.length }} คน)</h3>
+      </div>
+
+      <!-- ตารางแสดงเมื่อมีข้อมูล -->
+      <div class="table-responsive" *ngIf="students.length > 0">
+        <table class="student-table">
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 60px;">ลำดับ</th>
+              <th>ยศ - ชื่อ - นามสกุล</th>
+              <th>รหัสประจำตัว</th>
+              <th>สังกัด</th>
+              <th class="text-center" style="width: 100px;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of students; let i = index" [class.highlight-row]="student.id === editingId">
+              <td class="text-center font-weight-medium">{{ i + 1 }}</td>
+              <td>
+                <span class="font-weight-medium">{{ student.rank }} {{ student.firstName }} {{ student.lastName }}</span>
+              </td>
+              <td>
+                <span class="code-badge">{{ student.studentCode }}</span>
+              </td>
+              <td>{{ student.affiliation || '-' }}</td>
+              <td class="text-center actions-cell">
+                <!-- ปุ่มแก้ไข -->
+                <button type="button" class="btn-icon btn-edit" title="แก้ไข" (click)="onEditStudent(student)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <!-- ปุ่มลบ -->
+                <button type="button" class="btn-icon btn-delete" title="ลบ" (click)="onDeleteStudent(student.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- แสดงเมื่อยังไม่มีข้อมูลนักเรียน -->
+      <div class="empty-state" *ngIf="students.length === 0">
+        <mat-icon class="empty-icon">person_off</mat-icon>
+        <p>ยังไม่มีข้อมูลนักเรียนในระบบ</p>
+      </div>
+    </div>
+
+  </div>
+</div>

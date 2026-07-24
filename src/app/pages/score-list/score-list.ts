@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject  } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,7 @@ import { ScoreService } from '../../services/score.service';
 import { CourseService, CourseGroup } from '../../services/course.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+
 
 interface Batch {
   id: number;
@@ -66,6 +67,7 @@ interface GroupSummary {
   styleUrl: './score-list.scss',
 })
 export class ScoreList implements OnInit {
+
   // Dropdown state
   courseGroups: CourseGroup[] = [];
   selectedCourse: any = 'all';
@@ -80,6 +82,8 @@ export class ScoreList implements OnInit {
   lastProcessedTime: string = '';
   isLoading: boolean = false;
   errorMsg: string = '';
+
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(
     private courseService: CourseService,
@@ -155,6 +159,7 @@ export class ScoreList implements OnInit {
   onSubjectChange(): void {
     this.students = [];
     this.groupSummary = null;
+    this.cdr.markForCheck();
 
     // ค้นหาวิชาที่ผู้ใช้เพิ่งกดเลือกจาก Dropdown
     const selectedSubj = this.subjectsList.find((s) => s.id === this.selectedSubjectId);
@@ -178,8 +183,12 @@ export class ScoreList implements OnInit {
           this.students = res.data;
           this.groupSummary = res.summary;
           this.updateProcessedTime();
+        }else{
+          this.students = [];
+          this.groupSummary = null;
         }
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to load results', err);

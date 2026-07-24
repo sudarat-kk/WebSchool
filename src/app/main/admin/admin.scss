@@ -52,9 +52,13 @@
   padding: 20px;
   border-radius: 8px;
   background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 
   .section-title {
     margin-top: 0;
+    margin-bottom: 4px;
     color: #333333;
     font-size: 18px;
   }
@@ -69,8 +73,16 @@
   padding: 15px;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
 
   .card-details {
+    text-align: left;
+
     .card-title {
       margin: 0 0 5px 0;
       color: #1976d2;
@@ -84,32 +96,112 @@
       color: #666666;
     }
   }
-}
 
-/* ส่วนของปุ่มกด */
-.btn-navigate {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 16px;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #1565c0; /* สีจะเข้มขึ้นเล็กน้อยเวลาเอาเมาส์ไปชี้ */
+  &.form-management-card {
+    .card-details .card-title {
+      color: #673ab7;
+    }
   }
 
+  &.student-management-card {
+    .card-details .card-title {
+      color: #00897b;
+    }
+  }
+}
+
+/* ส่วนของปุ่มกด (UI/UX Redesign) */
+.btn-navigate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  background-color: #1976d2;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  
+  /* เงาและ Animation การกด */
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.25);
+  transition: all 0.25s ease-in-out;
+  position: relative;
+  overflow: hidden;
+
+  /* 🖱️ Effect เวลาเอาเมาส์ชี้ (Hover) */
+  &:hover {
+    background-color: #1565c0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(25, 118, 210, 0.35);
+
+    .btn-icon {
+      transform: translateX(3px);
+    }
+  }
+
+  /* 👆 Effect เวลาคลิกกดลงไป (Active) */
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(25, 118, 210, 0.2);
+  }
+
+  /* 🟣 ปุ่มธีมม่วง */
+  &.btn-purple {
+    background-color: #673ab7;
+    box-shadow: 0 4px 12px rgba(103, 58, 183, 0.25);
+
+    &:hover {
+      background-color: #512da8;
+      box-shadow: 0 6px 16px rgba(103, 58, 183, 0.35);
+    }
+
+    &:active {
+      box-shadow: 0 2px 6px rgba(103, 58, 183, 0.2);
+    }
+  }
+
+  /* 🟢 ปุ่มธีมเขียว Teal */
+  &.btn-teal {
+    background-color: #00897b;
+    box-shadow: 0 4px 12px rgba(0, 137, 123, 0.25);
+
+    &:hover {
+      background-color: #00695c;
+      box-shadow: 0 6px 16px rgba(0, 137, 123, 0.35);
+    }
+
+    &:active {
+      box-shadow: 0 2px 6px rgba(0, 137, 123, 0.2);
+    }
+  }
+
+  /* 📍 ไอคอนภายในปุ่ม */
   .btn-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.25s ease;
+  }
+}
+
+/* รองรับการแสดงผลบนหน้าจอมือถือ */
+@media (max-width: 600px) {
+  .action-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    .btn-navigate {
+      width: 100%;
+      justify-content: center;
+    }
   }
 }

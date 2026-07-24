@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddCourseDialog } from '../add-course-dialog/add-course-dialog';
-import { AddStudentDialog } from '../add-student-dialog/add-student-dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
@@ -58,6 +57,7 @@ interface StudentScore {
   styleUrl: './score-management.scss',
 })
 export class ScoreManagement implements OnInit {
+
   
   courses: Course[] = [];
   courseGroups: CourseGroup[] = []; // เก็บข้อมูลหลักสูตรดิบจาก API พร้อม batches
@@ -299,18 +299,7 @@ onScoreChange(student: StudentScore, newScore?: any) {
     });
   }
 
-  addStudent() {
-    const dialogRef = this.dialog.open(AddStudentDialog, {
-      width: '500px',
-      disableClose: true,
-    });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result && this.selectedBatch && this.selectedSubjectId) {
-        this.loadStudents(this.selectedBatch, this.selectedSubjectId);
-      }
-    });
-  }
 
   onCancel() {
     this.selectedSubjectId = null;

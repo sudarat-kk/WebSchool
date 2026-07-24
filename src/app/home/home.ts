@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClient } from '@angular/common/http';
+import { ChangeDetectorRef, inject } from '@angular/core';
 
 @Component({
   selector: 'app-home',
@@ -36,6 +37,8 @@ export class Home {
 
   currentIndex = 0;
   private autoPlayTimer: any;
+
+  private cdr = inject(ChangeDetectorRef);
 
   nextSlide() {
     this.currentIndex = (this.currentIndex + 1) % this.slides.length;
@@ -113,6 +116,7 @@ export class Home {
       .subscribe((data) => {
         this.staffList = data;
         this.staffPage = 0; // reset หน้าให้เริ่มที่ 0 ทุกครั้งที่โหลดใหม่
+        this.cdr.detectChanges();
       });
 
     this.startAutoPlay();

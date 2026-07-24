@@ -6,34 +6,48 @@
     </button>
     <h1 class="course-title">ส่วนจัดการระบบ (สำหรับผู้ดูแลระบบ)</h1>
   </div>
-  
+
   <div class="content-container">
-    <p>หน้านี้เป็นส่วนที่ใช้สำหรับผู้ดูแลระบบในการจัดการลิงก์แบบประเมินต่างๆ</p>
-    
+    <p>หน้านี้เป็นส่วนที่ใช้สำหรับผู้ดูแลระบบในการจัดการลิงก์แบบประเมินและข้อมูลต่างๆ</p>
+
     <!-- ส่วนข้อมูลและปุ่มลิงก์ที่แยกคลาสเรียบร้อยแล้ว -->
     <div class="management-section">
       <h3 class="section-title">เมนูการจัดการ</h3>
-      
+
+      <!-- 🟢 การ์ดที่ 3: จัดการข้อมูลนักเรียน (แก้ไขปุ่มตรงนี้แล้ว) -->
+      <div class="action-card student-management-card">
+        <div class="card-details">
+          <h4 class="card-title">จัดการข้อมูลนักเรียน</h4>
+          <p class="card-subtitle">เพิ่ม นำเข้า แก้ไข และจัดการรายชื่อนักเรียนในระบบ</p>
+        </div>
+
+        <!-- ✅ เปลี่ยนเป็นใช้ class="btn-navigate btn-teal" ให้เข้ากับสไตล์ปุ่มอื่น -->
+        <button type="button" class="btn-navigate btn-teal" routerLink="/admin/addstudent">
+          <mat-icon class="btn-icon">add</mat-icon>
+          <span>เพิ่มข้อมูลนักเรียน</span>
+        </button>
+      </div>
+
       <!-- การ์ดที่ 1: แบบกรอกคะแนนนักเรียน (ของเดิม) -->
       <div class="action-card">
         <div class="card-details">
           <h4 class="card-title">แบบกรอกคะแนนนักเรียน</h4>
           <p class="card-subtitle">สำหรับเข้าสู่หน้าบันทึกและจัดการคะแนนในระบบ</p>
         </div>
-        
+
         <button mat-raised-button color="primary" routerLink="/admin/scoremanagement" class="btn-navigate">
           <mat-icon class="btn-icon">edit</mat-icon>
           ไปยังหน้ากรอกคะแนน
         </button>
       </div>
 
-      <!--  บาร์การ์ดที่ 2: เพิ่มการ์ดสำหรับไปยังหน้าแบบฟอร์ม (ธีมม่วงพาสเทล) -->
+      <!-- การ์ดที่ 2: เพิ่มการ์ดสำหรับไปยังหน้าแบบฟอร์ม (ธีมม่วงพาสเทล) -->
       <div class="action-card form-management-card">
         <div class="card-details">
           <h4 class="card-title">จัดการและสร้างแบบฟอร์มประเมิน</h4>
           <p class="card-subtitle">สร้าง ผูกหลักสูตร วางลิงก์ Google Form และเปิด-ปิดใช้งานแบบประเมิน</p>
         </div>
-        
+
         <!-- ใช้ routerLink ชี้ไปยัง Path หน้าฟอร์มที่คุณกำหนดไว้ใน Routing -->
         <button mat-raised-button color="primary" routerLink="/admin/form" class="btn-navigate btn-purple">
           <mat-icon class="btn-icon">assignment</mat-icon>

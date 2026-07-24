@@ -10,6 +10,8 @@ import { From } from './main/from/from';
 import { ScoreList } from './pages/score-list/score-list';
 import { ClassOverview } from './pages/class-overview/class-overview';
 import { AdminLogin } from './pages/admin-login/admin-login';
+import { Addstudent } from './pages/addstudent/addstudent';
+
 
 export const routes: Routes = [
   // หน้าแรก
@@ -37,6 +39,7 @@ export const routes: Routes = [
       { path: 'ScoreList', component: ScoreList },
       { path: 'form', component: From },
       { path: 'classoverview', component: ClassOverview },
+      { path: 'addstudent', component: Addstudent },
     ],
   },
 
