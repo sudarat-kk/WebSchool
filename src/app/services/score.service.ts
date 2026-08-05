@@ -30,88 +30,24 @@ export interface ScoreResponse {
   group_summaries: GroupSummary[];
 }
 
-export interface SingleScoreResponse {
-  message: string;
-  updated_summaries: GroupSummary[];
-}
-
-export interface ScoreItem {
-  setting_id: number;
-  raw_score: number;
-}
-
-export interface BulkScoreRequest {
-  student_id: number;
-  batch_id: number;
-  scores: ScoreItem[];
-}
-
-export interface SingleScoreRequest {
-  student_id: number;
-  batch_id: number;
-  setting_id: number;
-  raw_score: number;
-}
-
 export interface UpdateMaxScoreRequest {
   setting_id: number;
   max_score: number;
 }
 
-// ==========================================
-// Admin Score Interfaces
-// ==========================================
-export interface AdminScoreItem {
-  student_id: number;
-  raw_score: number;
-}
-
-export interface AdminBulkScoreRequest {
-  subject_id: number; // setting_id / subject id
-  batch_id: number;
-  scores: AdminScoreItem[];
-}
-
-export interface AdminSaveScoreResponse {
-  success: boolean;
-  message: string;
-  saved_count?: number;
-}
-// ข้อมูลนักเรียนและคะแนนดิบ สำหรับแสดงในตารางหน้า "กรอกคะแนน"
-export interface AdminStudentScoreRow {
+export interface AdminStudentScore {
   student_id: number;
   student_code: string;
   rank_name: string;
   first_name: string;
   last_name: string;
-  raw_score: number | null; // ถ้ายังไม่เคยกรอกจะเป็น null
+  raw_score: number | null;
 }
 
-export interface AdminGetSubjectScoresResponse {
+export interface AdminSubjectScoresResponse {
   success: boolean;
-  max_score: number; // ส่งคะแนนเต็มของวิชานี้กลับมาด้วย จะได้เอาไปโชว์ที่หัวตาราง
-  data: AdminStudentScoreRow[];
-}
-
-// ข้อมูลผลการเรียนที่ประมวลผลแล้ว สำหรับหน้า "ประมวลผลผลการเรียน"
-export interface AdminProcessedGradeRow {
-  student_id: number;
-  student_code: string;
-  rank_name: string;
-  first_name: string;
-  last_name: string;
-  total_raw_score: number;
-  total_max_score: number;
-  percentage: number;
-  grade: string;
-  index_value: number; // ค่าประกอบ (เกรด * หน่วยกิต)
-}
-
-export interface AdminGetProcessedGradesResponse {
-  success: boolean;
-  group_name: string;
-  credits: number;
-  data: AdminProcessedGradeRow[];
+  max_score: number;
+  data: AdminStudentScore[];
 }
 
 @Injectable({
@@ -123,18 +59,9 @@ export class ScoreService {
     private authService: AuthService,
   ) {}
 
-  // สร้าง Headers ที่มี Student Token
+  // สร้าง Headers ที่มี Token
   private getHeaders(): HttpHeaders {
     const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    });
-  }
-
-  // สร้าง Headers ที่มี Admin Token
-  private getAdminHeaders(): HttpHeaders {
-    const token = this.authService.getAdminToken();
     return new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
@@ -149,54 +76,70 @@ export class ScoreService {
     );
   }
 
-  // 3. บันทึกคะแนนแบบหลายวิชา (Bulk)
-  saveBulkScores(payload: BulkScoreRequest): Observable<ScoreResponse> {
-    return this.http.post<ScoreResponse>(`${environment.apiUrl}/scores/bulk`, payload, {
-      headers: this.getHeaders(),
+  // 3. แอดมินดึงรายชื่อนักเรียนพร้อมคะแนนของวิชาที่เลือก (ทั้งห้อง)
+  getAdminSubjectScores(
+    batchId: number,
+    subjectId: number,
+  ): Observable<AdminSubjectScoresResponse> {
+    const token = localStorage.getItem('admin_token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     });
-  }
-
-  // 4. บันทึกคะแนน 1 วิชา (Single)
-  saveSingleScore(payload: SingleScoreRequest): Observable<SingleScoreResponse> {
-    return this.http.post<SingleScoreResponse>(`${environment.apiUrl}/scores/single`, payload, {
-      headers: this.getHeaders(),
-    });
+    return this.http.get<AdminSubjectScoresResponse>(
+      `${environment.apiUrl}/admin/scores?batch_id=${batchId}&subject_id=${subjectId}`,
+      { headers },
+    );
   }
 
   // 5. อัปเดตคะแนนเต็มรายวิชา (แอดมิน)
   updateMaxScore(payload: UpdateMaxScoreRequest): Observable<any> {
     return this.http.put<any>(`${environment.apiUrl}/settings/max-score`, payload, {
-      headers: this.getAdminHeaders(),
+      headers: this.getHeaders(),
     });
   }
 
-  // 6. แอดมินบันทึกคะแนนดิบทั้งห้อง (backend คำนวณเอง)
-  saveAdminBulkScores(payload: AdminBulkScoreRequest): Observable<AdminSaveScoreResponse> {
-    return this.http.post<AdminSaveScoreResponse>(
-      `${environment.apiUrl}/admin/scores/bulk`,
-      payload,
-      { headers: this.getAdminHeaders() },
+  // 6. บันทึกคะแนนแบบ Bulk (แอดมิน - ทั้งห้อง)
+  saveAdminBulkScores(payload: {
+    batch_id: number;
+    subject_id: number;
+    scores: { student_id: number; raw_score: number | null }[];
+  }): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/admin/scores/bulk`, payload, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  // 7. ประมวลผลคะแนนตามกลุ่มวิชา
+  getProcessGroupScores(batchId: number, groupId: number): Observable<any> {
+    const token = localStorage.getItem('admin_token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.get<any>(
+      `${environment.apiUrl}/score/process-group?batch_id=${batchId}&group_id=${groupId}`,
+      { headers },
     );
   }
 
-  getAdminSubjectScores(
-    batchId: number,
-    subjectId: number,
-  ): Observable<AdminGetSubjectScoresResponse> {
-    return this.http.get<AdminGetSubjectScoresResponse>(
-      `${environment.apiUrl}/admin/scores?batch_id=${batchId}&subject_id=${subjectId}`,
-      { headers: this.getAdminHeaders() },
-    );
+  // ฟังก์ชันดึงข้อมูลสรุปผลการเรียนทั้งรุ่น
+  getBatchScoresSummary(batchId: number): Observable<any> {
+    const token = localStorage.getItem('admin_token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+
+    return this.http.get<any>(`${environment.apiUrl}/score/process-batch?batch_id=${batchId}`, {
+      headers,
+    });
   }
 
-  // 8. แอดมินดึงข้อมูลสรุปเกรดรายหมวดวิชา สำหรับหน้าจอประมวลผล
-  getAdminProcessedGrades(
-    batchId: number,
-    groupId: number,
-  ): Observable<AdminGetProcessedGradesResponse> {
-    return this.http.get<AdminGetProcessedGradesResponse>(
-      `${environment.apiUrl}/admin/grades/process?batch_id=${batchId}&group_id=${groupId}`,
-      { headers: this.getAdminHeaders() },
-    );
+  // 8. บันทึกคะแนนพิเศษแบบ Bulk (ฝึกอบรม, สอบ, ความประพฤติ)
+  saveSpecialScoresBulk(payload: any): Observable<any> {
+    const token = localStorage.getItem('admin_token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http.post<any>(`${environment.apiUrl}/scores/special-bulk`, payload, {
+      headers,
+    });
   }
 }

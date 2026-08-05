@@ -103,7 +103,7 @@ export class Header implements OnInit {
     // แปลงเป็นตัวพิมพ์เล็กทั้งหมดเพื่อป้องกัน Error จากพิมพ์เล็กพิมพ์ใหญ่ เช่น /Admin หรือ /Admin/dashboard
     const lowerUrl = url.toLowerCase();
 
-    this.isAdmin = lowerUrl.includes('/admin') || lowerUrl.includes('/teacher');
+    this.isAdmin = lowerUrl.includes('/admin');
 
     // เปิดคอนโซลใน Browser (กด F12) ดูว่าหน้าปัจจุบัน URL คืออะไร และระบบมองว่าเป็นแอดมินไหม
     console.log('Current URL:', lowerUrl, 'Is Admin?:', this.isAdmin);

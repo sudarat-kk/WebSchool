@@ -90,12 +90,12 @@ export class SpecialScoreDialog implements OnInit {
     };
 
     this.scoreService.saveSpecialScoresBulk(payload).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         alert('บันทึกข้อมูลคะแนนพิเศษสำเร็จ!');
         this.isSaving = false;
         this.dialogRef.close(true); // pass true to indicate successful save
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to save special scores', err);
         alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
         this.isSaving = false;

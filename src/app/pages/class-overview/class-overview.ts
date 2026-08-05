@@ -154,7 +154,7 @@ export class ClassOverview implements OnInit {
     }
 
     this.scoreService.getBatchScoresSummary(batchId).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         if (res?.success) {
           // ใช้งานข้อมูลผลลัพธ์ที่คำนวณจาก Backend โดยตรง
           this.subjectGroups = res.summary.subjectGroups || [];
@@ -222,7 +222,7 @@ export class ClassOverview implements OnInit {
         }
         this.isLoading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error fetching batch scores summary from service:', err);
         this.students = [];
         this.masterSubjects = [];

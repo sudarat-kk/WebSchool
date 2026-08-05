@@ -308,7 +308,7 @@ export class ScoreManagement implements OnInit {
       subject_id: this.selectedSubjectId,
       scores: studentsToSave.map((s) => ({
         student_id: s.student_id,
-        raw_score: s.raw_score,
+        raw_score: s.raw_score as number,
       })),
     };
 
