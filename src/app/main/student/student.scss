@@ -20,14 +20,34 @@
 .page-header {
   display: flex;
   align-items: center;
-  margin-bottom: 10rem;
+  margin-bottom: 5rem;
   
   .back-button {
     margin-right: 1rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #f8f9fa;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
     mat-icon {
       font-size: 2rem;
       width: 2rem;
       height: 2rem;
+      line-height: 2rem;
+      color: #333;
     }
   }
 
@@ -250,4 +270,14 @@
       }
     }
   }
+}
+
+.alert-title {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.alert-title:hover {
+  text-decoration: underline;
 }

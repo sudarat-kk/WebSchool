@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap');
+
+$purple-dark: #3e0549;
+$purple-mid: #7b3fa0;
+$purple-light: #f4f0fa;
+$purple-border: #d6c5e8;
+
+.admin-login-page {
+  min-height: 100vh;
+  background: linear-gradient(145deg, #f9f6fd 0%, #ede2f5 50%, #e0cff5 100%);
+  font-family: 'Sarabun', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Back button ────────────────────────
+.page-header {
+  padding: 12px 16px;
+}
+
+.back-button {
+  color: $purple-dark;
+}
+
+// ── Content wrapper ────────────────────
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px 40px;
+  text-align: center;
+}
+
+// ── Icon ──────────────────────────────
+.admin-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $purple-dark, $purple-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(62, 5, 73, 0.25);
+
+  .admin-shield-icon {
+    font-size: 42px;
+    width: 42px;
+    height: 42px;
+    color: #fff;
+  }
+}
+
+// ── Title ─────────────────────────────
+.main-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: $purple-dark;
+  margin: 0 0 8px;
+}
+
+.sub-title {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 28px;
+}
+
+// ── Card ──────────────────────────────
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(62, 5, 73, 0.1);
+  padding: 32px 28px 24px;
+  margin-bottom: 24px;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.input-field {
+  width: 100%;
+  font-size: 16px;
+}
+
+// ── Error ─────────────────────────────
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #c62828;
+  font-size: 14px;
+  margin: 0;
+  padding: 10px 14px;
+  background: #ffebee;
+  border-radius: 8px;
+
+  .error-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ── Login Button ──────────────────────
+.action-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, $purple-dark, $purple-mid) !important;
+  color: #fff !important;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 10px 40px;
+  border-radius: 10px;
+  min-width: 160px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+
+  &:hover:not([disabled]) {
+    opacity: 0.88;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+  }
+}
+
+// ── Support Footer ────────────────────
+.support-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 440px;
+  padding: 16px 8px;
+
+  .support-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+
+    .warning-icon {
+      color: #fbc02d;
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  .support-right-inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .phone-btn {
+    background-color: #db4437 !important;
+    color: #fff !important;
+
+    .mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .phone-number-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #000;
+    white-space: nowrap;
+  }
+}

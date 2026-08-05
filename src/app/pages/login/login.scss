@@ -1,0 +1,144 @@
+.page-content {
+  text-align: center;
+  padding: 20px;
+}
+
+.main-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 50px; 
+}
+
+.sub-title {
+  font-size: 20px; 
+  color: #333333; 
+  margin-bottom: 32px; 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.title-icon {
+  font-size: 24px; 
+  width: 24px;
+  height: 24px;
+  color: #333333;       
+}
+
+/* ส่วนจัดแต่งสำหรับกล่องกรอกข้อมูล */
+.login-container {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;    
+  gap: 20px; 
+  width: 100%;
+}
+
+.password-field {
+  width: 100%;
+  max-width: 420px;       
+  font-size: 18px; 
+
+  ::v-deep .mat-icon {
+    font-size: 24px; 
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ส่วนเพิ่มข้อความสองฝั่ง (ลงมาจากช่องกรอกรหัสผ่าน) */
+.login-helpers {
+  display: flex;
+  justify-content: space-between; 
+  width: 100%;
+  max-width: 420px;               
+  margin-top: -8px;               
+  padding: 0 4px;                 
+  font-size: 15px;                
+  color: #666666;                 
+  
+  span {
+    cursor: pointer;              
+    &:hover {
+      color: #1976d2;             
+      text-decoration: underline; 
+    }
+  }
+}
+
+/* จัดตำแหน่งปุ่มค้นหา */
+.action-container {
+  margin-top: 24px;
+  margin-bottom: 40px; 
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.search-btn {
+  background-color: #e0e0e0; 
+  color: #000000;            
+  font-size: 20px;           
+  font-weight: 500;
+  padding: 8px 32px;         
+  border-radius: 8px;        
+  min-width: 140px;          
+  height: auto;
+}
+
+/* ส่วนแจ้งปัญหาด้านล่างสุด (คุมพฤติกรรมแยกฝั่งซ้าย-ขวา) */
+.support-footer {
+  display: flex;
+  justify-content: space-between; /* ดันกลุ่มซ้าย และกลุ่มขวา แยกออกจากกันสุดขอบ */
+  align-items: center;
+  width: 100%;
+  max-width: 420px;               /* ความกว้างเท่ากับช่องกรอกด้านบน */
+  margin: 0 auto;                 /* จัดให้กล่องทั้งหมดอยู่ตรงกลางหน้าจอ */
+  padding: 16px 8px;
+}
+
+/* จัดสไตล์ฝั่งซ้าย */
+.support-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;                      
+  font-size: 18px;               
+  color: #000000;
+  font-weight: 500;
+
+  .warning-icon {
+    color: #fbc02d;              /* ไอคอนสามเหลี่ยมสีเหลือง */
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* จัดสไตล์ฝั่งขวา (ปุ่มแดง + เบอร์โทร) */
+.support-right-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* ระยะห่างระหว่างปุ่มวงกลมสีแดง กับ ตัวเลขเบอร์โทรด้านหลัง */
+}
+
+/* ปุ่มโทรศัพท์วงกลมสีแดง */
+.phone-btn {
+  background-color: #db4437 !important; /* สีแดงส้มตามรูป (ใส่ !important กัน Material ครอบงำ) */
+  color: #ffffff !important;            /* ไอคอนโทรศัพท์สีขาว */
+  
+  .mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ตัวหนังสือเบอร์โทรศัพท์ปกติที่อยู่ขวาสุด */
+.phone-number-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #000000;      /* ตัวหนังสือสีดำปกติ */
+  white-space: nowrap; /* ล็อกไม่ให้ตัวเลขเบอร์โทรตกบรรทัด */
+}

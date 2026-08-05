@@ -27,101 +27,87 @@ export interface StudentLoginResponse {
   studentData?: StudentData;
 }
 
-// ==========================================
-// 2. Interfaces สำหรับ Admin Authentication
-// ==========================================
-export interface AdminData {
-  admin_id: number;
-  email: string;
-}
-
-export interface AdminLoginRequest {
-  email: string; // 👈 แก้จาก username เป็น email ให้ตรงกับ Backend
-  password: string;
-}
-
-export interface AdminLoginResponse {
-  success: boolean;
-  message: string;
-  token?: string;
-  adminData?: AdminData; // 👈 เพิ่มการรับค่า adminData
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   constructor(private http: HttpClient) {}
 
-  // ==========================================
-  // Student Methods
-  // ==========================================
-
   // ฟังก์ชันยิง API Login
   studentLogin(payload: StudentLoginRequest): Observable<StudentLoginResponse> {
     return this.http.post<StudentLoginResponse>(`${environment.apiUrl}/student-login`, payload);
   }
 
+  // บันทึก Token ลง localStorage
   saveToken(token: string): void {
     localStorage.setItem('student_token', token);
   }
 
+  // ดึง Token จาก localStorage
   getToken(): string | null {
     return localStorage.getItem('student_token');
   }
 
+  // บันทึกข้อมูลนักเรียนลง localStorage
   saveStudentData(data: StudentData): void {
     localStorage.setItem('student_data', JSON.stringify(data));
   }
 
+  // ดึงข้อมูลนักเรียนจาก localStorage
   getStudentData(): StudentData | null {
     const data = localStorage.getItem('student_data');
     return data ? JSON.parse(data) : null;
   }
 
+  // ออกจากระบบ
   logout(): void {
     localStorage.removeItem('student_token');
     localStorage.removeItem('student_data');
   }
 
+  // ตรวจสอบว่า Login อยู่หรือไม่
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
 
   // ==========================================
-  // Admin Methods
+  // ส่วนของ Admin
   // ==========================================
 
-  // ฟังก์ชันยิง API Login สำหรับแอดมิน
-  adminLogin(payload: AdminLoginRequest): Observable<AdminLoginResponse> {
-    return this.http.post<AdminLoginResponse>(`${environment.apiUrl}/admin/login`, payload);
+  // ฟังก์ชันยิง API Admin Login
+  adminLogin(payload: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/admin/login`, payload);
   }
 
+  // บันทึก Admin Token ลง localStorage
   saveAdminToken(token: string): void {
     localStorage.setItem('admin_token', token);
   }
 
+  // ดึง Admin Token จาก localStorage
   getAdminToken(): string | null {
     return localStorage.getItem('admin_token');
   }
 
-  // 👈 เพิ่มฟังก์ชันบันทึกข้อมูลแอดมิน
-  saveAdminData(data: AdminData): void {
+  // บันทึกข้อมูล Admin ลง localStorage
+  saveAdminData(data: any): void {
     localStorage.setItem('admin_data', JSON.stringify(data));
   }
 
-  // 👈 เพิ่มฟังก์ชันดึงข้อมูลแอดมิน
-  getAdminData(): AdminData | null {
+  // ดึงข้อมูล Admin จาก localStorage
+  getAdminData(): any | null {
     const data = localStorage.getItem('admin_data');
     return data ? JSON.parse(data) : null;
   }
 
-  adminLogout(): void {
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_data'); // 👈 อย่าลืมเคลียร์ข้อมูลตอนล็อกเอาท์ด้วย
-  }
-
+  // ตรวจสอบว่า Admin Login อยู่หรือไม่
   isAdminLoggedIn(): boolean {
     return !!this.getAdminToken();
+  }
+
+  // ออกจากระบบ Admin
+  adminLogout(): void {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_data');
   }
 }

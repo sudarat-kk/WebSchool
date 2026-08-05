@@ -1,14 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ElementRef, inject, ChangeDetectorRef } from '@angular/core';
+// Angular Material
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+
+import { CommonModule } from '@angular/common';
+import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { CourseService } from '../services/course.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
+    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
@@ -17,9 +23,10 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
     RouterLinkActive,
   ],
   templateUrl: './header.html',
-  styleUrl: './header.scss',
+  styleUrls: ['./header.scss'],
 })
 export class Header implements OnInit {
+  isAdmin = false;
   // สร้าง Array มารอรับข้อมูลจาก Backend
   // โครงสร้างเมนูของคุณ (แก้ไขตามที่มีอยู่จริง)
   menuData: any[] = [
@@ -35,20 +42,17 @@ export class Header implements OnInit {
     },
     {
       title: 'สำหรับคณะกับกำหลักสูตร',
-      path: '',
+      path: '/committee',
       submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
       title: 'แบบประเมินติดตามผู้สำเร็จฯ',
-      submenus: [
-        { course_name: 'นายสิบอาวุโส (เร่งรัด)', batches: [] },
-        { course_name: 'นายสิบชั้นต้น (เร่งรัด)', batches: [] },
-        { course_name: 'ช่างอิเล็กทรอนิกส์', batches: [] },
-        { course_name: 'นนส.ทบ. เหล่า ส.', batches: [] },
-      ], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
+      path: '/follow-up',
+      submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
       title: 'สรุปผลการฝึกอบรม',
+      path: '/training-summary',
       simpleItems: [
         'ชั้นนายพัน',
         'นายสิบอาวุโส',
@@ -59,6 +63,7 @@ export class Header implements OnInit {
     },
     {
       title: 'สรุปผลการประเมินฯ',
+      path: '/evaluation-summary',
       simpleItems: [
         'ชั้นนายพัน',
         'ชั้นนายร้อย',
@@ -73,48 +78,71 @@ export class Header implements OnInit {
   constructor(
     private courseService: CourseService,
     private router: Router,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  ) {
+    // เช็ก URL ตั้งแต่เปิดหน้าเว็บครั้งแรก
+    this.checkRoute(this.router.url);
+
+    // ดักฟังทุกครั้งที่ผู้ใช้งานคลิกเปลี่ยนหน้าเว็บในระบบ
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.checkRoute(event.url);
+      });
+  }
+
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.fetchCourses();
+  }
+
+  // ⚡ แก้ไขฟังก์ชัน checkRoute ในไฟล์ header.ts ของคุณให้เป็นแบบนี้
+  private checkRoute(url: string): void {
+    if (!url) return;
+
+    // แปลงเป็นตัวพิมพ์เล็กทั้งหมดเพื่อป้องกัน Error จากพิมพ์เล็กพิมพ์ใหญ่ เช่น /Admin หรือ /Admin/dashboard
+    const lowerUrl = url.toLowerCase();
+
+    this.isAdmin = lowerUrl.includes('/admin') || lowerUrl.includes('/teacher');
+
+    // เปิดคอนโซลใน Browser (กด F12) ดูว่าหน้าปัจจุบัน URL คืออะไร และระบบมองว่าเป็นแอดมินไหม
+    console.log('Current URL:', lowerUrl, 'Is Admin?:', this.isAdmin);
   }
 
   fetchCourses(): void {
     this.courseService.getCourses().subscribe({
       next: (response) => {
         if (response.success) {
-          // โคลน array ใหม่เพื่อไม่ให้ Angular งงเรื่อง Reference
-          const newMenuData = [...this.menuData];
-
-          const studentMenuIndex = newMenuData.findIndex((m) => m.title === 'สำหรับผู้เรียน');
+          // หา index ของเมนูที่ชื่อ 'สำหรับผู้เรียน'
+          const studentMenuIndex = this.menuData.findIndex((m) => m.title === 'สำหรับผู้เรียน');
           if (studentMenuIndex !== -1) {
-            newMenuData[studentMenuIndex] = {
-              ...newMenuData[studentMenuIndex],
-              submenus: response.data,
-            };
+            // เอาข้อมูลจาก API ยัดเข้าไปแทนที่
+            this.menuData[studentMenuIndex].submenus = response.data;
           }
 
-          const teacherMenuIndex = newMenuData.findIndex((m) => m.title === 'สำหรับครู-อาจารย์');
+          // หา index ของเมนูที่ชื่อ 'สำหรับครู-อาจารย์'
+          const teacherMenuIndex = this.menuData.findIndex((m) => m.title === 'สำหรับครู-อาจารย์');
           if (teacherMenuIndex !== -1) {
-            newMenuData[teacherMenuIndex] = {
-              ...newMenuData[teacherMenuIndex],
-              submenus: response.data,
-            };
+            // เอาข้อมูลจาก API ยัดเข้าไปแทนที่
+            this.menuData[teacherMenuIndex].submenus = response.data;
           }
 
-          const committeeMenuIndex = newMenuData.findIndex(
+          // 3. ใส่ข้อมูลให้เมนู "สำหรับคณะกับกำหลักสูตร"
+          const committeeMenuIndex = this.menuData.findIndex(
             (m) => m.title === 'สำหรับคณะกับกำหลักสูตร',
           );
           if (committeeMenuIndex !== -1) {
-            newMenuData[committeeMenuIndex] = {
-              ...newMenuData[committeeMenuIndex],
-              submenus: response.data,
-            };
+            this.menuData[committeeMenuIndex].submenus = response.data;
           }
 
-          // อัปเดต array หลักและแจ้งให้ Angular ตรวจสอบการเปลี่ยนแปลง (แก้บั๊ก NG0100)
-          this.menuData = newMenuData;
+          // 4. ใส่ข้อมูลให้เมนู "แบบประเมินติดตามผู้สำเร็จฯ"
+          const followUpMenuIndex = this.menuData.findIndex(
+            (m) => m.title === 'แบบประเมินติดตามผู้สำเร็จฯ',
+          );
+          if (followUpMenuIndex !== -1) {
+            this.menuData[followUpMenuIndex].submenus = response.data;
+          }
+
           this.cdr.detectChanges();
         }
       },

@@ -1,0 +1,67 @@
+<div class="admin-login-page">
+  <div class="page-header">
+    <button mat-icon-button class="back-button" routerLink="/">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+  </div>
+
+  <div class="page-content">
+    <!-- Logo / Icon -->
+    <div class="admin-icon-wrap">
+      <mat-icon class="admin-shield-icon">admin_panel_settings</mat-icon>
+    </div>
+
+    <h1 class="main-title">เข้าสู่ระบบผู้ดูแล</h1>
+    <p class="sub-title">กรุณากรอกข้อมูลเพื่อเข้าสู่ระบบจัดการ</p>
+
+    <div class="login-card">
+      <div class="login-container">
+        <mat-form-field appearance="outline" class="input-field">
+          <mat-label>อีเมล</mat-label>
+          <input matInput type="email" placeholder="กรอกอีเมลของคุณ"
+            [(ngModel)]="email" (keyup.enter)="onLogin()">
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="input-field">
+          <mat-label>รหัสผ่าน</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'"
+            placeholder="กรอกรหัสผ่าน"
+            [(ngModel)]="password" (keyup.enter)="onLogin()">
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword"
+            [attr.aria-label]="'Toggle password'" [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- ข้อความ error -->
+        <p class="error-message" *ngIf="errorMessage">
+          <mat-icon class="error-icon">error_outline</mat-icon>
+          {{ errorMessage }}
+        </p>
+      </div>
+
+      <div class="action-container">
+        <button mat-flat-button class="login-btn" (click)="onLogin()" [disabled]="isLoading">
+          <mat-icon *ngIf="!isLoading">login</mat-icon>
+          <span *ngIf="!isLoading">เข้าสู่ระบบ</span>
+          <span *ngIf="isLoading">กำลังตรวจสอบ...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="support-footer">
+      <div class="support-left">
+        <mat-icon class="warning-icon">warning</mat-icon>
+        <span>หากพบปัญหา แจ้งมาได้ที่</span>
+      </div>
+      <div class="support-right-inline">
+        <a href="tel:02-2975248" mat-mini-fab class="phone-btn">
+          <mat-icon>phone</mat-icon>
+        </a>
+        <span class="phone-number-text">02-2975248</span>
+      </div>
+    </div>
+  </div>
+</div>

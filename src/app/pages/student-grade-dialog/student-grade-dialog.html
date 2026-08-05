@@ -1,0 +1,126 @@
+<div class="grade-dialog-container">
+  <!-- Dialog Header -->
+  <div class="dialog-header">
+    <div class="header-title">
+      <mat-icon class="header-icon">assignment_ind</mat-icon>
+      <h2>รายงานผลการเรียนรายบุคคล</h2>
+    </div>
+    <button mat-icon-button (click)="onClose()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Dialog Body (Printable Area) -->
+  <div class="dialog-body printable-area">
+    <!-- Student Profile Card -->
+    <div class="student-info-card">
+      <div class="info-row">
+        <div class="info-item">
+          <span class="info-label">รหัสประจำตัว:</span>
+          <span class="info-value text-bold">{{ data.student.code }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ยศ - ชื่อ - นามสกุล:</span>
+          <span class="info-value text-bold primary-text">{{ data.student.rank }} {{ data.student.name }}</span>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-item" *ngIf="data.courseName">
+          <span class="info-label">หลักสูตร:</span>
+          <span class="info-value">{{ data.courseName }}</span>
+        </div>
+        <div class="info-item" *ngIf="data.batchName">
+          <span class="info-label">รุ่น:</span>
+          <span class="info-value">{{ data.batchName }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">สถานะการศึกษา:</span>
+          <span class="status-badge" [ngClass]="data.student.isPassed ? 'pass' : 'fail'">
+            {{ getGradeDescription(data.student.gpa) || (data.student.isPassed ? 'ผ่านเกณฑ์' : 'ไม่ผ่านเกณฑ์') }}
+          </span>
+        </div>
+      </div>
+      <div class="info-row mt-2" style="margin-top: 12px; background: #fdfafb; padding: 10px; border-radius: 8px; border: 1px dashed #dcd0ea;">
+        <div class="info-item">
+          <span class="info-label">เวลาฝึกอบรม (100):</span>
+          <span class="info-value text-purple text-bold">{{ data.student.trainingTimeScore || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">เวลาสอบ (100):</span>
+          <span class="info-value text-purple text-bold">{{ data.student.examTimeScore || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">คะแนนความประพฤติ (200):</span>
+          <span class="info-value text-purple text-bold">{{ data.student.behaviorScore || '-' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grade Table -->
+    <div class="table-container">
+      <table class="detail-grade-table">
+        <thead>
+          <tr>
+            <th class="text-center" style="width: 60px;">ลำดับ</th>
+            <th class="text-left">รายวิชา</th>
+            <th class="text-center" style="width: 90px;">หน่วยกิต</th>
+            <th class="text-center" style="width: 100px;">คะแนนดิบ</th>
+            <th class="text-center" style="width: 90px;">เกรด</th>
+            <th class="text-center" style="width: 90px;">ผลการฝึก</th>
+            <th class="text-center" style="width: 100px;">Index</th>
+            <th class="text-center" style="width: 110px;">สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let subject of data.student.subjects; let i = index">
+            <td class="text-center">{{ i + 1 }}</td>
+            <td class="text-left font-medium">{{ subject.name }}</td>
+            
+            <ng-container *ngIf="subject.isFirstInGroup">
+              <td class="text-center" [attr.rowspan]="subject.rowspan">{{ subject.credit }}</td>
+            </ng-container>
+
+            <td class="text-center">{{ subject.rawScore !== undefined && subject.rawScore !== null ? subject.rawScore : '-' }}</td>
+            
+            <ng-container *ngIf="subject.isFirstInGroup">
+              <td class="text-center text-bold grade-text text-purple" [attr.rowspan]="subject.rowspan">{{ subject.grade || '-' }}</td>
+              <td class="text-center text-bold text-primary" [attr.rowspan]="subject.rowspan">{{ getNumericGrade(subject.grade) }}</td>
+              <td class="text-center text-bold index-text" [attr.rowspan]="subject.rowspan">({{ subject.indexValue || '0.00' }})</td>
+              <td class="text-center" [attr.rowspan]="subject.rowspan">
+                <span class="mini-status pass">ผ่าน</span>
+              </td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Summary Box -->
+    <div class="summary-box">
+      <div class="summary-item">
+        <span class="sum-label">หน่วยกิตรวม:</span>
+        <span class="sum-value">{{ data.student.totalCredit }} หน่วยกิต</span>
+      </div>
+      <div class="summary-item highlight">
+        <span class="sum-label">เกรดเฉลี่ยรวม (GPA):</span>
+        <span class="sum-value gpa-val">{{ data.student.gpa }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="sum-label">ผลการศึกษา:</span>
+        <span class="sum-value" [ngClass]="data.student.isPassed ? 'text-success' : 'text-danger'">
+          {{ data.student.isPassed ? 'ผ่านเกณฑ์การศึกษา' : 'ไม่ผ่านเกณฑ์การศึกษา' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog Footer (Actions) -->
+  <div class="dialog-footer no-print">
+    <button class="btn-action btn-print" (click)="printReport()">
+      <mat-icon>print</mat-icon> พิมพ์ใบรายงานผล
+    </button>
+    <button class="btn-action btn-close" (click)="onClose()">
+      ปิดหน้าต่าง
+    </button>
+  </div>
+</div>
