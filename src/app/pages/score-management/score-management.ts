@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { AddCourseDialog } from '../add-course-dialog/add-course-dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
@@ -286,18 +285,7 @@ onScoreChange(student: StudentScore, newScore?: any) {
     this.onScoreInput(student);
   }
 
-  addCourse() {
-    const dialogRef = this.dialog.open(AddCourseDialog, {
-      width: '500px',
-      disableClose: true,
-    });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadCourses();
-      }
-    });
-  }
 
 
 

@@ -1,0 +1,47 @@
+.committee-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px); /* Adjust based on your header height */
+  padding: 2rem;
+  background-color: #f9f9f9;
+}
+
+.evaluation-box {
+  background: white;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  min-width: 300px;
+  
+  h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 2rem;
+    font-weight: 600;
+  }
+}
+
+.evaluation-link {
+  color: #1c7c8c; /* using a teal-like color for the link */
+  text-decoration: underline;
+  font-size: 1.2rem;
+  font-weight: 500;
+  transition: color 0.3s;
+  
+  &:hover {
+    color: #125561;
+  }
+}
+
+.no-form-text {
+  color: #777;
+  font-size: 1.1rem;
+}
+
+.loading-box {
+  text-align: center;
+  color: #555;
+  font-size: 1.2rem;
+}

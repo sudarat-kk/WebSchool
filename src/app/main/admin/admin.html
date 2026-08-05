@@ -14,6 +14,19 @@
     <div class="management-section">
       <h3 class="section-title">เมนูการจัดการ</h3>
 
+      <!-- 🔵 การ์ดใหม่: จัดการหลักสูตรและรายวิชา -->
+      <div class="action-card course-management-card">
+        <div class="card-details">
+          <h4 class="card-title">จัดการหลักสูตรและรายวิชา</h4>
+          <p class="card-subtitle">เพิ่มหลักสูตรใหม่ หรือเพิ่มรายวิชาเข้าไปในหลักสูตรที่มีอยู่</p>
+        </div>
+
+        <button type="button" class="btn-navigate btn-purple-light" style="background-color: #8b5cf6; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: bold;" routerLink="/admin/addcourse">
+          <mat-icon class="btn-icon">add_box</mat-icon>
+          <span>เพิ่มหลักสูตร / เพิ่มวิชา</span>
+        </button>
+      </div>
+
       <!-- 🟢 การ์ดที่ 3: จัดการข้อมูลนักเรียน (แก้ไขปุ่มตรงนี้แล้ว) -->
       <div class="action-card student-management-card">
         <div class="card-details">

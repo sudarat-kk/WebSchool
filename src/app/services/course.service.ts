@@ -34,4 +34,36 @@ export class CourseService {
   getCourses(): Observable<ApiResponse> {
     return this.http.get<ApiResponse>(this.apiUrl);
   }
+
+  getSubjectsByBatch(batchId: string | number): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/subjects/${batchId}`);
+  }
+
+  getAllCourses(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/courses/all`);
+  }
+
+  getAllBatches(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/batches/all`);
+  }
+
+  getAllSubjectGroups(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/subject-groups/all`);
+  }
+
+  addCourse(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/courses`, data);
+  }
+
+  addBatch(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/batches`, data);
+  }
+
+  addSubjectGroup(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/subject-groups`, data);
+  }
+
+  addSubject(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/subjects`, data);
+  }
 }

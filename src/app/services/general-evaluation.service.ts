@@ -25,4 +25,16 @@ export class GeneralEvaluationService {
       `${environment.apiUrl}/general-evaluation/${batchId}?type=${type}` 
     ); 
   }
+
+  createGeneralEvaluation(payload: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/evaluation`, payload);
+  }
+
+  updateGeneralEvaluation(id: number | string, payload: any): Observable<any> {
+    return this.http.put<any>(`${environment.apiUrl}/evaluation/${id}`, payload);
+  }
+
+  getAllForms(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/evaluation-forms`);
+  }
 }

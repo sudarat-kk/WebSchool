@@ -25,34 +25,49 @@
       <div class="form-row">
         <div class="form-group flex-1">
           <label class="input-label">ผูกกับหลักสูตร</label>
-          <select class="custom-input" [(ngModel)]="formData.course">
+          <select class="custom-input" [(ngModel)]="formData.courseName" (change)="onCourseChange()">
             <option value="" disabled selected>เลือกหลักสูตร</option>
-            <option value="course1">หลักสูตร A</option>
-            <option value="course2">หลักสูตร B</option>
+            <option *ngFor="let course of courseGroups" [value]="course.course_name">
+              {{ course.course_name }}
+            </option>
           </select>
         </div>
 
         <div class="form-group flex-1">
           <label class="input-label">รุ่นนักเรียน (ที่เข้าข่ายการประเมินนี้)</label>
-          <input type="text" class="custom-input" placeholder="เช่น รุ่น 67" [(ngModel)]="formData.generation"/>
+          <select class="custom-input" [(ngModel)]="formData.generationId" [disabled]="!formData.courseName" (change)="onGenerationChange()">
+            <option value="" disabled selected>เลือกรุ่นนักเรียน</option>
+            <option *ngFor="let batch of availableBatches" [value]="batch.batch_id">
+              {{ batch.batch_name }}
+            </option>
+          </select>
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="input-label">ประเภทแบบฟอร์ม / ลิงก์ประเมิน</label>
-        <select class="custom-input" [(ngModel)]="formData.formType">
-          <option value="" disabled selected>เลือกประเภท</option>
-          <option value="eval1">แบบประเมินความพึงพอใจ</option>
-        </select>
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label class="input-label">ประเภทแบบฟอร์ม / ลิงก์ประเมิน</label>
+          <select class="custom-input" [(ngModel)]="formData.formType" (change)="onTypeChange()">
+            <option value="" disabled selected>เลือกประเภท</option>
+            <option *ngFor="let type of formTypes" [value]="type.value">
+              {{ type.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- กล่องเลือกวิชา จะโผล่มาก็ต่อเมื่อเลือก "ประเมินอาจารย์ผู้สอน" -->
+        <div class="form-group flex-1" *ngIf="formData.formType === 'instructor'">
+          <label class="input-label">เลือกรายวิชา (สำหรับการประเมินผู้สอน)</label>
+          <select class="custom-input" [(ngModel)]="formData.subjectId" [disabled]="!formData.generationId">
+            <option value="" disabled selected>เลือกรายวิชา</option>
+            <option *ngFor="let subject of availableSubjects" [value]="subject.id">
+              {{ subject.name }}
+            </option>
+          </select>
+        </div>
       </div>
 
-      <!-- ปุ่มกดสร้างแบบฟอร์มเปิดแท็บใหม่ของ Google Forms -->
-      <div class="form-group center-button">
-        <a mat-stroked-button href="https://forms.new" target="_blank" class="btn-create-form">
-          <mat-icon>add_circle_outline</mat-icon>
-          กดสร้างแบบฟอร์ม
-        </a>
-      </div>
+
 
       <div class="form-group">
         <label class="input-label">วางลิงก์ <b>GOOGLE FORM (URL)</b></label>
@@ -62,11 +77,6 @@
       <div class="form-group">
         <label class="input-label">ชื่อฟอร์มประเมิน</label>
         <input type="text" class="custom-input" placeholder="ชื่อของแบบประเมิน" [(ngModel)]="formData.formName"/>
-      </div>
-
-      <div class="form-group">
-        <label class="input-label">เกณฑ์ชี้แจงที่จะประเมิน</label>
-        <textarea class="custom-input" placeholder="รายละเอียดเกณฑ์การประเมิน" rows="3" [(ngModel)]="formData.criteria"></textarea>
       </div>
 
       <!-- ส่วนปุ่มกึ่งกลางหน้าจอ -->
@@ -91,47 +101,102 @@
     </div>
 
     <!-- ส่วนที่ 2: รายการแบบฟอร์มที่มีในระบบ -->
-    <div class="management-section list-section">
-      <h3 class="section-title">รายการแบบฟอร์มที่มี</h3>
-      
-      <div class="search-filter-bar">
-        <div class="search-input-wrapper">
-          <mat-icon class="search-icon">search</mat-icon>
-          <input type="text" class="custom-input rounded-search" placeholder="ค้นหาชื่อแบบฟอร์ม ลิงก์"/>
-        </div>
-        
-        <select class="custom-input filter-dropdown">
-          <option value="all">แสดงทุกรุ่น</option>
-        </select>
+    <div class="form-list-section mt-5">
+      <div class="list-header flex items-center mb-4">
+        <div class="vertical-line"></div>
+        <h2 class="section-title">ดูและจัดการแบบฟอร์ม (เลือกหลักสูตรและรุ่นเพื่อดึงข้อมูล)</h2>
       </div>
 
-      <div class="form-list-table">
-        <div class="table-header">
-          <div class="col-gen">รุ่น</div>
-          <div class="col-details">รายละเอียดลิงก์ประเมินออนไลน์</div>
-          <div class="col-actions">การจัดการ</div>
+      <!-- ตัวกรอง (Filter) -->
+      <div class="filter-box" style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+        <div class="form-row" style="margin-bottom: 0;">
+          <div class="form-group flex-1">
+            <label class="input-label">หลักสูตร</label>
+            <select class="custom-input" [(ngModel)]="filterCourse" (change)="onFilterCourseChange()">
+              <option value="" disabled selected>เลือกหลักสูตร</option>
+              <option *ngFor="let group of courseGroups" [value]="group.course_name">
+                {{ group.course_name }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="form-group flex-1">
+            <label class="input-label">รุ่น</label>
+            <select class="custom-input" [(ngModel)]="filterGeneration" [disabled]="!filterCourse" (change)="onFilterGenerationChange()">
+              <option value="" disabled selected>เลือกรุ่น</option>
+              <option *ngFor="let batch of filterBatches" [value]="batch.batch_id">
+                {{ batch.batch_name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group flex-1">
+            <label class="input-label">ประเภทแบบฟอร์ม</label>
+            <select class="custom-input" [(ngModel)]="filterType" (change)="onFilterTypeChange()">
+              <option *ngFor="let type of formTypes" [value]="type.value">
+                {{ type.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ตารางแสดงข้อมูล -->
+      <div class="table-container">
+        <div class="table-header" style="display: flex; padding: 12px; background: #e0e0e0; font-weight: bold; color: #555;">
+          <div class="col-course" style="flex: 2;">{{ filterType === 'instructor' ? 'วิชา' : 'ประเภทการประเมิน' }}</div>
+          <div class="col-link" style="flex: 2;">ลิงก์ประเมินออนไลน์</div>
+          <div class="col-actions" style="flex: 1; text-align: center;">การจัดการ</div>
+        </div>
+
+        <!-- แจ้งเตือนเมื่อยังไม่ได้เลือกตัวกรอง -->
+        <div *ngIf="!filterCourse || !filterGeneration" style="text-align: center; padding: 20px; color: #666; background: #fff;">
+          กรุณาเลือกหลักสูตรและรุ่นด้านบน เพื่อดูรายการแบบฟอร์ม
+        </div>
+
+        <!-- วนลูปแสดงข้อมูล (เมื่อเลือกตัวกรองแล้ว) -->
+        <div class="table-row" *ngFor="let row of displayTableData" style="display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff;">
+          
+          <!-- ชื่อวิชา หรือ ชื่อประเภท (ถ้าไม่ใช่ประเมินอาจารย์) -->
+          <div class="col-course" style="flex: 2; font-weight: 500;">
+            {{ row.isSubjectMode ? row.subjectName : 'แบบฟอร์มสำหรับรุ่นนี้' }}
+          </div>
+          
+          <!-- ลิงก์ -->
+          <div class="col-link" style="flex: 2;">
+            <ng-container *ngIf="row.hasForm">
+              <a [href]="row.formDetails.googleFormUrl" target="_blank" class="link-text text-primary" style="display: flex; align-items: center; gap: 4px; color: #6a1b9a; text-decoration: underline;">
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px;">link</mat-icon>
+                {{ row.formDetails.formName || 'ดูฟอร์ม (Google Forms)' }}
+              </a>
+            </ng-container>
+            <ng-container *ngIf="!row.hasForm">
+              <span style="color: #999; font-style: italic;">ยังไม่ได้เพิ่มลิงก์</span>
+            </ng-container>
+          </div>
+          
+          <!-- ปุ่มจัดการ -->
+          <div class="col-actions" style="flex: 1; display: flex; justify-content: center; gap: 8px;">
+            <ng-container *ngIf="row.hasForm">
+              <button mat-icon-button color="primary" (click)="onEditAction(row.formDetails)" title="แก้ไขลิงก์">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="onDeleteAction(row.formDetails.id)" title="ลบลิงก์">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </ng-container>
+
+            <ng-container *ngIf="!row.hasForm">
+              <button mat-stroked-button color="primary" (click)="onAddLinkAction(row)" style="border-color: #8142ff; color: #8142ff; border-radius: 20px;">
+                <mat-icon style="font-size: 18px;">add</mat-icon> เพิ่มลิงก์
+              </button>
+            </ng-container>
+          </div>
+          
         </div>
         
-        <div class="table-row">
-          <div class="col-gen row-gen">รุ่น 67</div>
-          <div class="col-details row-details">
-            <span class="form-name">แบบประเมินความพึงพอใจ - หลักสูตร A (รุ่น 67)</span>
-            <div class="status-toggle">
-              <mat-slide-toggle color="primary" [checked]="true">เปิดใช้งาน</mat-slide-toggle>
-            </div>
-          </div>
-          <div class="col-actions row-actions">
-            <button mat-icon-button class="btn-copy" title="คัดลอกลิงก์">
-              <mat-icon>content_copy</mat-icon>
-            </button>
-            <button mat-icon-button class="btn-view" title="แก้ไขข้อมูล" 
-                    (click)="onEditAction({id: '101', name: 'แบบประเมินความพึงพอใจ - หลักสูตร A', gen: 'รุ่น 67', url: 'https://docs.google.com/forms/d/example', criteria: 'ประเมินความพึงพอใจทั่วไป'})">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button class="btn-delete" title="ลบแบบฟอร์ม">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
+        <div *ngIf="filterCourse && filterGeneration && displayTableData.length === 0" style="text-align: center; padding: 2rem; color: #777; background: #fff;">
+          ไม่พบข้อมูลรายวิชาสำหรับรุ่นนี้
         </div>
       </div>
     </div>
