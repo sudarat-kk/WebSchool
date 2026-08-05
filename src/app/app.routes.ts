@@ -11,7 +11,13 @@ import { ScoreList } from './pages/score-list/score-list';
 import { ClassOverview } from './pages/class-overview/class-overview';
 import { AdminLogin } from './pages/admin-login/admin-login';
 import { Addstudent } from './pages/addstudent/addstudent';
+import { TrainingSummaryComponent } from './pages/training-summary/training-summary';
+import { EvaluationSummaryComponent } from './pages/evaluation-summary/evaluation-summary';
+import { FollowUpComponent } from './pages/follow-up/follow-up';
+import { Committee } from './main/committee/committee';
 
+
+import { AddCourse } from './pages/add-course-dialog/add-course-dialog';
 
 export const routes: Routes = [
   // หน้าแรก
@@ -40,11 +46,18 @@ export const routes: Routes = [
       { path: 'form', component: From },
       { path: 'classoverview', component: ClassOverview },
       { path: 'addstudent', component: Addstudent },
+      { path: 'addcourse', component: AddCourse },
     ],
   },
 
   // ส่วนของคะแนน (ทั่วไป)
   { path: 'score', component: Score },
+
+  // หน้าใหม่ที่เพิ่มเข้ามา
+  { path: 'training-summary', component: TrainingSummaryComponent },
+  { path: 'evaluation-summary', component: EvaluationSummaryComponent },
+  { path: 'follow-up', component: FollowUpComponent },
+  { path: 'committee', component: Committee },
 
   // กรณีพิมพ์ URL ผิดให้เด้งกลับหน้าแรก
   { path: '**', redirectTo: '' }

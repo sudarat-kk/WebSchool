@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { DropdownService } from '../../services/dropdown.service';
+import { StudentService } from '../../services/student.service';
+import { CourseService, CourseGroup, BatchItem } from '../../services/course.service';
+import Swal from 'sweetalert2';
 
 export interface Student {
   id: number;
@@ -13,44 +17,99 @@ export interface Student {
   studentCode: string;
   password?: string;
   affiliation: string;
+  student_code?: string;
+  rank_name?: string;
+  first_name?: string;
+  last_name?: string;
+  showPassword?: boolean; // สำหรับเปิดปิดตาดูรหัสในตาราง
 }
 
 @Component({
   selector: 'app-addstudent',
   standalone: true,
-  imports: [
-    CommonModule, 
-    FormsModule, 
-    MatIconModule, 
-    MatButtonModule
-  ],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
   templateUrl: './addstudent.html',
-  // ใช้ styleUrls (Array) เพื่อรองรับ Angular ทุกเวอร์ชัน ป้องกันปัญหา CSS/SCSS ไม่โหลด
-  styleUrls: ['./addstudent.scss']
+  styleUrls: ['./addstudent.scss'],
 })
-export class Addstudent {
-
+export class Addstudent implements OnInit {
   constructor(
     private router: Router,
-    private location: Location
+    private location: Location,
+    private courseService: CourseService,
+    private studentService: StudentService,
   ) {}
 
   activeTab: 'single' | 'excel' | 'file' = 'single';
-  
-  // ข้อมูลจำลองรายชื่อนักเรียน
-  students: Student[] = [
-    { id: 1, rank: 'ร.ต.', firstName: 'สมชาย', lastName: 'ใจดี', studentCode: '67001', affiliation: 'กองพันทหารช่าง' },
-    { id: 2, rank: 'ส.อ.', firstName: 'วิชัย', lastName: 'รักชาติ', studentCode: '67002', affiliation: 'กองพันทหารราบ' }
-  ];
-
-  // โมเดลสำหรับฟอร์ม
+  students: Student[] = [];
   studentForm: Student = this.getEmptyForm();
-  
-  // สถานะการแก้ไขและการอัปโหลด
   isEditing: boolean = false;
   editingId: number | null = null;
   excelData: string = '';
   selectedFileName: string = '';
+  selectedFile: File | null = null;
+  showPassword = false;
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+  
+  courseGroups: CourseGroup[] = [];
+  availableBatches: BatchItem[] = [];
+  selectedCourse: string = '';
+  selectedBatch: string = '';
+
+  ngOnInit() {
+    this.fetchCourses();
+  }
+
+  fetchCourses() {
+    this.courseService.getCourses().subscribe({
+      next: (res) => {
+        if (res?.success && res.data) {
+          this.courseGroups = res.data;
+        }
+      },
+      error: (err) => console.error('Failed to load courses', err),
+    });
+  }
+
+  onCourseChange() {
+    const selectedGroup = this.courseGroups.find((c) => c.course_name === this.selectedCourse);
+    if (selectedGroup) {
+      this.availableBatches = selectedGroup.batches;
+    } else {
+      this.availableBatches = [];
+    }
+    this.selectedBatch = '';
+    this.fetchStudents();
+  }
+
+  onBatchChange() {
+    this.fetchStudents();
+  }
+
+  fetchStudents() {
+    if (!this.selectedBatch) {
+      this.students = [];
+      return;
+    }
+    this.studentService.getStudents(this.selectedBatch).subscribe({
+      next: (res) => {
+        const data = Array.isArray(res) ? res : (res.data || []);
+        this.students = data.map((s: any) => ({
+          id: s.id,
+          rank: s.rank_name || s.rankName || '',
+          firstName: s.first_name || s.firstName || '',
+          lastName: s.last_name || s.lastName || '',
+          studentCode: s.student_code || s.studentCode || '',
+          password: s.password || '', // เก็บข้อมูลรหัสผ่านจาก DB
+          affiliation: s.affiliation || '',
+          showPassword: false // ค่าเริ่มต้นให้ซ่อนรหัสผ่านในตาราง
+        }));
+      },
+      error: (err) => console.error('Failed to load students', err),
+    });
+  }
 
   onCancel(): void {
     this.location.back();
@@ -60,7 +119,6 @@ export class Addstudent {
     this.activeTab = tabId;
   }
 
-  // ล้างค่าในฟอร์ม
   resetForm() {
     this.studentForm = this.getEmptyForm();
     this.isEditing = false;
@@ -68,103 +126,135 @@ export class Addstudent {
   }
 
   private getEmptyForm(): Student {
-    return { id: 0, rank: '', firstName: '', lastName: '', studentCode: '', password: '', affiliation: '' };
+    return {
+      id: 0,
+      rank: '',
+      firstName: '',
+      lastName: '',
+      studentCode: '',
+      password: '',
+      affiliation: '',
+    };
   }
 
-  // 📝 ฟังก์ชันกดปุ่มแก้ไขรายคน
   onEditStudent(student: Student) {
     this.isEditing = true;
     this.editingId = student.id;
-    this.studentForm = { ...student, password: '' }; // ก๊อปปี้ข้อมูลลงฟอร์ม
-    this.activeTab = 'single'; // สลับไปแท็บแรกอัตโนมัติเพื่อแก้ไข
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // เลื่อนจอขึ้นด้านบน
+    this.studentForm = { ...student, password: '' };
+    this.activeTab = 'single';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // 🗑️ ฟังก์ชันกดปุ่มลบรายคน
   onDeleteStudent(id: number) {
-    if (confirm('คุณต้องการลบข้อมูลนักเรียนคนนี้ใช่หรือไม่?')) {
-      this.students = this.students.filter(s => s.id !== id);
-      if (this.editingId === id) {
-        this.resetForm();
-      }
-    }
-  }
-
-  // 💾 ฟังก์ชันบันทึกข้อมูลแบบรายคน (ทั้งเพิ่มใหม่ และแก้ไข)
-  onSubmitSingle() {
-    if (!this.studentForm.firstName || !this.studentForm.lastName || !this.studentForm.studentCode) {
-      alert('กรุณากรอกข้อมูล ชื่อ, นามสกุล และรหัสนักเรียน ให้ครบถ้วน');
-      return;
-    }
-
-    if (this.isEditing && this.editingId !== null) {
-      // อัปเดตข้อมูลเดิม
-      const index = this.students.findIndex(s => s.id === this.editingId);
-      if (index !== -1) {
-        this.students[index] = { ...this.studentForm, id: this.editingId };
-      }
-    } else {
-      // เพิ่มข้อมูลคนใหม่
-      const newStudent: Student = {
-        ...this.studentForm,
-        id: Date.now()
-      };
-      this.students.push(newStudent);
-    }
-
-    this.resetForm();
-  }
-
-  // 📋 ฟังก์ชันวางข้อมูลจาก Excel (Tab-separated)
-  onSubmitExcel() {
-    if (!this.excelData.trim()) {
-      alert('กรุณา วางข้อมูลจาก Excel ก่อนทำการบันทึก');
-      return;
-    }
-
-    const lines = this.excelData.trim().split('\n');
-    let addedCount = 0;
-
-    lines.forEach((line, index) => {
-      const columns = line.split('\t');
-      // ตรวจสอบว่ามีข้อมูลอย่างน้อย 3 คอลัมน์ (ยศ, ชื่อ, นามสกุล)
-      if (columns.length >= 3) {
-        const newStudent: Student = {
-          id: Date.now() + index,
-          rank: columns[0]?.trim() || '',
-          firstName: columns[1]?.trim() || '',
-          lastName: columns[2]?.trim() || '',
-          studentCode: columns[3]?.trim() || `ST${Math.floor(1000 + Math.random() * 9000)}`,
-          affiliation: columns[4]?.trim() || '-'
-        };
-        this.students.push(newStudent);
-        addedCount++;
+    Swal.fire({
+      title: 'ยืนยันการลบ?',
+      text: "คุณต้องการลบข้อมูลนักเรียนคนนี้ใช่หรือไม่?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#9ca3af',
+      confirmButtonText: 'ใช่, ลบเลย!',
+      cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.studentService.deleteStudent(id).subscribe({
+          next: (res) => {
+            Swal.fire('สำเร็จ', 'ลบข้อมูลนักเรียนสำเร็จ', 'success');
+            this.students = this.students.filter(s => s.id !== id);
+            if (this.editingId === id) {
+              this.resetForm();
+            }
+          },
+          error: (err) => {
+            console.error('Delete failed', err);
+            Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการลบข้อมูลนักเรียน', 'error');
+          }
+        });
       }
     });
+  }
 
-    if (addedCount > 0) {
-      alert(`นำเข้าข้อมูลสำเร็จทั้งหมด ${addedCount} รายการ`);
-      this.excelData = '';
+  onSubmitSingle() {
+    if (!this.selectedCourse || !this.selectedBatch) {
+      Swal.fire('แจ้งเตือน', 'กรุณาเลือกหลักสูตรและรุ่นก่อนทำการเพิ่มนักเรียน', 'warning');
+      return;
+    }
+
+    if (
+      !this.studentForm.firstName ||
+      !this.studentForm.lastName ||
+      !this.studentForm.studentCode
+    ) {
+      Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูล ชื่อ, นามสกุล และรหัสนักเรียน ให้ครบถ้วน', 'warning');
+      return;
+    }
+
+    const payload = {
+      batch_id: this.selectedBatch,
+      student_code: this.studentForm.studentCode,
+      password: this.studentForm.password || '1234',
+      rank_name: this.studentForm.rank,
+      first_name: this.studentForm.firstName,
+      last_name: this.studentForm.lastName,
+      affiliation: this.studentForm.affiliation,
+    };
+
+    if (this.isEditing && this.editingId !== null) {
+      this.studentService.updateStudent(this.editingId, payload).subscribe({
+        next: (res) => {
+          Swal.fire('สำเร็จ', 'อัปเดตข้อมูลนักเรียนสำเร็จ', 'success');
+          this.resetForm();
+          this.fetchStudents();
+        },
+        error: (err) => {
+          console.error('Update failed', err);
+          Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการอัปเดตข้อมูลนักเรียน', 'error');
+        }
+      });
     } else {
-      alert('รูปแบบข้อมูลไม่ถูกต้อง กรุณาตรวจสอบการคัดลอกจาก Excel');
+      this.studentService.addStudent(payload).subscribe({
+        next: (res) => {
+          Swal.fire('สำเร็จ', 'เพิ่มข้อมูลนักเรียนสำเร็จ', 'success');
+          this.resetForm();
+          this.fetchStudents();
+        },
+        error: (err) => {
+          console.error('Add failed', err);
+          Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลนักเรียน', 'error');
+        },
+      });
     }
   }
 
-  // 📁 ฟังก์ชันเลือกไฟล์ CSV/TXT
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      this.selectedFileName = file.name;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target?.result as string;
-        if (text) {
-          this.excelData = text; // อ่านเนื้อหาเข้าแปะในระบบ
-        }
-      };
-      reader.readAsText(file);
+      this.selectedFile = input.files[0];
+      this.selectedFileName = this.selectedFile.name;
     }
+  }
+
+  onSubmitFile() {
+    if (!this.selectedCourse || !this.selectedBatch) {
+      Swal.fire('แจ้งเตือน', 'กรุณาเลือกหลักสูตรและรุ่นก่อนทำการอัปโหลดไฟล์', 'warning');
+      return;
+    }
+    if (!this.selectedFile) {
+      Swal.fire('แจ้งเตือน', 'กรุณาเลือกไฟล์ CSV หรือ TXT ก่อนทำการบันทึก', 'warning');
+      return;
+    }
+
+    this.studentService.uploadStudentCsv(this.selectedBatch, this.selectedFile).subscribe({
+      next: (res) => {
+        Swal.fire('สำเร็จ', 'อัปโหลดข้อมูลสำเร็จ', 'success');
+        this.selectedFile = null;
+        this.selectedFileName = '';
+        this.fetchStudents();
+      },
+      error: (err) => {
+        console.error('Upload failed', err);
+        Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์', 'error');
+      },
+    });
   }
 }

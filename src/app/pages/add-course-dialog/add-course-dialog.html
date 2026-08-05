@@ -1,74 +1,242 @@
-<div class="modal-container">
-
-  <!-- Header Zone: แถบสีม่วงอ่อนพร้อมโลโก้ -->
-  <div class="modal-header-bar">
-    <div class="logo-placeholder">
-    </div>
+<div class="page-container">
+  <div class="page-header">
+    <button class="btn-back" (click)="onClose()">
+      <span class="material-icons">chevron_left</span>
+    </button>
+    <h1>จัดการหลักสูตรและรายวิชา</h1>
   </div>
 
-  <!-- Content Zone -->
-  <div class="modal-content">
-    <!-- ปุ่มปิด (X) -->
-    <button class="btn-close" (click)="onClose()">
-      <span class="material-icons">close</span>
-    </button>
+  <div class="content-wrapper">
 
-    <!-- Tab Selection: เมนูสลับหัวข้อฟอร์ม -->
-    <div class="modal-tabs">
-      <button type="button" [class.active]="activeTab === 'subject'" (click)="switchTab('subject')">
-        เพิ่มรายวิชาใหม่
-      </button>
-      <button type="button" [class.active]="activeTab === 'curriculum'" (click)="switchTab('curriculum')">
-        เพิ่มหลักสูตรใหม่
-      </button>
+    <!-- 1. ส่วนเพิ่มหลักสูตร -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="material-icons">school</span>
+        <h2>1. เพิ่มหลักสูตรใหม่ (Course)</h2>
+      </div>
+      <form (ngSubmit)="onSubmitCourse()" class="custom-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>ชื่อหลักสูตร</label>
+            <input type="text" [(ngModel)]="courseForm.course_name" name="course_name" placeholder="เช่น ชั้นนายพัน เหล่า ส." required>
+          </div>
+          <div class="form-group short-input">
+            <label>ปีหลักสูตร</label>
+            <input type="number" [(ngModel)]="courseForm.curriculum_year" name="curriculum_year" placeholder="เช่น 2569" required>
+          </div>
+        </div>
+        <div class="form-actions right">
+          <button type="submit" class="btn-submit">บันทึกหลักสูตร</button>
+        </div>
+      </form>
     </div>
 
-    <!-- ================= ฟอร์ม 1: เพิ่มรายวิชาใหม่ ================= -->
-    <form *ngIf="activeTab === 'subject'" class="modal-form">
-      <div class="form-group">
-        <label for="curriculum">เลือกโครงสร้างหลักสูตรที่จะผูก</label>
-        <div class="select-wrapper">
-          <select id="curriculum" name="curriculum">
-            <option value="" disabled selected>เลือกโครงสร้างหลักสูตร...</option>
-            <option value="1">หลักสูตรวิศวกรรมศาสตรบัณฑิต</option>
-            <option value="2">หลักสูตรวิทยาศาสตรบัณฑิต</option>
-          </select>
+    <!-- 2. ส่วนเพิ่มรุ่น -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="material-icons">groups</span>
+        <h2>2. เพิ่มรุ่น (Batch)</h2>
+      </div>
+      <form (ngSubmit)="onSubmitBatch()" class="custom-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>เลือกหลักสูตร</label>
+            <div class="select-wrapper">
+              <select [(ngModel)]="selectedCourseNameForBatch" name="selectedCourseNameForBatch" (change)="batchForm.course_id = ''" required>
+                <option value="" disabled selected>-- เลือกหลักสูตร --</option>
+                <option *ngFor="let name of getUniqueCourseNames()" [value]="name">{{ name }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>เลือกปีการศึกษา</label>
+            <div class="select-wrapper">
+              <select [(ngModel)]="batchForm.course_id" name="course_id" [disabled]="!selectedCourseNameForBatch" required>
+                <option value="" disabled selected>-- เลือกปีการศึกษา --</option>
+                <option *ngFor="let c of getCoursesByName(selectedCourseNameForBatch)" [value]="c.id">{{ c.curriculum_year }}</option>
+              </select>
+            </div>
+          </div>
         </div>
-      </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ชื่อรุ่น</label>
+            <input type="text" [(ngModel)]="batchForm.batch_name" name="batch_name" placeholder="เช่น รุ่นที่ 63" required>
+          </div>
+          <div class="form-group">
+            <label>วันที่เริ่มต้น</label>
+            <input type="date" [(ngModel)]="batchForm.start_date" name="start_date">
+          </div>
+          <div class="form-group">
+            <label>วันที่สิ้นสุด</label>
+            <input type="date" [(ngModel)]="batchForm.end_date" name="end_date">
+          </div>
+        </div>
+        <div class="form-actions right">
+          <button type="submit" class="btn-submit">บันทึกรุ่น</button>
+        </div>
+      </form>
+    </div>
 
-      <div class="form-group">
-        <label for="subjectName">ชื่อรายวิชา</label>
-        <input type="text" id="subjectName" name="subjectName" placeholder="กรอกชื่อรายวิชา">
+    <!-- 3. ส่วนเพิ่มกลุ่มวิชา -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="material-icons">category</span>
+        <h2>3. เพิ่มกลุ่มวิชา (Subject Group)</h2>
       </div>
+      <form (ngSubmit)="onSubmitSubjectGroup()" class="custom-form">
+        
+        <!-- คำอธิบายประเภทวิชา (Legend) -->
+        <div class="info-box">
+          <div class="info-header">
+            <span class="material-icons">info</span>
+            <strong>คำแนะนำ: ตัวย่อสำหรับตั้งชื่อกลุ่มวิชา (เช่น M01, MN01)</strong>
+          </div>
+          <div class="info-badges">
+            <span class="badge badge-yellow"><strong>M</strong> (Main) = วิชาหลัก</span>
+            <span class="badge badge-red"><strong>MN</strong> (Minor) = วิชารอง</span>
+            <span class="badge badge-blue"><strong>S</strong> (Supporting) = วิชาประกอบ</span>
+            <span class="badge badge-white"><strong>P</strong> (Practical) = ภาคปฏิบัติ</span>
+          </div>
+        </div>
 
-      <div class="form-group short-input">
-        <label for="credits">หน่วยกิต</label>
-        <input type="number" id="credits" name="credits" placeholder="0">
-      </div>
+        <!-- Cascading: เลือกหลักสูตรก่อน -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>เลือกหลักสูตร</label>
+            <div class="select-wrapper">
+              <select [(ngModel)]="selectedCourseNameForGroup" name="selectedCourseNameForGroup" (change)="selectedCourseIdForGroup = ''; groupForm.batch_id = ''">
+                <option value="" disabled selected>-- เลือกหลักสูตร --</option>
+                <option *ngFor="let name of getUniqueCourseNames()" [value]="name">{{ name }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>เลือกปีการศึกษา</label>
+            <div class="select-wrapper">
+              <select [(ngModel)]="selectedCourseIdForGroup" name="selectedCourseIdForGroup" (change)="groupForm.batch_id = ''" [disabled]="!selectedCourseNameForGroup">
+                <option value="" disabled selected>-- เลือกปีการศึกษา --</option>
+                <option *ngFor="let c of getCoursesByName(selectedCourseNameForGroup)" [value]="c.id">{{ c.curriculum_year }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-      <div class="form-actions right">
-        <button type="submit" class="btn-submit">ยืนยัน</button>
-      </div>
-    </form>
-
-    <!-- ================= ฟอร์ม 2: เพิ่มหลักสูตรใหม่ ================= -->
-    <form *ngIf="activeTab === 'curriculum'" class="modal-form">
-      <div class="form-row">
+        <!-- Cascading: เลือกรุ่นที่เกี่ยวข้องกับหลักสูตรข้างต้น -->
         <div class="form-group">
-          <label for="curriculumId">รหัสอ้างอิงหลักสูตร(ID)</label>
-          <input type="text" id="curriculumId" name="curriculumId" placeholder="กรอกรหัสอ้างอิง">
+          <label>เลือกรุ่นที่ต้องการเพิ่มกลุ่มวิชา</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="groupForm.batch_id" name="batch_id" [disabled]="!selectedCourseIdForGroup" required>
+              <option value="" disabled selected>-- เลือกรุ่น --</option>
+              <option *ngFor="let b of getBatchesForCourse(selectedCourseIdForGroup)" [value]="b.id">{{ b.batch_name }}</option>
+            </select>
+          </div>
         </div>
 
+        <div class="form-row">
+          <div class="form-group">
+            <label>รหัสกลุ่ม/ชื่อกลุ่มวิชา</label>
+            <input type="text" [(ngModel)]="groupForm.group_name" name="group_name" placeholder="เช่น M01" required>
+          </div>
+          <div class="form-group short-input">
+            <label>หน่วยกิตรวม</label>
+            <input type="number" step="0.5" [(ngModel)]="groupForm.credits" name="credits" placeholder="เช่น 2.0" required>
+          </div>
+        </div>
+        <div class="form-actions right">
+          <button type="submit" class="btn-submit">บันทึกกลุ่มวิชา</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 4. ส่วนเพิ่มรายวิชา -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="material-icons">book</span>
+        <h2>4. เพิ่มรายวิชา (Subject)</h2>
+      </div>
+      <form (ngSubmit)="onSubmitSubject()" class="custom-form">
+        
+        <!-- คำอธิบายประเภทวิชา (Legend) -->
+        <div class="info-box">
+          <div class="info-header">
+            <span class="material-icons">info</span>
+            <strong>คำแนะนำ: ความหมายของตัวย่อกลุ่มวิชา (เทียบตามแถบสี)</strong>
+          </div>
+          <div class="info-badges">
+            <span class="badge badge-yellow"><strong>M</strong> (Main) = วิชาหลัก</span>
+            <span class="badge badge-red"><strong>MN</strong> (Minor) = วิชารอง</span>
+            <span class="badge badge-blue"><strong>S</strong> (Supporting) = วิชาประกอบ</span>
+            <span class="badge badge-white"><strong>P</strong> (Practical) = ภาคปฏิบัติ</span>
+          </div>
+        </div>
+
+        <!-- Cascading: เลือกหลักสูตร -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>เลือกหลักสูตร</label>
+            <div class="select-wrapper">
+              <select [(ngModel)]="selectedCourseNameForSubject" name="selectedCourseNameForSubject" (change)="selectedCourseIdForSubject = ''; selectedBatchForSubject = ''; subjectForm.group_id = ''">
+                <option value="" disabled selected>-- เลือกหลักสูตร --</option>
+                <option *ngFor="let name of getUniqueCourseNames()" [value]="name">{{ name }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>เลือกปีการศึกษา</label>
+            <div class="select-wrapper">
+              <select [(ngModel)]="selectedCourseIdForSubject" name="selectedCourseIdForSubject" (change)="selectedBatchForSubject = ''; subjectForm.group_id = ''" [disabled]="!selectedCourseNameForSubject">
+                <option value="" disabled selected>-- เลือกปีการศึกษา --</option>
+                <option *ngFor="let c of getCoursesByName(selectedCourseNameForSubject)" [value]="c.id">{{ c.curriculum_year }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cascading: เลือกรุ่น -->
         <div class="form-group">
-          <label for="groupName">ชื่อกลุ่มหลักสูตร</label>
-          <input type="text" id="groupName" name="groupName" placeholder="กรอกชื่อกลุ่มหลักสูตร">
+          <label>เลือกรุ่น</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="selectedBatchForSubject" name="selectedBatchForSubject" (change)="subjectForm.group_id = ''" [disabled]="!selectedCourseIdForSubject">
+              <option value="" disabled selected>-- เลือกรุ่น --</option>
+              <option *ngFor="let b of getBatchesForCourse(selectedCourseIdForSubject)" [value]="b.id">{{ b.batch_name }}</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      <div class="form-actions center">
-        <button type="submit" class="btn-submit-wide">สร้างและนำเข้าหลักสูตร</button>
-      </div>
-    </form>
+        <!-- Cascading: เลือกกลุ่มวิชา -->
+        <div class="form-group">
+          <label>เลือกกลุ่มวิชา</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="subjectForm.group_id" name="group_id" [disabled]="!selectedBatchForSubject" required>
+              <option value="" disabled selected>-- เลือกกลุ่มวิชา --</option>
+              <option *ngFor="let g of getGroupsForBatch(selectedBatchForSubject)" [value]="g.id">{{ g.group_name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Multiple Subjects Array -->
+        <div class="dynamic-list-container">
+          <label>รายชื่อวิชาในกลุ่มนี้ (เพิ่มได้หลายวิชา)</label>
+          <div class="dynamic-row" *ngFor="let subj of subjectsList; let i = index; let isLast = last">
+            <div class="form-group mb-0">
+              <input type="text" [(ngModel)]="subj.subject_name" name="subject_name_{{i}}" placeholder="เช่น ฝ่ายอำนวยการ" required>
+            </div>
+            
+            <button type="button" class="btn-icon-action btn-add" (click)="addSubjectField()" *ngIf="isLast" title="เพิ่มรายวิชา">
+              <span class="material-icons">add_circle</span>
+            </button>
+            <button type="button" class="btn-icon-action btn-remove" (click)="removeSubjectField(i)" *ngIf="subjectsList.length > 1" title="ลบรายวิชานี้">
+              <span class="material-icons">remove_circle</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions right" style="margin-top: 24px;">
+          <button type="submit" class="btn-submit">บันทึกรายวิชาทั้งหมด</button>
+        </div>
+      </form>
+    </div>
 
   </div>
 </div>
