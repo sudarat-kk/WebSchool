@@ -20,9 +20,7 @@ export class Score implements OnInit {
   isLoading: boolean = true;
   errorMessage: string = '';
 
-  // จัดกลุ่ม subjects ตาม group_name
-  groupedSubjects: { [key: string]: SubjectDetail[] } = {};
-  groupNames: string[] = [];
+  // ลบตัวแปรจัดกลุ่มออก เนื่องจากเราจะแสดงรายวิชาทั้งหมดในตารางเดียว
 
   constructor(
     private authService: AuthService,
@@ -57,7 +55,7 @@ export class Score implements OnInit {
         next: (res) => {
           this.subjectDetails = res.subject_details || [];
           this.groupSummaries = res.group_summaries || [];
-          this.buildGroupedSubjects();
+          // ไม่ต้องจัดกลุ่มแล้ว
           this.isLoading = false;
           setTimeout(() => this.cdr.detectChanges());
         },
@@ -74,31 +72,22 @@ export class Score implements OnInit {
       });
   }
 
-  // จัดกลุ่ม subjects ตาม group_name
-  buildGroupedSubjects(): void {
-    this.groupedSubjects = {};
-    for (const subject of this.subjectDetails) {
-      if (!this.groupedSubjects[subject.group_name]) {
-        this.groupedSubjects[subject.group_name] = [];
-      }
-      this.groupedSubjects[subject.group_name].push(subject);
-    }
-    this.groupNames = Object.keys(this.groupedSubjects);
-  }
 
-  // คืนค่า GroupSummary ของ group_name นั้น
-  getSummaryForGroup(groupName: string): GroupSummary | undefined {
-    return this.groupSummaries.find((g) => g.group_name === groupName);
-  }
-
-  // แปลง String เปอร์เซ็นต์เป็น Number สำหรับ Progress Bar
-  getPercentage(summary: GroupSummary | undefined): number {
-    if (!summary) return 0;
-    return parseFloat(summary.group_percentage) || 0;
-  }
 
   onLogout(): void {
+    const batchId = this.studentData?.batch_id || '';
+    const courseName = this.studentData?.course_name || '';
+    const batchName = this.studentData?.batch_name || '';
+    const title = (courseName && batchName) ? `${courseName} ${batchName}` : '';
+    
     this.authService.logout();
-    this.router.navigate(['/']);
+    this.router.navigate(['/student/login'], { 
+      queryParams: { 
+        batchId: batchId, 
+        title: title,
+        courseName: courseName,
+        batchName: batchName
+      } 
+    });
   }
 }

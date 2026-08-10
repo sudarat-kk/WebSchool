@@ -210,7 +210,7 @@
           <div class="select-wrapper">
             <select [(ngModel)]="subjectForm.group_id" name="group_id" [disabled]="!selectedBatchForSubject" required>
               <option value="" disabled selected>-- เลือกกลุ่มวิชา --</option>
-              <option *ngFor="let g of getGroupsForBatch(selectedBatchForSubject)" [value]="g.id">{{ g.group_name }}</option>
+              <option *ngFor="let g of getGroupsForBatch(selectedBatchForSubject)" [value]="g.id">{{ getGroupLabel(g) }}</option>
             </select>
           </div>
         </div>

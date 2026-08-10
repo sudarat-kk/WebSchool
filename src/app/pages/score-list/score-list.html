@@ -4,7 +4,10 @@
       <mat-icon>chevron_left</mat-icon>
     </button>
     <h1 class="page-title">ประมวลผลการเรียน</h1>
-    <div class="header-spacer"></div>
+    <button class="header-btn" routerLink="/admin/classoverview">
+      <mat-icon style="font-size: 20px; width: 20px; height: 20px; margin-right: 4px">assessment</mat-icon>
+      ภาพรวมผลการเรียนทั้งรุ่น
+    </button>
   </div>
 
   <div class="page-wrapper">
@@ -192,13 +195,5 @@
         <strong class="text-purple">{{ lastProcessedTime || 'ยังไม่มีการประมวลผล' }}</strong></span
       >
     </div>
-  </div>
-
-  <!-- ➡️ ปุ่มหน้าถัดไป -->
-  <div class="navigation-container">
-    <button class="btn-next" routerLink="/admin/classoverview">
-      หน้าถัดไป
-      <mat-icon>chevron_right</mat-icon>
-    </button>
   </div>
 </div>

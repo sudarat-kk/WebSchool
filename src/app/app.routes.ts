@@ -20,8 +20,9 @@ import { EvaluationSummaryComponent } from './pages/evaluation-summary/evaluatio
 import { FollowUpComponent } from './pages/follow-up/follow-up';
 import { Committee } from './main/committee/committee';
 
-
 import { AddCourse } from './pages/add-course-dialog/add-course-dialog';
+
+import { EvaluationFillComponent } from './main/student/evaluation-fill/evaluation-fill.component';
 
 export const routes: Routes = [
   // หน้าแรก
@@ -33,16 +34,18 @@ export const routes: Routes = [
     children: [
       { path: '', component: Student }, // เข้าด้วย /student
       { path: 'login', component: Login }, // เข้าด้วย /student/login
+      { path: 'fill-form', component: EvaluationFillComponent }, // เข้าด้วย /student/fill-form
+      { path: 'score', component: Score }, // เข้าด้วย /student/score
     ],
   },
   //สรุปผลสถิติ
-   {
+  {
     path: 'training-results',
     children: [
-      { path: '', component: TrainingResults }, 
+      { path: '', component: TrainingResults },
       { path: 'training-statistics', component: TrainingStatistics },
-      { path: 'training-summary', component: TrainingSummary }     
-    ]
+      { path: 'training-summary', component: TrainingSummary },
+    ],
   },
 
   // ส่วนของครู
@@ -63,12 +66,9 @@ export const routes: Routes = [
     ],
   },
 
-  {path:'register',component: Register},
+  { path: 'register', component: Register },
 
-  {path:'score-submission',component: ScoreSubmission},
-
-  // ส่วนของคะแนน (ทั่วไป)
-  { path: 'score', component: Score },
+  { path: 'score-submission', component: ScoreSubmission },
 
   // หน้าใหม่ที่เพิ่มเข้ามา
   { path: 'evaluation-summary', component: EvaluationSummaryComponent },

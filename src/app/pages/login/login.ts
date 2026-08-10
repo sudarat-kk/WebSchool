@@ -37,10 +37,23 @@ export class Login implements OnInit {
     private route: ActivatedRoute,
   ) {}
 
+  loginTitle: string = '';
+  loginCourseName: string = '';
+  loginBatchName: string = '';
+
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       if (params['batchId']) {
         this.batchId = Number(params['batchId']);
+      }
+      if (params['title']) {
+        this.loginTitle = params['title'];
+      }
+      if (params['courseName']) {
+        this.loginCourseName = params['courseName'];
+      }
+      if (params['batchName']) {
+        this.loginBatchName = params['batchName'];
       }
     });
   }
@@ -66,10 +79,20 @@ export class Login implements OnInit {
         if (res.success && res.token) {
           this.authService.saveToken(res.token);
           if (res.studentData) {
+            // เพิ่มข้อมูลหลักสูตรและรุ่นเข้าไปถ้าระบบไม่ได้ส่งมาให้ เพื่อนำไปแสดงในหน้าคะแนน
+            if (this.loginCourseName && (!res.studentData.course_name || res.studentData.course_name === '-')) {
+              res.studentData.course_name = this.loginCourseName;
+            }
+            if (this.loginBatchName && (!res.studentData.batch_name || res.studentData.batch_name === '-')) {
+              res.studentData.batch_name = this.loginBatchName;
+            }
+            if (!res.studentData.student_code || res.studentData.student_code === '-') {
+              res.studentData.student_code = this.studentCode;
+            }
             this.authService.saveStudentData(res.studentData);
           }
           // นำผู้ใช้ไปยังหน้าผลคะแนน
-          this.router.navigate(['/student/score']);
+          this.router.navigate(['/score']);
         } else {
           this.errorMessage = res.message || 'รหัสนักเรียนหรือรหัสผ่านไม่ถูกต้อง';
         }

@@ -6,58 +6,62 @@
     </div>
 
     <div class="page-content">
-        <h1 class="main-title">ระบบแจ้งผลการเรียนออนไลน์ โรงเรียนทหารสื่อสาร กรมทหารสื่อสาร</h1>
-        <p class="sub-title">
-            กรอกเลขรหัสผ่านของผู้เรียน
-            <mat-icon class="title-icon">search</mat-icon>
-        </p>
-
-        <div class="login-container">
-            <mat-form-field appearance="outline" class="password-field">
-                <mat-label>รหัสนักเรียน</mat-label>
-                <input matInput type="text" placeholder="กรอกรหัสนักเรียนของคุณ"
-                    [(ngModel)]="studentCode">
-                <mat-icon matSuffix>account_circle</mat-icon>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="password-field">
-                <mat-label>กรอกเลข 4 ตัว หลังของบัตรประจำตัวประชาชน</mat-label>
-                <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="กรอกรหัสผ่านของคุณ"
-                    [(ngModel)]="password">
-
-                <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword"
-                    [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
-                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-                </button>
-            </mat-form-field>
-
-            <!-- แสดงข้อความ error -->
-            <p class="error-message" *ngIf="errorMessage">
-                <mat-icon class="error-icon">error_outline</mat-icon>
-                {{ errorMessage }}
-            </p>
-        </div>
-
-        <div class="action-container">
-            <button mat-flat-button class="search-btn" (click)="onLogin()" [disabled]="isLoading">
-                <span *ngIf="!isLoading">ค้นหา</span>
-                <span *ngIf="isLoading">กำลังตรวจสอบ...</span>
-            </button>
-        </div>
-
-        <div class="support-footer">
-            <div class="support-left">
-                <mat-icon class="warning-icon">warning</mat-icon>
-                <span>หากพบปัญหา แจ้งมาได้ที่</span>
+        <div class="login-card">
+            <div class="card-header">
+                <img src="assets/image/logo.png" alt="School Logo" class="school-logo" *ngIf="false" /> <!-- Add logo if you want, hiding for now -->
+                <h1 class="main-title">ระบบแจ้งผลการเรียนออนไลน์<br>โรงเรียนทหารสื่อสาร กรมทหารสื่อสาร</h1>
+                
+                <div class="course-badge" *ngIf="loginTitle">
+                    <span class="badge-label">เข้าสู่ระบบ:</span>
+                    <span class="badge-value">{{ loginTitle }}</span>
+                </div>
             </div>
 
-            <div class="support-right-inline">
-                <a href="tel:02-2975248" mat-mini-fab class="phone-btn">
-                    <mat-icon>phone</mat-icon>
-                </a>
-                <span class="phone-number-text">02-2975248</span>
+            <div class="login-body">
+                <p class="sub-title">
+                    <mat-icon class="title-icon">lock_outline</mat-icon>
+                    กรอกข้อมูลเพื่อเข้าสู่ระบบ
+                </p>
+
+                <div class="login-form">
+                    <mat-form-field appearance="outline" class="custom-field">
+                        <mat-label>รหัสนักเรียน</mat-label>
+                        <input matInput type="text" placeholder="รหัสนักเรียน 10 หลัก" [(ngModel)]="studentCode">
+                        <mat-icon matSuffix class="field-icon">person</mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="custom-field">
+                        <mat-label>เลข 4 ตัว หลังบัตรประชาชน</mat-label>
+                        <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="รหัสผ่าน" [(ngModel)]="password" (keyup.enter)="onLogin()">
+                        <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" tabindex="-1">
+                            <mat-icon class="field-icon">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                    </mat-form-field>
+
+                    <div class="error-message" *ngIf="errorMessage">
+                        <mat-icon>error_outline</mat-icon>
+                        <span>{{ errorMessage }}</span>
+                    </div>
+
+                    <button mat-flat-button class="login-btn" (click)="onLogin()" [disabled]="isLoading">
+                        <span *ngIf="!isLoading">เข้าสู่ระบบ</span>
+                        <mat-icon *ngIf="!isLoading" class="btn-icon">arrow_forward</mat-icon>
+                        <div *ngIf="isLoading" class="spinner"></div>
+                        <span *ngIf="isLoading" style="margin-left: 8px;">กำลังตรวจสอบ...</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <div class="support-info">
+                    <mat-icon class="support-icon">support_agent</mat-icon>
+                    <span>หากพบปัญหา แจ้งมาได้ที่</span>
+                    <a href="tel:02-2975248" class="phone-link">
+                        <mat-icon>call</mat-icon>
+                        02-2975248
+                    </a>
+                </div>
             </div>
         </div>
-
     </div>
 </div>
