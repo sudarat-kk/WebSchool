@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -12,6 +12,7 @@ export interface SubjectDetail {
   subject_name: string;
   max_score: string;
   raw_score: string;
+  is_evaluated?: boolean; // เพิ่มสถานะการประเมิน
 }
 
 export interface GroupSummary {
@@ -31,7 +32,8 @@ export interface ScoreResponse {
 }
 
 export interface UpdateMaxScoreRequest {
-  setting_id: number;
+  batch_id: number;
+  subject_id: number;
   max_score: number;
 }
 
@@ -59,7 +61,9 @@ export class ScoreService {
     private authService: AuthService,
   ) {}
 
-  // สร้าง Headers ที่มี Token
+  // ==========================================
+  // Helper Methods สำหรับจัดการ Headers
+  // ==========================================
   private getHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     return new HttpHeaders({
@@ -67,6 +71,19 @@ export class ScoreService {
       Authorization: `Bearer ${token}`,
     });
   }
+
+  // ✅ สร้าง Helper สำหรับ Admin Token โดยเฉพาะ เพื่อลดความซ้ำซ้อน
+  private getAdminHeaders(): HttpHeaders {
+    const token = localStorage.getItem('admin_token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  // ==========================================
+  // API Methods
+  // ==========================================
 
   // 2. ดึงข้อมูลคะแนนนักเรียน
   getStudentScores(studentId: number, batchId: number): Observable<ScoreResponse> {
@@ -81,22 +98,29 @@ export class ScoreService {
     batchId: number,
     subjectId: number,
   ): Observable<AdminSubjectScoresResponse> {
-    const token = localStorage.getItem('admin_token');
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    });
-    return this.http.get<AdminSubjectScoresResponse>(
-      `${environment.apiUrl}/admin/scores?batch_id=${batchId}&subject_id=${subjectId}`,
-      { headers },
-    );
+    return this.http
+      .get<AdminSubjectScoresResponse>(
+        `${environment.apiUrl}/admin/scores?batch_id=${batchId}&subject_id=${subjectId}`,
+        { headers: this.getAdminHeaders() }, // ✅ ใช้ Helper Method
+      )
+      .pipe(
+        // ✅ ดักจับ Error 404 แล้วคืนค่าข้อมูลว่างกลับไปแทน (แก้ปัญหาหน้าเว็บพังครั้งแรก)
+        catchError((error) => {
+          if (error.status === 404) {
+            return of({ success: true, max_score: 0, data: [] } as AdminSubjectScoresResponse);
+          }
+          return throwError(() => error);
+        }),
+      );
   }
 
   // 5. อัปเดตคะแนนเต็มรายวิชา (แอดมิน)
   updateMaxScore(payload: UpdateMaxScoreRequest): Observable<any> {
-    return this.http.put<any>(`${environment.apiUrl}/settings/max-score`, payload, {
-      headers: this.getHeaders(),
-    });
+    return this.http.put<any>(
+      `${environment.apiUrl}/settings/max-score`,
+      payload,
+      { headers: this.getHeaders() }, // ควรเช็กว่าใช้ Admin หรือ User Header
+    );
   }
 
   // 6. บันทึกคะแนนแบบ Bulk (แอดมิน - ทั้งห้อง)
@@ -105,41 +129,35 @@ export class ScoreService {
     subject_id: number;
     scores: { student_id: number; raw_score: number | null }[];
   }): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/admin/scores/bulk`, payload, {
-      headers: this.getHeaders(),
-    });
+    return this.http.post<any>(
+      `${environment.apiUrl}/admin/scores/bulk`,
+      payload,
+      { headers: this.getAdminHeaders() }, // ✅ ปรับมาใช้ Admin Header
+    );
   }
 
   // 7. ประมวลผลคะแนนตามกลุ่มวิชา
   getProcessGroupScores(batchId: number, groupId: number): Observable<any> {
-    const token = localStorage.getItem('admin_token');
-    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
     return this.http.get<any>(
       `${environment.apiUrl}/score/process-group?batch_id=${batchId}&group_id=${groupId}`,
-      { headers },
+      { headers: this.getAdminHeaders() }, // ✅ ปรับมาใช้ Admin Header
     );
   }
 
   // ฟังก์ชันดึงข้อมูลสรุปผลการเรียนทั้งรุ่น
   getBatchScoresSummary(batchId: number): Observable<any> {
-    const token = localStorage.getItem('admin_token');
-    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-
-    return this.http.get<any>(`${environment.apiUrl}/score/process-batch?batch_id=${batchId}`, {
-      headers,
-    });
+    return this.http.get<any>(
+      `${environment.apiUrl}/score/process-batch?batch_id=${batchId}`,
+      { headers: this.getAdminHeaders() }, // ✅ ปรับมาใช้ Admin Header
+    );
   }
 
   // 8. บันทึกคะแนนพิเศษแบบ Bulk (ฝึกอบรม, สอบ, ความประพฤติ)
   saveSpecialScoresBulk(payload: any): Observable<any> {
-    const token = localStorage.getItem('admin_token');
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    });
-
-    return this.http.post<any>(`${environment.apiUrl}/scores/special-bulk`, payload, {
-      headers,
-    });
+    return this.http.post<any>(
+      `${environment.apiUrl}/scores/special-bulk`,
+      payload,
+      { headers: this.getAdminHeaders() }, // ✅ ปรับมาใช้ Admin Header
+    );
   }
 }

@@ -8,7 +8,7 @@
   </div>
 
   <div class="alert-title-container">
-    <a [routerLink]="['/student/login']" [queryParams]="{ batchId: currentBatchId }" class="alert-title">
+    <a [routerLink]="['/student/login']" [queryParams]="{ batchId: currentBatchId, title: pageTitle, courseName: currentCourseName, batchName: currentBatchName }" class="alert-title">
       ระบบแจ้งผลคะแนนผู้เรียน
       <mat-icon class="alert-icon">warning</mat-icon>
     </a>

@@ -175,4 +175,22 @@ export class AddCourse implements OnInit {
       console.error(err);
     }
   }
+
+  getGroupLabel(g: any): string {
+    const nameUpper = (g.group_name || '').toUpperCase();
+    let type = '';
+    if (nameUpper.startsWith('MN')) type = 'วิชารอง';
+    else if (nameUpper.startsWith('M')) type = 'วิชาหลัก';
+    else if (nameUpper.startsWith('S')) type = 'วิชาประกอบ';
+    else if (nameUpper.startsWith('P')) type = 'ภาคปฏิบัติ';
+    
+    let label = g.group_name;
+    if (type) {
+      label += ` (${type})`;
+    }
+    if (g.credits) {
+      label += ` - ${g.credits} หน่วยกิต`;
+    }
+    return label;
+  }
 }

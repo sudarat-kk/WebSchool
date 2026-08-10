@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
-import { RouterLink, ActivatedRoute } from '@angular/router'; // 👈 นำเข้า ActivatedRoute
+import { RouterLink, ActivatedRoute, Router } from '@angular/router'; // 👈 นำเข้า Router
 import { SubjectService } from '../../services/subject.service';
 import { GeneralEvaluationService } from '../../services/general-evaluation.service';
 import { Subscription } from 'rxjs';
@@ -26,6 +26,8 @@ export class Student implements OnInit, OnDestroy {
   pageTitle: string = 'กำลังโหลดข้อมูล...'; // 👈 เพิ่มตัวแปรเก็บชื่อหัวข้อ H1
   selectedAssessment: string = '';
   currentBatchId: number | null = null;
+  currentCourseName: string = '';
+  currentBatchName: string = '';
   private evaluationSub: Subscription | null = null;
 
   // เก็บข้อมูลรายวิชาทั้งหมดที่ดึงมาจาก API
@@ -37,7 +39,8 @@ export class Student implements OnInit, OnDestroy {
   constructor(
     private subjectService: SubjectService,
     private generalEvaluationService: GeneralEvaluationService,
-    private route: ActivatedRoute, // 👈 Inject ActivatedRoute เข้ามาใช้งาน
+    private route: ActivatedRoute, 
+    private router: Router, // 👈 เพิ่ม Router
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -52,10 +55,18 @@ export class Student implements OnInit, OnDestroy {
     this.route.queryParams.subscribe((params) => {
       const batchId = params['batchId'];
       const title = params['title'];
+      const courseName = params['courseName'];
+      const batchName = params['batchName'];
 
       // อัปเดตชื่อหัวข้อหลักสูตรตามที่ส่งมาจาก Header
       if (title) {
         this.pageTitle = title;
+      }
+      if (courseName) {
+        this.currentCourseName = courseName;
+      }
+      if (batchName) {
+        this.currentBatchName = batchName;
       }
 
       // ถ้ามี batchId ส่งมา ให้เรียก API ดึงข้อมูลวิชา
@@ -162,12 +173,20 @@ export class Student implements OnInit, OnDestroy {
 
   // ทำงานเมื่อกดคลิกที่ Card รายวิชา
   openForm(course: CourseCard): void {
-    if (course.formUrl) {
-      // เปิดลิงก์แบบฟอร์มในแท็บใหม่
-      window.open(course.formUrl, '_blank');
-    } else {
-      // แจ้งเตือนกรณีรายวิชานั้นยังไม่มีการใส่ฟอร์มลิงก์มาให้
-      alert(`ยังไม่มีลิงก์แบบประเมินสำหรับวิชา: ${course.text}`);
-    }
+    // กำหนดประเภทการประเมินจาก selectedAssessment
+    let typeStr = 'instructor';
+    if (this.selectedAssessment === '2') typeStr = 'director';
+    if (this.selectedAssessment === '3') typeStr = 'course';
+
+    // เปลี่ยนหน้าไปทำแบบประเมินในระบบ
+    this.router.navigate(['/student/fill-form'], {
+      queryParams: {
+        batchId: this.currentBatchId,
+        subjectId: course.id,
+        type: typeStr,
+        courseTitle: course.text,
+        batchName: this.currentBatchName // 👈 ส่งชื่อรุ่นที่ถูกต้องไปด้วย
+      }
+    });
   }
 }

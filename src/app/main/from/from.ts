@@ -8,6 +8,17 @@ import { FormsModule } from '@angular/forms';
 import { CourseService, CourseGroup, BatchItem } from '../../services/course.service';
 import { GeneralEvaluationService } from '../../services/general-evaluation.service';
 
+export interface Choice {
+  choice_text: string;
+  score_value: number;
+}
+
+export interface Question {
+  question_text: string;
+  question_type: 'choice' | 'text';
+  choices?: Choice[];
+}
+
 @Component({
   selector: 'app-from',
   standalone: true,
@@ -39,17 +50,17 @@ export class From implements OnInit {
     { value: 'followup', label: 'แบบประเมินติดตามผู้สำเร็จการศึกษา' }
   ];
 
-  // โครงสร้างตัวแปรสำหรับผูกข้อมูลกับทุกช่องกรอกในฟอร์ม
+  // โครงสร้างตัวแปรสำหรับผูกข้อมูลกับทุกช่องกรอกในฟอร์ม (ปรับใหม่ให้มี questions)
   formData = {
     courseName: '', 
     formType: '',
-    googleFormUrl: '',
     formName: '',
     generationId: '',
-    subjectId: '' // เพิ่มฟิลด์สำหรับเก็บ ID วิชา
+    subjectId: '',
+    questions: [] as Question[]
   };
 
-  // รายการวิชาสำหรับรุ่นนั้นๆ (ใช้ข้อมูลจำลองไปก่อนระหว่างรอ Backend)
+  // รายการวิชาสำหรับรุ่นนั้นๆ
   availableSubjects: any[] = [];
 
   // รายการแบบฟอร์มที่มี (สำหรับแสดงในตารางด้านล่าง)
@@ -62,6 +73,8 @@ export class From implements OnInit {
 
   ngOnInit(): void {
     this.fetchCourses();
+    // เพิ่มคำถามตั้งต้น 1 ข้อให้เวลาเปิดหน้าจอมา
+    this.addQuestion();
   }
 
   fetchCourses(): void {
@@ -69,25 +82,21 @@ export class From implements OnInit {
       next: (res) => {
         if (res.success && res.data) {
           this.courseGroups = res.data;
-          this.fetchAllForms(); // โหลดรายการฟอร์มทั้งหมดหลังจากได้ข้อมูลหลักสูตรรุ่นมาแล้ว
+          this.fetchAllForms(); 
         }
       },
       error: (err) => {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลหลักสูตร:', err);
-        this.fetchAllForms(); // โหลดเหมือนเดิมเผื่อกรณี fail
+        this.fetchAllForms(); 
       }
     });
   }
 
-  // ดึงข้อมูลฟอร์มทั้งหมดจาก Backend
   fetchAllForms(): void {
     this.generalEvaluationService.getAllForms().subscribe({
       next: (res) => {
         if (res.success && res.data) {
-          // แปลงชื่อตัวแปรจาก Database (Backend) ให้ตรงกับที่ Frontend ใช้แสดงผลตาราง
           this.formList = res.data.map((item: any) => {
-            
-            // 1. หาชื่อหลักสูตรและชื่อรุ่น จาก batch_id
             let cName = 'ไม่ระบุ';
             let gName = 'ไม่ระบุรุ่น';
             if (item.batch_id) {
@@ -101,26 +110,24 @@ export class From implements OnInit {
               }
             }
 
-            // 2. หาชื่อประเภทภาษาไทย
             const typeObj = this.formTypes.find(t => t.value === item.evaluation_type);
             const typeLabel = typeObj ? typeObj.label : (item.evaluation_type || 'ไม่ระบุ');
 
             return {
               id: item.id,
               courseName: cName,
-              generationId: item.batch_id, // เก็บเป็น ID ไว้ใช้เวลาแก้ไข
-              generationName: gName,       // เอาไว้โชว์บนตาราง
+              generationId: item.batch_id, 
+              generationName: gName,       
               formType: item.evaluation_type,
               formTypeName: typeLabel,
               formName: item.form_name,
-              googleFormUrl: item.form_url,
-              subjectId: item.subject_id || '', // เผื่อ Backend ส่ง subject_id กลับมา
-              subjectName: item.subject_name || '-', // เอาไว้โชว์ชื่อวิชาในตาราง
+              subjectId: item.subject_id || '',
+              subjectName: item.subject_name || '-',
               isActive: item.is_active === 1 || item.is_active === true
             };
           });
           
-          this.generateTableData(); // อัปเดตตารางด้านล่างด้วยข้อมูลล่าสุด
+          this.generateTableData();
         } else {
           this.formList = [];
           this.generateTableData();
@@ -135,7 +142,6 @@ export class From implements OnInit {
   }
 
   onCourseChange(resetGen: boolean = true): void {
-    // เมื่อเลือกหลักสูตรใหม่ ให้หา batches ของหลักสูตรนั้นๆ
     const selectedGroup = this.courseGroups.find(c => c.course_name === this.formData.courseName);
     if (selectedGroup) {
       this.availableBatches = selectedGroup.batches;
@@ -143,7 +149,6 @@ export class From implements OnInit {
       this.availableBatches = [];
     }
     
-    // รีเซ็ตรุ่นที่เลือกไว้ เฉพาะเวลาแอดมินเปลี่ยนหลักสูตรเอง
     if (resetGen) {
       this.formData.generationId = '';
       this.formData.subjectId = '';
@@ -151,7 +156,6 @@ export class From implements OnInit {
   }
 
   onGenerationChange(resetSubject: boolean = true): void {
-    // ฟังก์ชันนี้จะถูกเรียกเมื่อแอดมินเลือกรุ่น (Generation) เสร็จ
     if (resetSubject) {
       this.formData.subjectId = '';
     }
@@ -159,11 +163,7 @@ export class From implements OnInit {
       this.courseService.getSubjectsByBatch(this.formData.generationId).subscribe({
         next: (res) => {
           if (res.success && res.data) {
-            
-            // ข้อมูลจาก Backend ส่งมาเป็น Group (มี group_name และ subjects เป็น Array ซ้อนอยู่ข้างใน)
-            // เราต้องวนลูปเพื่อดึงวิชาทั้งหมดออกมาเรียงเป็นก้อนเดียว
             let allSubjects: any[] = [];
-            
             res.data.forEach((group: any) => {
               if (group.subjects && Array.isArray(group.subjects)) {
                 group.subjects.forEach((s: any) => {
@@ -174,7 +174,6 @@ export class From implements OnInit {
                 });
               }
             });
-
             this.availableSubjects = allSubjects;
           } else {
             this.availableSubjects = [];
@@ -191,179 +190,162 @@ export class From implements OnInit {
   }
 
   onTypeChange(): void {
-    // ถ้าเปลี่ยนประเภทแบบฟอร์มแล้วไม่ใช่ "ประเมินอาจารย์ผู้สอน" ให้เคลียร์วิชาทิ้ง
     if (this.formData.formType !== 'instructor') {
       this.formData.subjectId = '';
     }
   }
 
-  // 1. ฟังก์ชันเมื่อกดปุ่ม "สร้างและแชร์แบบฟอร์มประเมินนี้"
+  // ==========================================
+  // ส่วนจัดการคำถาม (Dynamic Form Builder)
+  // ==========================================
+
+  addQuestion() {
+    this.formData.questions.push({
+      question_text: '',
+      question_type: 'choice',
+      choices: [
+        { choice_text: 'สามารถให้คำแนะนำ...อย่างเหมาะสม', score_value: 3 },
+        { choice_text: 'สามารถให้คำแนะนำ...พอสมควร', score_value: 2 },
+        { choice_text: 'ยังไม่เหมาะสม', score_value: 1 }
+      ]
+    });
+  }
+
+  removeQuestion(index: number) {
+    this.formData.questions.splice(index, 1);
+  }
+
+  addChoice(qIndex: number) {
+    if (!this.formData.questions[qIndex].choices) {
+      this.formData.questions[qIndex].choices = [];
+    }
+    this.formData.questions[qIndex].choices!.push({ choice_text: '', score_value: 0 });
+  }
+
+  removeChoice(qIndex: number, cIndex: number) {
+    this.formData.questions[qIndex].choices!.splice(cIndex, 1);
+  }
+
+  onQuestionTypeChange(qIndex: number) {
+    // ถ้าเปลี่ยนเป็น text ให้ล้าง choices ไปเลย เพื่อลดข้อมูลขยะ
+    if (this.formData.questions[qIndex].question_type === 'text') {
+      this.formData.questions[qIndex].choices = [];
+    } else {
+      // ถ้าเปลี่ยนกลับมา choice ให้มีค่า default ไว้ให้
+      if (!this.formData.questions[qIndex].choices || this.formData.questions[qIndex].choices!.length === 0) {
+        this.formData.questions[qIndex].choices = [
+          { choice_text: 'มาก', score_value: 3 },
+          { choice_text: 'ปานกลาง', score_value: 2 },
+          { choice_text: 'น้อย', score_value: 1 }
+        ];
+      }
+    }
+  }
+
+  // ==========================================
+  // ส่วนสร้างและอัปเดตฟอร์ม (เรียก API)
+  // ==========================================
+
   onCreateForm() {
-    // ตรวจสอบว่ากรอกข้อมูลครบหรือยัง (เบื้องต้น)
     if (!this.formData.courseName || !this.formData.generationId || !this.formData.formType) {
       alert('กรุณาเลือกหลักสูตร รุ่น และประเภทแบบฟอร์มให้ครบถ้วน');
       return;
     }
-    
-    // บังคับเลือกวิชา หากประเภทเป็น "ประเมินอาจารย์ผู้สอน"
-    if (this.formData.formType === 'instructor' && !this.formData.subjectId) {
-      alert('กรุณาเลือกวิชา สำหรับแบบประเมินอาจารย์ผู้สอน');
+
+    if (!this.formData.questions || this.formData.questions.length === 0) {
+      alert('กรุณาสร้างคำถามอย่างน้อย 1 ข้อ');
       return;
     }
 
-    if (!this.formData.googleFormUrl) {
-      alert('กรุณากรอกลิงก์ Google Form');
-      return;
-    }
-
-    // ทำความสะอาด subjectId ป้องกันกรณี HTML แปลง undefined เป็นสตริง 'undefined'
     const cleanSubjectId = (this.formData.subjectId === 'undefined' || !this.formData.subjectId) 
       ? null 
       : this.formData.subjectId;
 
     const payload = {
-      // ส่งชื่อตัวแปรแบบเก่า (กันกรณี Backend บน Render ยังไม่อัปเดต)
-      batch_id: this.formData.generationId || null,
-      evaluation_type: this.formData.formType,
-      form_url: this.formData.googleFormUrl,
-      form_name: this.formData.formName,
-      subject_id: cleanSubjectId,
-      
-      // ส่งชื่อตัวแปรแบบใหม่ (ตามโค้ด Backend ล่าสุดที่คุณแก้)
       courseName: this.formData.courseName,
       formType: this.formData.formType,
-      googleFormUrl: this.formData.googleFormUrl,
       formName: this.formData.formName,
       generationId: this.formData.generationId || null,
-      subjectId: cleanSubjectId
+      subjectId: cleanSubjectId,
+      questions: this.formData.questions
     };
 
     console.log('กำลังสร้างฟอร์มใหม่ด้วยข้อมูลนี้:', payload);
     
-    // เรียกใช้ Service เพื่อส่งข้อมูลไปให้ Backend
     this.generalEvaluationService.createGeneralEvaluation(payload).subscribe({
       next: (res) => {
         if (res.success) {
           alert('สร้างฟอร์มสำเร็จ');
           this.resetForm();
-          this.fetchAllForms(); // โหลดข้อมูลตารางใหม่
+          this.fetchAllForms(); 
         } else {
           alert('เกิดข้อผิดพลาดในการสร้างฟอร์ม: ' + (res.message || ''));
         }
       },
       error: (err) => {
         console.error('Error จาก Backend:', err);
-        alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์ (กรุณาเช็ค Console F12)');
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
       }
     });
   }
 
-  // 2. ฟังก์ชันเมื่อกดปุ่มแก้ไข (ปุ่มรูปดวงตา/แก้ไขจากรายการตารางด้านล่าง)
   onEditAction(item: any) {
     this.isEditMode = true;
     this.selectedFormId = item.id;
     
-    // นำข้อมูลจากตารางมาใส่ในฟอร์มด้านบน
     this.formData = {
       courseName: item.courseName || '',
       formType: item.formType || '',
-      googleFormUrl: item.googleFormUrl || '',
       formName: item.formName || '',
       generationId: item.generationId || '',
-      subjectId: item.subjectId || ''
+      subjectId: item.subjectId || '',
+      // หมายเหตุ: โค้ด Backend ยังไม่รองรับการดึงชุดคำถามตอนแก้ไข 
+      // เพื่อไม่ให้ UI พัง เราจะสร้าง question เปล่าไปก่อน (หรือรอ Backend รองรับ)
+      questions: []
     };
     
-    // โหลดรายการรุ่นของหลักสูตรนี้ แต่ "ไม่ต้อง" รีเซ็ตค่า generationId ทิ้ง
     this.onCourseChange(false); 
-    this.onGenerationChange(false); // โหลดวิชาแต่ไม่ทิ้งค่า subjectId
+    this.onGenerationChange(false); 
     
-    // เลื่อนหน้าจอกลับขึ้นไปด้านบนเพื่อให้ผู้ใช้เห็นช่องกรอกและแก้ไขได้ทันที
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    alert('โหมดแก้ไขในขณะนี้ ยังไม่รองรับการดึงคำถามเดิมจากฐานข้อมูล (ต้องทำ API เพิ่มครับ)');
   }
 
-  // 3. ฟังก์ชันเมื่อกดปุ่ม "บันทึกการแก้ไขแบบฟอร์ม"
   onUpdateForm() {
-    // บังคับเลือกวิชา หากประเภทเป็น "ประเมินอาจารย์ผู้สอน"
-    if (this.formData.formType === 'instructor' && !this.formData.subjectId) {
-      alert('กรุณาเลือกวิชา สำหรับแบบประเมินอาจารย์ผู้สอน');
-      return;
-    }
-
-    // ทำความสะอาด subjectId ป้องกันกรณี HTML แปลง undefined เป็นสตริง 'undefined'
-    const cleanSubjectId = (this.formData.subjectId === 'undefined' || !this.formData.subjectId) 
-      ? null 
-      : this.formData.subjectId;
-
-    const payload = {
-      // ส่งชื่อตัวแปรแบบเก่า (กันกรณี Backend บน Render ยังไม่อัปเดต)
-      batch_id: this.formData.generationId || null,
-      evaluation_type: this.formData.formType,
-      form_url: this.formData.googleFormUrl,
-      form_name: this.formData.formName,
-      subject_id: cleanSubjectId,
-      
-      // ส่งชื่อตัวแปรแบบใหม่ (ตามโค้ด Backend ล่าสุดที่คุณแก้)
-      courseName: this.formData.courseName,
-      formType: this.formData.formType,
-      googleFormUrl: this.formData.googleFormUrl,
-      formName: this.formData.formName,
-      generationId: this.formData.generationId || null,
-      subjectId: cleanSubjectId
-    };
-
-    console.log('กำลังอัปเดตข้อมูลฟอร์ม ID:', this.selectedFormId, 'เป็นข้อมูลใหม่:', payload);
-    
-    // เรียกใช้ Service เพื่อส่งข้อมูลแก้ไขไปให้ Backend
-    this.generalEvaluationService.updateGeneralEvaluation(this.selectedFormId, payload).subscribe({
-      next: (res) => {
-        if (res.success) {
-          alert('อัปเดตข้อมูลฟอร์มสำเร็จ');
-          this.resetForm();
-          this.fetchAllForms(); // โหลดข้อมูลตารางใหม่
-        } else {
-          alert('เกิดข้อผิดพลาดในการอัปเดตฟอร์ม');
-        }
-      },
-      error: (err) => {
-        console.error('Error:', err);
-        alert('เกิดข้อผิดพลาดจากเซิร์ฟเวอร์');
-      }
-    });
+    alert('ระบบแก้ไขคำถามต้องรอ API จาก Backend รบกวนสร้างฟอร์มใหม่ หรือลบฟอร์มเก่าทิ้งแทนไปก่อนครับ');
   }
 
-  // ฟังก์ชันลบแบบฟอร์ม
   onDeleteAction(id: any) {
     if(confirm('คุณแน่ใจหรือไม่ว่าต้องการลบแบบฟอร์มนี้?')) {
       console.log('ลบฟอร์ม ID:', id);
       // TODO: เรียก API DELETE ไปที่ Backend
-      // this.generalEvaluationService.deleteGeneralEvaluation(id).subscribe(...)
-      alert('ลบฟอร์มเรียบร้อย (จำลอง)');
+      alert('ฟังก์ชันลบยังไม่เปิดใช้งาน');
     }
   }
 
-  // ฟังก์ชันสําหรับล้างค่าในช่องกรอกให้กลับมาว่างเปล่า
   resetForm() {
     this.isEditMode = false;
     this.selectedFormId = null;
     this.formData = { 
       courseName: '', 
       formType: '', 
-      googleFormUrl: '', 
       formName: '', 
       generationId: '',
-      subjectId: ''
+      subjectId: '',
+      questions: []
     };
+    this.addQuestion(); // สร้างข้อว่างเตรียมไว้ให้
     this.availableBatches = [];
     this.availableSubjects = [];
   }
 
   // ==========================================
-  // ส่วนใหม่: การกรองและจัดการตารางด้านล่าง
+  // ส่วนแสดงตารางและตัวกรอง
   // ==========================================
 
   filterCourse: string = '';
   filterGeneration: string = '';
-  filterType: string = 'instructor'; // ค่าเริ่มต้น
+  filterType: string = 'instructor'; 
 
   filterBatches: BatchItem[] = [];
   filterSubjects: any[] = [];
@@ -424,26 +406,22 @@ export class From implements OnInit {
       return;
     }
 
-    // กรองหาฟอร์มทั้งหมดในระบบที่ตรงกับ รุ่น และ ประเภท นี้
     const matchedForms = this.formList.filter(f => 
       f.generationId == this.filterGeneration && 
       f.formType === this.filterType
     );
 
     if (this.filterType === 'instructor') {
-      // โหมดเรียงตามรายวิชา
-      this.displayTableData = this.filterSubjects.map(sub => {
-        const form = matchedForms.find(f => f.subjectId == sub.id);
-        return {
-          isSubjectMode: true,
-          subjectId: sub.id,
-          subjectName: sub.name,
-          hasForm: !!form,
-          formDetails: form || null
-        };
-      });
+      // เปลี่ยนจากแสดงทุกวิชา เป็นแสดงแค่แถวเดียว สำหรับใช้กับทุกวิชาในรุ่น
+      const form = matchedForms.length > 0 ? matchedForms[0] : null;
+      this.displayTableData = [{
+        isSubjectMode: false,
+        subjectId: null,
+        subjectName: 'ประเมินอาจารย์ (ใช้ร่วมกันทุกวิชาในรุ่น)',
+        hasForm: !!form,
+        formDetails: form || null
+      }];
     } else {
-      // โหมดทั่วไป (ประเมินหลักสูตร, กำกับหลักสูตร ฯลฯ) มีแค่ 1 ฟอร์มต่อรุ่น
       const form = matchedForms.length > 0 ? matchedForms[0] : null;
       this.displayTableData = [{
         isSubjectMode: false,
@@ -456,12 +434,11 @@ export class From implements OnInit {
   }
 
   onAddLinkAction(row: any) {
-    // นำข้อมูลหลักสูตร รุ่น ประเภท ไปกรอกในฟอร์มด้านบนให้อัตโนมัติ เพื่อเตรียมให้แอดมินกรอกลิงก์
     this.formData.courseName = this.filterCourse;
     this.onCourseChange(false);
     
     this.formData.generationId = this.filterGeneration;
-    this.onGenerationChange(false); // โหลดรายชื่อวิชาของฟอร์มบน
+    this.onGenerationChange(false); 
 
     this.formData.formType = this.filterType;
     if (this.formData.formType !== 'instructor') {
@@ -470,12 +447,12 @@ export class From implements OnInit {
       this.formData.subjectId = row.subjectId;
     }
 
-    this.formData.googleFormUrl = '';
     this.formData.formName = '';
     this.isEditMode = false;
     this.selectedFormId = null;
+    this.formData.questions = [];
+    this.addQuestion(); // สร้างข้อแรกเตรียมไว้
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
 }

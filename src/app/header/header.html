@@ -20,7 +20,7 @@
 
             <ul class="submenu-side">
               <li *ngFor="let batch of sub.batches">
-                <a [routerLink]="menu.path" [queryParams]="{ batchId: batch.batch_id, title: sub.course_name + ' ' + batch.batch_name }">
+                <a [routerLink]="menu.path" [queryParams]="{ batchId: batch.batch_id, title: sub.course_name + ' ' + batch.batch_name, courseName: sub.course_name, batchName: batch.batch_name }">
                   {{ batch.batch_name }}
                 </a>
               </li>
@@ -71,7 +71,7 @@
       mat-menu-item
       *ngFor="let batch of batches"
       [routerLink]="path"
-      [queryParams]="{ batchId: batch.batch_id, title: courseName + ' ' + batch.batch_name }"
+      [queryParams]="{ batchId: batch.batch_id, title: courseName + ' ' + batch.batch_name, courseName: courseName, batchName: batch.batch_name }"
     >
       {{ batch.batch_name }}
     </a>

@@ -1,0 +1,73 @@
+<div class="evaluation-fill-page">
+  <div class="page-header">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <h1 class="course-title">{{ courseTitle }}</h1>
+  </div>
+
+  <div class="content-container">
+    <div *ngIf="isLoading" class="loading-state">
+      <p>กำลังโหลดข้อมูลแบบประเมิน...</p>
+    </div>
+
+    <div *ngIf="!isLoading && !formDetails" class="empty-state">
+      <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #ccc;">assignment_late</mat-icon>
+      <p>ยังไม่มีแบบประเมินสำหรับรายการนี้</p>
+    </div>
+
+    <div *ngIf="!isLoading && formDetails" class="form-wrapper">
+      <div class="form-header-card top-border-purple">
+        <h2 class="form-main-title">แบบประเมิน {{ courseTitle }} {{ batchName }} : {{ formDetails.form_name }}</h2>
+        <p class="subtitle">คำอธิบาย : แบบประเมินชุดนี้สำหรับผู้เรียน ประเมินคณะครู-อาจารย์กำกับหลักสูตรประจำหลักสูตร</p>
+        
+        <hr class="divider">
+        
+        <div class="instructions">
+          <strong>วัตถุประสงค์ :</strong> เพื่อนำผลการประเมินไปใช้ในการปรับปรุง แก้ไข และพัฒนาในการดำเนินการกำกับดูแลบริหารหลักสูตรของคณะทำงานให้ดียิ่งขึ้นในครั้งต่อไป<br>
+          <strong>คำชี้แจง :</strong> กรุณาทำเครื่องหมาย (/) ลงในช่องว่างที่ตรงตามความคิดเห็นของท่านมากที่สุด ดังนี้.-
+        </div>
+
+        <!-- ถ้ารูปแบบประเมินเป็นอาจารย์ผู้สอน ให้กรอกชื่ออาจารย์ -->
+        <div class="instructor-input-group" *ngIf="type === 'instructor'">
+          <label>ชื่อ-นามสกุล อาจารย์ผู้สอน <span class="required">*</span></label>
+          <input type="text" class="custom-input" placeholder="ระบุชื่ออาจารย์ที่ท่านต้องการประเมิน" [(ngModel)]="instructorName">
+        </div>
+      </div>
+
+      <div class="questions-list">
+        <div class="question-card" *ngFor="let q of questions; let i = index">
+          <div class="question-text">
+            <span class="q-num">{{ i + 1 }}.</span> {{ q.question_text }}
+            <span class="required" *ngIf="q.question_type === 'choice'">*</span>
+          </div>
+
+          <!-- แบบหลายตัวเลือก (Choice) -->
+          <div class="choices-group" *ngIf="q.question_type === 'choice'">
+            <label class="radio-label" *ngFor="let c of q.choices">
+              <input type="radio" 
+                     [name]="'question_' + q.id" 
+                     [value]="c.score_value" 
+                     [(ngModel)]="q.answer_score">
+              <span class="radio-text">{{ c.choice_text }}</span>
+            </label>
+          </div>
+
+          <!-- แบบพิมพ์ข้อความ (Text) -->
+          <div class="text-group" *ngIf="q.question_type === 'text'">
+            <textarea class="custom-textarea" 
+                      placeholder="แสดงความคิดเห็นเพิ่มเติม (ถ้ามี)..." 
+                      [(ngModel)]="q.answer_comment" 
+                      rows="4"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-action">
+        <button mat-raised-button class="btn-submit" (click)="onSubmit()">
+          ส่งแบบประเมิน
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

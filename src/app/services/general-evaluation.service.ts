@@ -37,4 +37,16 @@ export class GeneralEvaluationService {
   getAllForms(): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/evaluation-forms`);
   }
+
+  getEvaluationQuestions(batchId: number, type: string, subjectId?: string | number): Observable<any> {
+    let url = `${environment.apiUrl}/forms/${batchId}/questions?type=${type}`;
+    if (subjectId) {
+      url += `&subjectId=${subjectId}`;
+    }
+    return this.http.get<any>(url);
+  }
+
+  submitEvaluationAnswer(payload: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/forms/submit`, payload);
+  }
 }
