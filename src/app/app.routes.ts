@@ -11,10 +11,15 @@ import { ScoreList } from './pages/score-list/score-list';
 import { ClassOverview } from './pages/class-overview/class-overview';
 import { AdminLogin } from './pages/admin-login/admin-login';
 import { Addstudent } from './pages/addstudent/addstudent';
-import { TrainingSummaryComponent } from './pages/training-summary/training-summary';
+import { TrainingStatistics } from './pages/training-statistics/training-statistics';
+import { TrainingSummary } from './pages/training-summary/training-summary';
+import { TrainingResults } from './pages/training-results/training-results';
+import { Register } from './pages/register/register';
+import { ScoreSubmission } from './pages/score-submission/score-submission';
 import { EvaluationSummaryComponent } from './pages/evaluation-summary/evaluation-summary';
 import { FollowUpComponent } from './pages/follow-up/follow-up';
 import { Committee } from './main/committee/committee';
+
 
 import { AddCourse } from './pages/add-course-dialog/add-course-dialog';
 
@@ -29,6 +34,15 @@ export const routes: Routes = [
       { path: '', component: Student }, // เข้าด้วย /student
       { path: 'login', component: Login }, // เข้าด้วย /student/login
     ],
+  },
+  //สรุปผลสถิติ
+   {
+    path: 'training-results',
+    children: [
+      { path: '', component: TrainingResults }, 
+      { path: 'training-statistics', component: TrainingStatistics },
+      { path: 'training-summary', component: TrainingSummary }     
+    ]
   },
 
   // ส่วนของครู
@@ -49,11 +63,14 @@ export const routes: Routes = [
     ],
   },
 
+  {path:'register',component: Register},
+
+  {path:'score-submission',component: ScoreSubmission},
+
   // ส่วนของคะแนน (ทั่วไป)
   { path: 'score', component: Score },
 
   // หน้าใหม่ที่เพิ่มเข้ามา
-  { path: 'training-summary', component: TrainingSummaryComponent },
   { path: 'evaluation-summary', component: EvaluationSummaryComponent },
   { path: 'follow-up', component: FollowUpComponent },
   { path: 'committee', component: Committee },
