@@ -6,10 +6,16 @@ import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, inject } from '@angular/core';
+import { Chart, registerables, ChartType, ChartDataset } from 'chart.js';
+import { FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+
+
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, MatIconModule, RouterModule, MatButtonModule],
+  standalone: true,
+  imports: [CommonModule, MatIconModule, RouterModule, MatButtonModule, FormsModule, MatSelectModule],
   templateUrl: './home.html',
   styleUrl: './home.scss',
   animations: [
@@ -69,8 +75,10 @@ export class Home {
 
   sections = [
     { id: 'sec-home', key: 'home' },
+    { id: 'sec-dashboard', key: 'dashboard' },
     { id: 'sec-about', key: 'about' },
-    { id: 'sec-forms', key: 'forms' },
+    { id: 'sec-forms', key: 'forms' }
+
   ];
   scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -97,6 +105,70 @@ export class Home {
     });
     this.activeSection = current;
   }
+
+  // 1. ประกาศตัวแปรสำหรับกราฟ
+  public chart: Chart | null = null;
+  public chartType: ChartType = 'bar';
+
+  public chartLabels: string[] = [];
+  public chartDatasets: ChartDataset[] = [];
+
+  // ✅ 1. ประกาศตัวแปร 2 ตัวนี้เป็น public
+  public selectedCohort: string = 'all'; 
+  public currentAverageScore: number = 77.5; // 👈 ตัวแปรนี้แหละครับที่ HTML เรียกหา
+
+  // ข้อมูลคะแนนเฉลี่ยจำลองของแต่ละรุ่น
+  private cohortScores: { [key: string]: number } = {
+    'all': 77.5,
+    '1': 77.5,
+    '2': 77.0,
+    '3': 77.3
+  };
+
+  ngAfterViewInit(): void {
+    this.createChart();
+  }
+
+  // 3. ฟังก์ชันนี้ต้องเป็น public และชื่อตรงกับใน HTML
+  public onCohortChange(): void {
+    this.currentAverageScore = this.cohortScores[this.selectedCohort] || 0;
+  }
+
+  public createChart(): void {
+  const ctx = document.getElementById('mainChart') as HTMLCanvasElement;
+  if (!ctx) return;
+
+  // 🟢 เคลียร์กราฟใบเก่าออกจาก Canvas ก่อนเสมอ ป้องกัน Error "Canvas is already in use"
+  if (this.chart) {
+    this.chart.destroy();
+  }
+  // หรือใช้บรรทัดนี้ชัวร์ที่สุด: Chart.getChart(ctx)?.destroy();
+
+  this.chart = new Chart(ctx, {
+    type: this.chartType,
+    data: {
+      // 🟢 ดึงจากตัวแปรเก็บข้อมูล (เพื่อให้เวลาสลับกราฟ หรือโหลด API ข้อมูลรายการ 'นนส.ทบ.' จะไม่หายไป)
+      labels: this.chartLabels || [], 
+      datasets: this.chartDatasets || []
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+}
+
+  // 3. ฟังก์ชันสลับประเภทกราฟ
+  public switchChartType(type: 'bar' | 'line'): void {
+    if (this.chartType === type) return;
+    this.chartType = type as ChartType;
+
+    if (this.chart) {
+      this.chart.destroy();
+      this.createChart();
+    }
+  }
+
 
   // ── Lifecycle ─────────────────────────────────────
   ngOnDestroy() {

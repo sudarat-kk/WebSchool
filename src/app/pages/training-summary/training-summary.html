@@ -1,0 +1,219 @@
+<div class="training-summary-container">
+
+  <!-- Header Section -->
+  <header class="page-header">
+    <div class="header-title-group">
+      <h1>📊 สรุปผลการฝึกอบรม - ภาพรวมและกราฟสถิติ</h1>
+      <p class="subtitle">รายงานสถิติการเรียนรู้ รายวิชาที่มีพัฒนาการ ประเด็นเฝ้าระวัง และข้อเสนอแนะเชิงลึก</p>
+    </div>
+
+    <!-- Display คะแนนเฉลี่ย (คำนวณเฉลี่ย 2 รุ่นจาก 12 วิชา) -->
+    <div class="badge-avg">
+      เฉลี่ยรวม 2 รุ่น: <strong>75.2 คะแนน</strong>
+    </div>
+  </header>
+
+  <!-- Filter Bar Section -->
+  <div class="filter-bar-card">
+    <span class="filter-label">มุมมองรุ่นการฝึกอบรม: ภาพรวมเปรียบเทียบ (2 รุ่น)</span>
+    <div class="cohort-selector">
+      <mat-select class="cohort-dropdown" panelClass="purple-dropdown-panel"
+                  [(ngModel)]="selectedCohort" (selectionChange)="onCohortChange()">
+        <mat-option value="all">ภาพรวมเปรียบเทียบ (2 รุ่น)</mat-option>
+        <mat-option value="1">เฉพาะ รุ่นที่ 62</mat-option>
+        <mat-option value="2">เฉพาะ รุ่นที่ 63</mat-option>
+      </mat-select>
+    </div>
+  </div>
+
+  <!-- Section 1: Main Chart Card -->
+  <section class="card chart-card">
+    <div class="chart-header">
+      <h2 class="chart-title">📊 กราฟแสดงผลการเรียนรายวิชา</h2>
+      <div class="chart-toggle-buttons">
+        <button class="toggle-btn" [class.active]="chartType === 'bar'" (click)="switchChartType('bar')">
+          📊 กราฟแท่ง (Bar)
+        </button>
+        <button class="toggle-btn" [class.active]="chartType === 'line'" (click)="switchChartType('line')">
+          📈 กราฟเส้น (Line)
+        </button>
+      </div>
+    </div>
+
+    <div class="chart-body">
+      <canvas id="mainChart"></canvas>
+    </div>
+
+    <!-- Legend (เหลือ 2 รุ่น) -->
+    <div class="chart-legend">
+      <span class="legend-item light-blue"><span class="square"></span> รุ่นที่ 62</span>
+      <span class="legend-item blue"><span class="square"></span> รุ่นที่ 63</span>
+    </div>
+  </section>
+
+  <!-- Section 2: Section Analysis & Suggestions (ตรงตามรูปภาพ) -->
+  <section class="card summary-card">
+    <h3 class="summary-title">📌 วิเคราะห์เชิงลึกและข้อเสนอแนะ</h3>
+    
+    <div class="summary-grid">
+      <!-- จุดแข็ง (3 อันดับสูงสุด) -->
+      <div class="summary-box strengths">
+        <div class="box-title">💪 จุดแข็ง (3 อันดับสูงสุด)</div>
+        <ul class="ranking-list">
+          <li>1. การยิงปืนประจำกาย (89.5 คะแนน)</li>
+          <li>2. ยุทธวิธีระดับหมวด (84.5 คะแนน)</li>
+          <li>3. ระเบียบแถวและวินัย (85.5 คะแนน)</li>
+        </ul>
+      </div>
+
+      <!-- จุดอ่อน (3 อันดับต่ำสุด) -->
+      <div class="summary-box weaknesses">
+        <div class="box-title">⚠️ จุดอ่อน (3 อันดับต่ำสุด)</div>
+        <ul class="ranking-list">
+          <li>1. ความมั่นคงไซเบอร์ (61.0 คะแนน)</li>
+          <li>2. วิชาการต้นแบบอาวุธ (66.5 คะแนน)</li>
+          <li>3. วิชาสื่อสารและเรดาร์ (68.5 คะแนน)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- พัฒนาการ & ประเด็นเฝ้าระวัง -->
+    <div class="summary-grid marginTop">
+      <div class="summary-box highlight-blue">
+        <div class="box-title">🚀 พัฒนาการก้าวกระโดด</div>
+        <p>วิชาที่มีคะแนนเพิ่มขึ้นสูงสุดในรุ่นคือ <strong>การปฐมพยาบาลสนาม (+8 คะแนน)</strong> แสดงถึงเทคนิคการสอนที่ประสบความสำเร็จ</p>
+      </div>
+      <div class="summary-box highlight-orange">
+        <div class="box-title">🚨 ประเด็นที่ต้องเฝ้าระวัง</div>
+        <p>วิชาที่มีคะแนนลดลงมากที่สุดในรุ่นคือ <strong>วิชาสื่อสารและเรดาร์ (-7 คะแนน)</strong> ต้องเข้าตรวจสอบเนื้อหาและประเมินความพร้อมผู้เรียน</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Data Table Card (ดึงข้อมูลตรงตามรูปภาพ + ตัดรุ่นที่ 3 ออก) -->
+  <section class="card table-card">
+    <h3 class="table-title">📋 ตารางข้อมูลผลการเรียนเชิงลึก (รวมทั้งหมด 12 รายวิชา)</h3>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>ชื่อวิชา</th>
+            <th>รุ่นที่ 62</th>
+            <th>รุ่นที่ 63</th>
+            <th>เฉลี่ยรวม</th>
+            <th>ผลต่าง (+/-)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td class="bold">การยิงปืนประจำกาย</td>
+            <td>88</td>
+            <td>91</td>
+            <td class="bold">89.5</td>
+            <td class="trend up">▲ +3.0</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td class="bold">ยุทธวิธีระดับหมวด</td>
+            <td>82</td>
+            <td>87</td>
+            <td class="bold">84.5</td>
+            <td class="trend up">▲ +5.0</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td class="bold">การปฐมพยาบาลสนาม</td>
+            <td>75</td>
+            <td>83</td>
+            <td class="bold">79.0</td>
+            <td class="trend up">▲ +8.0</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td class="bold">ระเบียบแถวและวินัย</td>
+            <td>85</td>
+            <td>86</td>
+            <td class="bold">85.5</td>
+            <td class="trend up">▲ +1.0</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td class="bold">แผนที่และเข็มทิศ</td>
+            <td>70</td>
+            <td>74</td>
+            <td class="bold">72.0</td>
+            <td class="trend up">▲ +4.0</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td class="bold">วิชาสื่อสารและเรดาร์</td>
+            <td>72</td>
+            <td>65</td>
+            <td class="bold">68.5</td>
+            <td class="trend down">▼ -7.0</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td class="bold">วิชาการต้นแบบอาวุธ</td>
+            <td>68</td>
+            <td>65</td>
+            <td class="bold">66.5</td>
+            <td class="trend down">▼ -3.0</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td class="bold">ความมั่นคงไซเบอร์</td>
+            <td>60</td>
+            <td>62</td>
+            <td class="bold">61.0</td>
+            <td class="trend up">▲ +2.0</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td class="bold">กฎหมายสงคราม</td>
+            <td>78</td>
+            <td>72</td>
+            <td class="bold">75.0</td>
+            <td class="trend down">▼ -6.0</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td class="bold">การต่อสู้ระยะประชิด</td>
+            <td>80</td>
+            <td>82</td>
+            <td class="bold">81.0</td>
+            <td class="trend up">▲ +2.0</td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td class="bold">ยุทธวิธีทางน้ำ</td>
+            <td>65</td>
+            <td>70</td>
+            <td class="bold">67.5</td>
+            <td class="trend up">▲ +5.0</td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td class="bold">ส่งกำลังบำรุง</td>
+            <td>74</td>
+            <td>71</td>
+            <td class="bold">72.5</td>
+            <td class="trend down">▼ -3.0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 4: Action Plan / Recommendations -->
+  <section class="card action-plan-card">
+    <h3 class="action-title">💡 ข้อเสนอแนะและกิจกรรมส่งเสริมการเรียนรู้สำหรับ (ภาพรวมทุกรุ่น)</h3>
+    <ul class="action-list">
+      <li><strong>กิจกรรมคลินิกการเรียนรู้ (Peer Tutoring):</strong> นำกำลังพลที่ได้คะแนน Top 3 ของรุ่น มาช่วยติวเชิงลึกให้เพื่อนร่วมรุ่น</li>
+      <li><strong>ทบทวนหลังการปฏิบัติ (AAR):</strong> จัด AAR เข้มข้นในวิชาที่มีคะแนนลดลง เพื่อหาสาเหตุและปรับรูปแบบการสอนก่อนเริ่มรุ่นถัดไป</li>
+    </ul>
+  </section>
+
+</div>

@@ -4,33 +4,29 @@
     <nav class="sidebar-nav">
       <div class="sidebar-line"></div>
 
-      <a
-        class="sidebar-item"
-        [class.active]="activeSection === 'home'"
-        (click)="scrollTo('sec-home')"
-      >
+      <a class="sidebar-item" [class.active]="activeSection === 'home'" (click)="scrollTo('sec-home')">
         <span class="dot"></span>
         <span class="label">หน้าแรก</span>
       </a>
 
       <div class="sidebar-line"></div>
 
-      <a
-        class="sidebar-item"
-        [class.active]="activeSection === 'about'"
-        (click)="scrollTo('sec-about')"
-      >
+      <a class="sidebar-item" [class.active]="activeSection === 'dashboard'" (click)="scrollTo('sec-dashboard')">
+        <span class="dot"></span>
+        <span class="label">แดชบอร์ด</span>
+      </a>
+
+      <div class="sidebar-line"></div>
+
+
+      <a class="sidebar-item" [class.active]="activeSection === 'about'" (click)="scrollTo('sec-about')">
         <span class="dot"></span>
         <span class="label">เกี่ยวกับเรา</span>
       </a>
 
       <div class="sidebar-line"></div>
 
-      <a
-        class="sidebar-item"
-        [class.active]="activeSection === 'forms'"
-        (click)="scrollTo('sec-forms')"
-      >
+      <a class="sidebar-item" [class.active]="activeSection === 'forms'" (click)="scrollTo('sec-forms')">
         <span class="dot"></span>
         <span class="label">แบบฟอร์มคำร้อง</span>
       </a>
@@ -51,12 +47,8 @@
       <!-- Banner Slideshow -->
       <div class="banner">
         <div class="slideshow-container">
-          <div
-            class="slide"
-            *ngFor="let slide of slides; let i = index"
-            [class.active]="i === currentIndex"
-            [@slideAnim]="i === currentIndex ? 'in' : 'out'"
-          >
+          <div class="slide" *ngFor="let slide of slides; let i = index" [class.active]="i === currentIndex"
+            [@slideAnim]="i === currentIndex ? 'in' : 'out'">
             <img [src]="slide.image" [alt]="slide.caption" />
           </div>
 
@@ -65,17 +57,185 @@
 
           <!-- Dots -->
           <div class="dots">
-            <span
-              class="dot"
-              *ngFor="let slide of slides; let i = index"
-              [class.active]="i === currentIndex"
-              (click)="goToSlide(i)"
-            >
+            <span class="dot" *ngFor="let slide of slides; let i = index" [class.active]="i === currentIndex"
+              (click)="goToSlide(i)">
             </span>
           </div>
         </div>
       </div>
     </section>
+
+    <section id="sec-dashboard" class="dashboard-container">
+
+      <!-- Section บน: Area Chart (Visits) -->
+      <div class="dashboard-container">
+
+        <!-- Header Section -->
+        <header class="page-header">
+          <div class="header-title-group">
+            <h1>📊 สถิติการฝึกอบรม (Training Statistics)</h1>
+            <p class="subtitle">หลักสูตรนายสิบชั้นต้น เหล่าทหารสื่อสาร (E-learning) เร่งรัด รุ่นที่ 8</p>
+          </div>
+          <!-- ส่วน Dropdown เลือกรุ่นและแสดงคะแนนเฉลี่ย -->
+          <div class="cohort-selector-card">
+            <label for="cohortSelect" class="selector-label">เลือกดูรุ่น:</label>
+            <mat-select id="cohortSelect" class="cohort-dropdown" panelClass="purple-pastel-panel"
+              [(ngModel)]="selectedCohort" (selectionChange)="onCohortChange()">
+              <mat-option value="all">🌟 แสดงรวมทุกรุ่น (3 รุ่น)</mat-option>
+              <mat-option value="1">รุ่นที่ 1</mat-option>
+              <mat-option value="2">รุ่นที่ 2</mat-option>
+              <mat-option value="3">รุ่นที่ 3</mat-option>
+            </mat-select>
+
+            <!-- Display คะแนนเฉลี่ยที่จะเปลี่ยนตามรุ่นที่เลือก -->
+            <div class="badge-avg">
+              เฉลี่ย: <strong>{{ currentAverageScore }}%</strong>
+            </div>
+          </div>
+        </header>
+
+        <!-- Section 1: Main Chart Card -->
+        <section class="card chart-card">
+          <div class="chart-header">
+            <h2 class="chart-title">📊 กราฟวิเคราะห์และเปรียบเทียบคะแนนรายวิชา</h2>
+            <div class="chart-toggle-buttons">
+              <button class="toggle-btn" [class.active]="chartType === 'bar'" (click)="switchChartType('bar')">
+                📊 กราฟแท่ง (Bar)
+              </button>
+
+              <button class="toggle-btn" [class.active]="chartType === 'line'" (click)="switchChartType('line')">
+                📈 กราฟเส้น (Line)
+              </button>
+            </div>
+          </div>
+
+          <div class="chart-body">
+            <!-- ใช้ canvas ธรรมดาที่มี id="mainChart" -->
+            <canvas id="mainChart"></canvas>
+          </div>
+
+          <!-- Legend -->
+          <div class="chart-legend">
+            <span class="legend-item light-blue"><span class="square"></span> รุ่นที่ 1</span>
+            <span class="legend-item blue"><span class="square"></span> รุ่นที่ 2</span>
+            <span class="legend-item dark-blue"><span class="square"></span> รุ่นที่ 3</span>
+          </div>
+        </section>
+
+        <!-- Section 2: Top & Bottom 3 Grid -->
+        <section class="rankings-grid">
+          <!-- Top 3 Card -->
+          <div class="card ranking-card">
+            <h3 class="ranking-title">🥇 Top 3 รายวิชาคะแนนสูงสุด (เฉลี่ย)</h3>
+            <ul class="ranking-list">
+              <li>
+                <span class="subject">1. การยิงปืนประจำกาย</span>
+                <span class="score green">92.5</span>
+              </li>
+              <li>
+                <span class="subject">2. ยุทธวิธีระดับหมวด</span>
+                <span class="score green">88</span>
+              </li>
+              <li>
+                <span class="subject">3. วิชาสื่อสารและเรดาร์</span>
+                <span class="score green">64.3</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Bottom 3 Card -->
+          <div class="card ranking-card">
+            <h3 class="ranking-title">⚠️ Bottom 3 รายวิชาคะแนนต่ำสุด (เฉลี่ย)</h3>
+            <ul class="ranking-list">
+              <li>
+                <span class="subject">1. วิชาการต้นแบบอาวุธ</span>
+                <span class="score red">64.2</span>
+              </li>
+              <li>
+                <span class="subject">2. วิชาสื่อสารและเรดาร์</span>
+                <span class="score red">64.3</span>
+              </li>
+              <li>
+                <span class="subject">3. ยุทธวิธีระดับหมวด</span>
+                <span class="score red">88</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section 3: Data Table Card -->
+        <section class="card table-card">
+          <h3 class="table-title">📋 ตารางข้อมูลการเรียนทั้งหมด (ดึงข้อมูลตรงจาก Database)</h3>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>ลำดับ</th>
+                  <th>รายวิชา</th>
+                  <th>รุ่นที่ 1</th>
+                  <th>รุ่นที่ 2</th>
+                  <th>รุ่นที่ 3</th>
+                  <th>เฉลี่ยรวม</th>
+                  <th>แนวโน้ม</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td class="bold">การยิงปืนประจำกาย</td>
+                  <td>88</td>
+                  <td>91</td>
+                  <td>98.5</td>
+                  <td class="bold">92.5</td>
+                  <td class="trend up">▲ เพิ่มขึ้น (+10.5)</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td class="bold">ยุทธวิธีระดับหมวด</td>
+                  <td>82</td>
+                  <td>87</td>
+                  <td>95</td>
+                  <td class="bold">88</td>
+                  <td class="trend up">▲ เพิ่มขึ้น (+13)</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td class="bold">วิชาสื่อสารและเรดาร์</td>
+                  <td>72</td>
+                  <td>65</td>
+                  <td>56</td>
+                  <td class="bold">64.3</td>
+                  <td class="trend down">▼ ลดลง (-16)</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td class="bold">วิชาการต้นแบบอาวุธ</td>
+                  <td>68</td>
+                  <td>65</td>
+                  <td>59.6</td>
+                  <td class="bold">64.2</td>
+                  <td class="trend down">▼ ลดลง (-8.4)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section 4: Recommendation Banner -->
+        <section class="recommendation-box">
+          <h3>💡 โครงการ / กิจกรรมที่แนะนำเพื่อส่งเสริมทักษะ</h3>
+          <ul>
+            <li><strong>โครงการ Boot Camp เสริมวิชาสื่อสาร:</strong> เพิ่มชั่วโมงฝึกปฏิบัติการใช้เรดาร์ภาคสนามสัปดาห์ละ
+              4 ชม.</li>
+            <li><strong>กิจกรรม Peer Tutoring:</strong> จัดประกวดครูฝึกดีเด่น นำกำลังพลที่ได้คะแนนยิงปืน Top 3
+              มาช่วยติวรุ่นถัดไป</li>
+          </ul>
+        </section>
+
+      </div>
+
+    </section>
+
 
     <!-- ─────────────────────────────── -->
 

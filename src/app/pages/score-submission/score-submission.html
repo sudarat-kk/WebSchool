@@ -1,0 +1,118 @@
+<div class="page-container">
+    <!-- ส่วนหัว -->
+    <header class="header">
+        <div class="header-left">
+            <button class="back-button">
+                <i class="material-icons">arrow_back_ios</i>
+            </button>
+            <h1 class="page-title">ตรวจสอบการส่งคะแนน</h1>
+        </div>
+        <div class="header-right">
+            <div class="dropdown-wrapper">
+                <button class="dropdown-button">
+                    หลักสูตร
+                    <i class="material-icons">arrow_drop_down</i>
+                </button>
+            </div>
+            <div class="dropdown-wrapper">
+                <button class="dropdown-button">
+                    รุ่น
+                    <i class="material-icons">arrow_drop_down</i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ส่วนการ์ดสรุป -->
+    <section class="summary-cards">
+        <div class="card total-card">
+            <div class="card-content">
+                <div class="card-header">
+                    <i class="material-icons summary-icon">auto_stories</i>
+                    <p class="label">วิชาทั้งหมด</p>
+                </div>
+                <div class="card-body">
+                    <span class="value">{{ summaryData.totalSubjects }}</span>
+                    <span class="sub-label">วิชา</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card verified-card">
+            <div class="card-content">
+                <div class="card-header">
+                    <i class="material-icons summary-icon verified">check_circle</i>
+                    <p class="label">วิชาที่ตรวจสอบแล้ว</p>
+                </div>
+                <div class="card-body">
+                    <span class="value">{{ summaryData.verifiedSubjects }}</span>
+                    <span class="sub-label">วิชา</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card pending-card">
+            <div class="card-content">
+                <div class="card-header">
+                    <i class="material-icons summary-icon pending">history</i>
+                    <p class="label">รอตรวจสอบ</p>
+                </div>
+                <div class="card-body">
+                    <span class="value">{{ summaryData.pendingVerifications }}</span>
+                    <span class="sub-label">วิชา</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ส่วนตาราง -->
+    <main class="table-section">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="col-check">ตรวจสอบ</th>
+                    <th class="col-subject">วิชา</th>
+                    <th class="col-date">วันที่ส่งคะแนน</th>
+                    <th class="col-time">เวลาที่ส่ง</th>
+                    <th class="col-note">หมายเหตุ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of gradeItems; let i = index">
+                    <td class="col-check">
+                        <input type="checkbox" [(ngModel)]="item.checked" [id]="'check-' + i" [name]="'check-' + i">
+                        <label [for]="'check-' + i">
+                            <span class="custom-checkbox"></span>
+                        </label>
+                    </td>
+                    <td class="col-subject">{{ item.subjectName }}</td>
+                    <td class="col-date">{{ item.submitDate }}</td>
+                    <td class="col-time">{{ item.submitTime }}</td>
+                    <td class="col-note">{{ item.note }}</td> <!-- 👈 เพิ่มช่องหมายเหตุ -->
+                </tr>
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <!-- colspan="5" ครอบคลุมทั้ง 5 คอลัมน์ (เลือก, วิชา, วันที่, เวลา, หมายเหตุ) -->
+                    <td colspan="5" class="table-footer-actions">
+                        <div class="action-buttons">
+                            <button class="btn btn-pdf" (click)="exportToPDF()">
+                                <i class="material-icons">save_alt</i>
+                                Export as PDF
+                            </button>
+                            <button class="btn btn-cancel" (click)="cancelAllSelection()">
+                                <i class="material-icons">delete_sweep</i>
+                                ยกเลิกการเลือกทั้งหมด
+                            </button>
+                            <button class="btn btn-save" (click)="saveVerification()">
+                                <i class="material-icons">save</i>
+                                บันทึกการตรวจสอบ
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </main>
+</div>

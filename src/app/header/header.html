@@ -28,23 +28,18 @@
           </li>
         </ul>
 
-        <!-- Desktop Menu: Simple Items -->
         <ul class="dropdown-menu" *ngIf="menu.simpleItems">
           <li *ngFor="let item of menu.simpleItems">
-            <a [routerLink]="menu.path">{{ item }}</a>
+            <a [routerLink]="menu.path" [queryParams]="{ course: item }">
+              {{ item.title ? item.title : item }}
+            </a>
           </li>
         </ul>
-      </li>
     </ul>
   </nav>
 
   <!-- 3. ปุ่มเมนูบนมือถือ (ซ่อนเมื่อเป็นแอดมิน ด้วย *ngIf="!isAdmin") -->
-  <button
-    mat-icon-button
-    class="mobile-menu-btn"
-    [matMenuTriggerFor]="mobileMainMenu"
-    *ngIf="!isAdmin"
-  >
+  <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="mobileMainMenu" *ngIf="!isAdmin">
     <mat-icon>menu</mat-icon>
   </button>
 </mat-toolbar>
@@ -52,20 +47,12 @@
 <!-- ส่วนที่เหลือปล่อยไว้ตามเดิมได้เลยครับ... -->
 <mat-menu #mobileMainMenu="matMenu">
   <ng-container *ngFor="let menu of menuData">
-    <button
-      mat-menu-item
-      *ngIf="menu.submenus"
-      [matMenuTriggerFor]="courseSubMenu"
-      [matMenuTriggerData]="{ submenus: menu.submenus, path: menu.path }"
-    >
+    <button mat-menu-item *ngIf="menu.submenus" [matMenuTriggerFor]="courseSubMenu"
+      [matMenuTriggerData]="{ submenus: menu.submenus, path: menu.path }">
       {{ menu.title }}
     </button>
-    <button
-      mat-menu-item
-      *ngIf="menu.simpleItems"
-      [matMenuTriggerFor]="simpleMenu"
-      [matMenuTriggerData]="{ simpleItems: menu.simpleItems, path: menu.path }"
-    >
+    <button mat-menu-item *ngIf="menu.simpleItems" [matMenuTriggerFor]="simpleMenu"
+      [matMenuTriggerData]="{ simpleItems: menu.simpleItems, path: menu.path }">
       {{ menu.title }}
     </button>
   </ng-container>
@@ -74,12 +61,8 @@
 <mat-menu #courseSubMenu="matMenu" class="mobile-step-menu-l2">
   <ng-template matMenuContent let-submenus="submenus" let-path="path">
     <!-- ย้ายคอมเมนต์มาไว้ข้างนอกแบบนี้แทนครับ -->
-    <button
-      mat-menu-item
-      *ngFor="let sub of submenus"
-      [matMenuTriggerFor]="genSubMenu"
-      [matMenuTriggerData]="{ batches: sub.batches, path: path, courseName: sub.course_name }"
-    >
+    <button mat-menu-item *ngFor="let sub of submenus" [matMenuTriggerFor]="genSubMenu"
+      [matMenuTriggerData]="{ batches: sub.batches, path: path, courseName: sub.course_name }">
       {{ sub.course_name }}
     </button>
   </ng-template>
@@ -87,12 +70,7 @@
 
 <mat-menu #genSubMenu="matMenu">
   <ng-template matMenuContent let-batches="batches" let-path="path">
-    <a
-      mat-menu-item
-      *ngFor="let batch of batches"
-      [routerLink]="path"
-      [queryParams]="{ batchId: batch.batch_id }"
-    >
+    <a mat-menu-item *ngFor="let batch of batches" [routerLink]="path" [queryParams]="{ batchId: batch.batch_id }">
       {{ batch.batch_name }}
     </a>
   </ng-template>
@@ -100,8 +78,9 @@
 
 <mat-menu #simpleMenu="matMenu" class="mobile-step-menu-l2">
   <ng-template matMenuContent let-simpleItems="simpleItems" let-path="path">
-    <a mat-menu-item *ngFor="let item of simpleItems" [routerLink]="path">
-      {{ item }}
+    <a mat-menu-item *ngFor="let item of simpleItems" [routerLink]="item.path || path"
+      [queryParams]="{ course: item.title }">
+      {{ item.title }}
     </a>
   </ng-template>
 </mat-menu>

@@ -1,0 +1,197 @@
+// Color Variables
+$page-bg: #f5f0f6;         // สีม่วงพาสเทลอ่อนๆ สำหรับพื้นหลังเว็บ
+$card-bg: #ede8f8;         // สีพื้นหลังการ์ด
+$input-bg: #ffffff;        // สีพื้นหลังช่องกรอกข้อมูล
+$input-text: #4a4a4a;
+$placeholder-color: #8c8c8c;
+$button-bg: #9c92f8;       // สีม่วงปุ่มยืนยัน
+$button-hover: #8378ed;
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: $page-bg;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+/* Card Container */
+.register-container {
+  width: 100%;
+  max-width: 780px;
+  background-color: $card-bg;
+  border-radius: 24px;       // ขอบมนของการ์ด
+  padding: 40px 48px 56px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+
+  /* Header Section - ปรับให้อยู่ตรงกลางเป๊ะ */
+  .header {
+    display: flex;
+    justify-content: center; // จัดเรียงหัวข้อให้อยู่ตรงกลาง
+    align-items: center;
+    margin-bottom: 36px;
+    width: 100%;
+
+    .title {
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: #000;
+      margin: 0;
+      text-align: center;
+    }
+  }
+
+  /* Form Content */
+  .form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    .row-three-cols {
+      display: flex;
+      gap: 16px;
+
+      .flex-1 {
+        flex: 1;
+      }
+      .flex-2 {
+        flex: 2;
+      }
+    }
+
+    .input-group {
+      position: relative;
+      width: 100%;
+
+      input {
+        width: 100%;
+        height: 60px;
+        background-color: $input-bg;
+        border: none;
+        border-radius: 16px;
+        padding: 0 14px;
+        font-size: 0.85rem;
+        color: $input-text;
+        box-sizing: border-box;
+        outline: none;
+        transition: background-color 0.2s ease;
+
+        &::placeholder {
+          color: $placeholder-color;
+        }
+
+        &:focus {
+          background-color: darken($input-bg, 4%);
+        }
+      }
+
+      /* จัดตำแหน่งปุ่มเปิด/ปิดตาในช่องรหัสผ่าน */
+      &.password-group {
+        input {
+          padding-right: 50px; // เว้นระยะด้านขวาไม่ให้ข้อความทับไอคอน
+        }
+
+        .toggle-password {
+          position: absolute;
+          right: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px;
+          opacity: 0.7;
+          transition: opacity 0.2s ease;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          svg {
+            display: block; // ป้องกันปัญหาระยะขอบส่วนเกินของ SVG
+          }
+        }
+      }
+    }
+
+    /* 📍 จัดให้ปุ่ม Google ชิดขวา */
+    .google-container {
+      display: flex;
+      justify-content: flex-end; // ดันปุ่มไปฝั่งขวาสุด
+      margin-top: 4px;
+
+      .google-btn {
+        height: 40px;
+        padding: 0 16px;
+        background-color: #ffffff;
+        border: 1px solid rgba(139, 126, 248, 0.2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #4a4a4a;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: #fcfbfe;
+          border-color: $button-bg;
+          box-shadow: 0 4px 10px rgba(139, 126, 248, 0.15);
+          transform: translateY(-1px);
+        }
+
+        svg {
+          display: block;
+        }
+      }
+    }
+
+    /* Submit Button Area */
+    .action-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 18px;
+
+      .submit-btn {
+        width: 180px;
+        height: 48px;
+        background-color: $button-bg;
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: $button-hover;
+        }
+      }
+    }
+  }
+}
+
+
+
+/* Responsive adjustment for Mobile */
+@media (max-width: 600px) {
+  .register-container {
+    padding: 24px 20px 32px;
+    border-radius: 16px;
+
+    .form-content .row-three-cols {
+      flex-direction: column;
+      gap: 18px;
+    }
+  }
+}

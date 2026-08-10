@@ -1,0 +1,95 @@
+<div class="course-menu-container">
+  <!-- Header / Navigation Bar -->
+  <div class="top-bar">
+    <button class="back-btn" (click)="goBack()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6" />
+      </svg>
+    </button>
+    <h1 class="page-title">หลักสูตร</h1>
+    <div class="placeholder"></div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="menu-content">
+    <!-- Card 1: สถิติการฝึกอบรม -->
+    <div class="menu-card" (click)="selectMenu('statistics')">
+      <div class="icon-wrapper">
+        <!-- SVG Graphic: สถิติการฝึกอบรม -->
+        <svg class="card-icon" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Board / Display Screen -->
+          <rect x="35" y="40" width="100" height="70" rx="6" fill="#334155" />
+          <rect x="40" y="45" width="90" height="60" rx="4" fill="#FFFFFF" />
+
+          <!-- Pie Chart on Board -->
+          <circle cx="65" cy="70" r="16" fill="#F59E0B" />
+          <path d="M65 70 L65 54 A16 16 0 0 1 81 70 Z" fill="#3B82F6" />
+          <path d="M65 70 L81 70 A16 16 0 0 1 65 86 Z" fill="#EF4444" />
+
+          <!-- Bar Graph on Board -->
+          <rect x="92" y="75" width="6" height="15" fill="#10B981" />
+          <rect x="101" y="65" width="6" height="25" fill="#F59E0B" />
+          <rect x="110" y="58" width="6" height="32" fill="#EF4444" />
+
+          <!-- Stand / Legs -->
+          <rect x="52" y="110" width="6" height="35" fill="#475569" />
+          <rect x="112" y="110" width="6" height="35" fill="#475569" />
+          <path d="M42 145 L68 145 L60 140 L50 140 Z" fill="#334155" />
+          <path d="M102 145 L128 145 L120 140 L110 140 Z" fill="#334155" />
+
+          <!-- Gear Icon -->
+          <path d="M140 85 C140 75 148 67 158 67 C168 67 176 75 176 85 C176 95 168 103 158 103 C148 103 140 95 140 85 Z"
+            fill="#F59E0B" />
+          <circle cx="158" cy="85" r="8" fill="#ECECF1" />
+
+          <!-- 3D Cones in front -->
+          <polygon points="120,135 110,105 130,135" fill="#DC2626" />
+          <polygon points="140,135 130,95 150,135" fill="#16A34A" />
+          <polygon points="160,135 150,85 170,135" fill="#2563EB" />
+        </svg>
+      </div>
+      <span class="card-label clickable" routerLink="/training-results/training-statistics">
+        สถิติการฝึกอบรม
+      </span>
+    </div>
+
+    <!-- Card 2: สรุปผลการฝึกอบรม -->
+    <div class="menu-card" (click)="selectMenu('summary')">
+      <div class="icon-wrapper">
+        <!-- SVG Graphic: สรุปผลการฝึกอบรม -->
+        <svg class="card-icon" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Hanging Board Top Roller -->
+          <rect x="30" y="42" width="140" height="12" rx="4" fill="#B45309" stroke="#1E293B" stroke-width="3" />
+
+          <!-- Canvas Screen -->
+          <rect x="38" y="54" width="124" height="95" fill="#FFFFFF" stroke="#1E293B" stroke-width="3" />
+
+          <!-- Bottom Roller & Knob -->
+          <rect x="30" y="149" width="140" height="10" rx="3" fill="#B45309" stroke="#1E293B" stroke-width="3" />
+          <circle cx="100" cy="164" r="5" fill="#FFFFFF" stroke="#1E293B" stroke-width="3" />
+
+          <!-- Trend Line with Arrow -->
+          <path d="M52 105 Q 70 85, 85 90 T 115 65" fill="none" stroke="#1E293B" stroke-width="4"
+            stroke-linecap="round" />
+          <polygon points="112,58 124,63 118,73" fill="#1E293B" />
+
+          <!-- Bar Chart -->
+          <rect x="52" y="120" width="12" height="20" rx="2" fill="#1E3A8A" stroke="#1E293B" stroke-width="2" />
+          <rect x="70" y="105" width="12" height="35" rx="2" fill="#EC4899" stroke="#1E293B" stroke-width="2" />
+          <rect x="88" y="115" width="12" height="25" rx="2" fill="#F59E0B" stroke="#1E293B" stroke-width="2" />
+
+          <!-- Horizontal Info Lines -->
+          <rect x="110" y="85" width="38" height="5" rx="2" fill="#1E293B" />
+          <rect x="110" y="97" width="38" height="5" rx="2" fill="#1E293B" />
+          <rect x="110" y="109" width="24" height="5" rx="2" fill="#3B82F6" />
+          <rect x="110" y="121" width="38" height="5" rx="2" fill="#1E293B" />
+        </svg>
+      </div>
+      <span class="card-label clickable" routerLink="/training-results/training-summary">
+        สรุปผลการฝึกอบรม
+      </span>
+    </div>
+
+  </div>
+</div>
