@@ -27,7 +27,7 @@
         </button>
       </div>
 
-      <!-- 🟢 การ์ดที่ 3: จัดการข้อมูลนักเรียน (แก้ไขปุ่มตรงนี้แล้ว) -->
+      <!--จัดการข้อมูลนักเรียน (แก้ไขปุ่มตรงนี้แล้ว) -->
       <div class="action-card student-management-card">
         <div class="card-details">
           <h4 class="card-title">จัดการข้อมูลนักเรียน</h4>
@@ -65,6 +65,19 @@
         <button mat-raised-button color="primary" routerLink="/admin/form" class="btn-navigate btn-purple">
           <mat-icon class="btn-icon">assignment</mat-icon>
           ไปยังหน้าจัดการแบบฟอร์ม
+        </button>
+      </div>
+
+      <div class="action-card score-submission-card">
+        <div class="card-details">
+          <h4 class="card-title">ตรวจสอบการส่งคะแนน</h4>
+          <p class="card-subtitle">เช็คข้อมูลการส่งคะแนน</p>
+        </div>
+
+        <!-- ใช้ routerLink ชี้ไปยัง Path หน้าฟอร์มที่คุณกำหนดไว้ใน Routing -->
+        <button mat-raised-button routerLink="/admin/score-submission" class="btn-navigate btn-rose">
+          <mat-icon class="btn-icon">assignment</mat-icon>
+          ไปยังหน้าตรวจสอบการส่งคะแนน
         </button>
       </div>
 
