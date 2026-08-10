@@ -178,7 +178,7 @@ export class ScoreList implements OnInit {
     this.errorMsg = '';
 
     this.scoreService.getProcessGroupScores(this.selectedBatch, groupId).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         if (res?.success) {
           this.students = res.data;
           this.groupSummary = res.summary;
@@ -190,7 +190,7 @@ export class ScoreList implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to load results', err);
         this.errorMsg = 'ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่';
         this.isLoading = false;

@@ -1,38 +1,46 @@
-// 🎨 โทนสีตาม Screenshot (ม่วง-ชมพูพาสเทล)
-$bg-main: #faf9fc; // พื้นหลังหลัก
-$purple-light: #f3ebf8; // แถบ header บนสุด
-$purple-primary: #7c43bd; // สีม่วงเข้ม (ปุ่มถัดไป, tab)
-$purple-badge: #8c5bc2; // สี pill badge คะแนนเต็ม
-$purple-table-header: #efe8f5; // หัวตาราง
-$text-dark: #333333;
-$text-muted: #888888;
-$border-color: #e0d9e8; // ขอบกล่องและตาราง
+// Palette สีม่วงพาสเทล
+$bg-light: #f9f8fc;
+$purple-primary: #b39ddb;
+$purple-light: #ede7f6;
+$purple-dark: #7e57c2;
+$purple-hover: #9575cd;
+$text-muted: #8e8e93;
 $white: #ffffff;
-$pink-btn: #b9006b; // ปุ่มบันทึกคะแนน
-$pink-btn-hover: #960055;
 
 .score-management-page {
   font-family: 'Kanit', 'Prompt', sans-serif;
   min-height: 100vh;
-  background-color: $bg-main;
+  background-color: $bg-light;
   display: flex;
   flex-direction: column;
+  position: relative;
+  padding-bottom: 90px; // เผื่อพื้นที่ให้ footer สรุปผลด้านล่างไม่ให้บังเนื้อหา
 }
 
-// Top Header
+// Top Header ปรับแต่งแก้ไขระบบเลเยอร์ให้ปุ่มย้อนกลับคลิกได้จริง
 .page-header {
   display: flex;
   align-items: center;
   background-color: $purple-light;
-  padding: 16px 24px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba($purple-primary, 0.3);
+  min-height: 56px;
   position: relative;
 
   .back-button {
-    color: $purple-primary !important;
+    color: $purple-dark !important;
     z-index: 10;
-    width: 40px;
-    height: 40px;
-    mat-icon { font-size: 24px; }
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    cursor: pointer;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
   }
 
   .page-title {
@@ -40,9 +48,10 @@ $pink-btn-hover: #960055;
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     font-weight: 500;
-    color: $text-dark;
+    color: #424242;
+    pointer-events: none;
   }
 }
 
@@ -53,463 +62,569 @@ $pink-btn-hover: #960055;
   padding: 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
-// ปุ่มเพิ่มข้อมูล
 .action-buttons-group {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-bottom: 8px;
 
   .btn-action {
     display: flex;
     align-items: center;
     gap: 8px;
     border: none;
-    border-radius: 6px;
-    padding: 10px 16px;
-    font-size: 0.9rem;
-    font-weight: 500;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    font-weight: 400;
     cursor: pointer;
-    background-color: $purple-primary;
-    color: $white;
-    transition: opacity 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 
-    &:hover { opacity: 0.9; }
-    mat-icon { font-size: 18px; width: 18px; height: 18px; }
-  }
-}
-
-// แท็บ
-::ng-deep .score-tabs {
-  background-color: transparent;
-
-  .mat-mdc-tab-header {
-    border-bottom: 2px solid $border-color;
-  }
-  
-  .mat-mdc-tab-labels {
-    justify-content: center;
-  }
-
-  .mat-mdc-tab {
-    color: $text-dark;
-    &.mdc-tab--active {
-      color: $purple-primary;
-      .mdc-tab__text-label { color: $purple-primary; font-weight: 600; }
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
     }
-  }
 
-  .mdc-tab-indicator__content--underline {
-    border-color: $purple-primary !important;
-    border-top-width: 3px !important;
-  }
-}
+    &.btn-purple-light,
+    &.btn-purple-dark {
+      background-color: $purple-dark;
+      color: $white;
 
-// Container หลัก
-.score-entry-container {
-  background-color: $white;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.03);
-  padding: 24px;
-  margin-top: 16px;
-  border: 1px solid $border-color;
-}
-
-.entry-header {
-  margin-bottom: 24px;
-  h2 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0 0 8px 0;
-    font-size: 1.25rem;
-    color: $text-dark;
-    font-weight: 600;
-    mat-icon { color: $purple-primary; }
-  }
-  p {
-    margin: 0;
-    color: $text-muted;
-    font-size: 0.9rem;
-    padding-left: 34px;
-  }
-}
-
-// แถวฟิลเตอร์แนวนอน
-.filters-card {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
-  background-color: $white;
-  border: 1px solid $border-color;
-  border-radius: 8px;
-  padding: 20px;
-
-  ::ng-deep .mat-mdc-form-field {
-    width: 100%;
-    .mdc-text-field--outlined {
-      border-color: $border-color;
-      border-radius: 6px;
-      .mdc-notched-outline {
-        // override color
+      &:hover {
+        background-color: darken($purple-dark, 5%);
       }
     }
-    
-    // เปลี่ยนสีขอบเป็นชมพูเมื่อ focus (ตามรูปแรก)
-    &.mat-focused .mdc-notched-outline__leading,
-    &.mat-focused .mdc-notched-outline__notch,
-    &.mat-focused .mdc-notched-outline__trailing {
-      border-color: $pink-btn !important;
-    }
-    &.mat-focused .mat-mdc-form-field-focus-overlay {
-      background-color: transparent;
-    }
-  }
-
-  @media (max-width: 992px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (max-width: 576px) {
-    grid-template-columns: 1fr;
   }
 }
 
-// กล่องตาราง
-.table-card {
-  border: 1px solid $border-color;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.table-card-header {
+.center-content {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: $purple-table-header;
-  padding: 16px 20px;
-  border-bottom: 1px solid $border-color;
+  justify-content: center;
+  margin: 10px 0;
 
-  .table-card-title {
+  .course-container {
+    width: 100%;
+    max-width: 500px;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    color: $purple-primary;
-    font-weight: 500;
-    font-size: 1rem;
-    mat-icon { font-size: 20px; width: 20px; height: 20px; }
-  }
-
-  .max-score-badge {
-    background-color: $purple-badge;
-    color: $white;
-    padding: 4px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
+    flex-direction: column;
+    gap: 20px;
   }
 }
 
-// ตาราง
+// สไตล์ของ Dropdown แบบสีขาวคลีนมีขอบพาสเทล
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .form-label {
+    font-size: 1rem;
+    color: $text-muted;
+    font-weight: 400;
+    padding-left: 4px;
+  }
+
+  .select-wrapper {
+    position: relative;
+    width: 100%;
+
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 0.95rem;
+      color: #424242;
+      background-color: $white;
+      border: 1px solid #d1c4e9;
+      border-radius: 8px;
+      appearance: none;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: $purple-primary;
+      }
+
+      &:focus {
+        background-color: $white;
+        border-color: $purple-dark;
+        box-shadow: 0 0 0 3px rgba($purple-primary, 0.2);
+      }
+    }
+
+    .arrow-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      color: $purple-primary;
+      pointer-events: none;
+    }
+  }
+}
+
+// ตารางคะแนน
 .table-responsive {
   width: 100%;
   overflow-x: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
 }
 
-.custom-score-table {
+.score-table {
   width: 100%;
   border-collapse: collapse;
   background-color: $white;
+  text-align: center;
 
   thead {
-    th {
-      background-color: #f8f6fb;
-      color: $text-dark;
-      font-weight: 500;
-      font-size: 0.9rem;
-      padding: 16px 12px;
-      border-bottom: 1px solid $border-color;
-      
-      &:first-child { padding-left: 24px; text-align: center; }
-      &:nth-child(2) { text-align: center; }
-      &:nth-child(3) { text-align: left; }
-      &:last-child { text-align: center; padding-right: 24px; }
+    th,
+    td {
+      background-color: #f3edf7;
+      color: #8e8e93;
+      font-size: 0.95rem;
+      padding: 12px 10px;
+      border: 1px solid #d1c4e9;
+      vertical-align: middle;
+      font-weight: normal;
+    }
+    .text-bold {
+      font-weight: bold;
+      color: #757575;
     }
   }
 
   tbody {
-    tr {
-      border-bottom: 1px solid $border-color;
-      transition: background-color 0.2s;
+    td {
+      padding: 14px 10px;
+      font-size: 0.95rem;
+      color: #424242;
+      border: 1px solid #e1bee7;
 
-      &:hover { background-color: #fdfcff; }
-      &:last-child { border-bottom: none; }
+      &.empty-row {
+        color: $text-muted;
+        padding: 40px;
+        font-style: italic;
+        background-color: $white;
+      }
+    }
+  }
+}
+
+// ช่องสำหรับพิมพ์กรอกคะแนนดิบ
+.input-score {
+  width: 100%;
+  max-width: 70px;
+  padding: 6px 8px;
+  border: 1px solid #d1c4e9;
+  border-radius: 6px;
+  text-align: center;
+  outline: none;
+
+  &:focus {
+    border-color: $purple-dark;
+    box-shadow: 0 0 0 2px rgba($purple-primary, 0.3);
+  }
+}
+
+// 🟩 กล่องสำหรับปุ่มบันทึกคะแนนทั้งหมดที่ด้านล่างขวาของตาราง
+.submit-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    background-color: #66bb6a; // สีเขียวพาสเทลสวยงาม
+    color: $white;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+
+    &:hover {
+      background-color: #4caf50;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Footer สรุปผลลัพธ์ยึดติดขอบล่าง
+.page-footer-summary {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+  background-color: #ebdcf2;
+  border-top: 1px solid rgba($purple-primary, 0.5);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+
+  .summary-item {
+    padding: 12px 8px;
+    font-size: 0.85rem;
+    color: #616161;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-right: 1px solid rgba(#b39ddb, 0.5);
+    line-height: 1.3;
+
+    &:last-child {
+      border-right: none;
+    }
+
+    &.main-title {
+      flex-direction: row;
+      gap: 8px;
+      font-weight: 500;
+      color: $purple-dark;
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    // ส่วนสไตล์จัดรูปแบบการแสดงผลของเครื่องหมายขีด - และค่าเฉลี่ย
+    .value-summary {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-top: 4px;
+      color: #424242;
+    }
+
+    .value {
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+    &.highlight-green .value {
+      color: #2e7d32;
+    }
+    &.highlight-red .value {
+      color: #c62828;
+    }
+  }
+}
+
+// Responsive สำหรับมือถือ
+@media (max-width: 768px) {
+  .action-buttons-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .page-footer-summary {
+    position: relative;
+    grid-template-columns: 1fr;
+    margin-top: 20px;
+    .summary-item {
+      border-right: none;
+      border-bottom: 1px solid rgba(#b39ddb, 0.3);
+    }
+  }
+  .score-management-page {
+    padding-bottom: 0;
+  }
+}
+
+// ── Tab Group ────────────────────────────────────────────────
+.score-tabs {
+  background: $white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+
+  .tab-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  ::ng-deep {
+    .mat-mdc-tab-header {
+      background-color: $purple-light;
+      border-bottom: 2px solid rgba($purple-primary, 0.3);
+    }
+    .mat-mdc-tab .mdc-tab__text-label {
+      color: #7e57c2;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+      color: $purple-dark;
+      font-weight: 600;
+    }
+    .mdc-tab-indicator__content--underline {
+      border-color: $purple-dark !important;
+    }
+    .mat-mdc-tab-body-content {
+      padding: 0;
+      overflow: hidden;
+    }
+  }
+}
+
+// ── Score Entry Container ─────────────────────────────────────
+.score-entry-container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.entry-header {
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: $purple-dark;
+    margin: 0 0 4px;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+  }
+  p {
+    color: $text-muted;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+// ── Filters Card ─────────────────────────────────────────────
+.filters-card {
+  background: $white;
+  border: 1px solid rgba($purple-primary, 0.25);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .filter-field {
+    flex: 1;
+    min-width: 220px;
+  }
+}
+
+// ── Table Card ───────────────────────────────────────────────
+.table-card {
+  background: $white;
+  border: 1px solid rgba($purple-primary, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  .table-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: $purple-light;
+    border-bottom: 1px solid rgba($purple-primary, 0.25);
+
+    .table-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      color: $purple-dark;
+      font-size: 0.95rem;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .max-score-badge {
+      background: $purple-dark;
+      color: $white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+  }
+}
+
+// ── Custom Score Table ────────────────────────────────────────
+.custom-score-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead tr {
+    background: #f3edf7;
+
+    th {
+      padding: 12px 16px;
+      color: #616161;
+      font-weight: 500;
+      border-bottom: 2px solid rgba($purple-primary, 0.3);
+      text-align: left;
+
+      &:first-child,
+      &:last-child {
+        text-align: center;
+      }
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba($purple-primary, 0.12);
+    transition: background 0.15s;
+
+    &:hover {
+      background: #faf7ff;
+    }
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.row-filled td:first-child {
+      border-left: 3px solid #66bb6a;
     }
 
     td {
-      padding: 12px;
-      font-size: 0.95rem;
-      color: $text-dark;
+      padding: 10px 16px;
+      color: #424242;
       vertical-align: middle;
 
-      &:first-child { padding-left: 24px; text-align: center; }
-      &:nth-child(2) { text-align: center; }
-      &:nth-child(3) { text-align: left; }
-      &:last-child { text-align: center; padding-right: 24px; }
+      &.text-center {
+        text-align: center;
+      }
     }
 
     .empty-row {
       text-align: center;
-      padding: 40px !important;
+      padding: 48px;
       color: $text-muted;
+      font-style: italic;
     }
   }
 }
 
-// ช่องกรอกคะแนนแบบธรรมดา (เหมือนใน Screenshot)
-.score-input-field-simple {
-  width: 100px;
-  height: 38px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  text-align: center;
-  font-size: 1rem;
-  outline: none;
-  font-family: inherit;
-  
-  &:focus {
-    border-color: $purple-primary;
-    box-shadow: 0 0 0 1px $purple-primary;
+// ── Score Input Field ─────────────────────────────────────────
+.score-input-field {
+  width: 90px;
+
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      border-radius: 8px !important;
+    }
+    input {
+      text-align: center;
+      font-size: 1rem;
+    }
+    .mat-mdc-form-field-infix {
+      padding: 6px 0 !important;
+      min-height: unset;
+    }
   }
 }
 
-// ส่วนท้ายตาราง สรุปด่วน
-.bottom-actions-row {
+// ── Inline Summary ────────────────────────────────────────────
+.inline-summary {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  background-color: $white;
-  border-top: 1px solid $border-color;
+  gap: 24px;
+  padding: 12px 20px;
+  background: #f9f7fc;
+  border-top: 1px solid rgba($purple-primary, 0.15);
+  font-size: 0.88rem;
+  color: #616161;
+  flex-wrap: wrap;
 
-  .inline-summary {
-    display: flex;
-    gap: 20px;
-    color: $text-muted;
-    font-size: 0.9rem;
-
-    b { color: $purple-primary; font-weight: 600; }
-  }
-
-  .action-buttons {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-
-    .btn-cancel {
-      background: transparent;
-      border: 1px solid $pink-btn;
-      color: $pink-btn;
-      border-radius: 20px;
-      padding: 8px 20px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-      
-      &:hover { background-color: rgba($pink-btn, 0.05); }
-      mat-icon { font-size: 18px; width: 18px; height: 18px; }
-    }
-
-    .btn-save {
-      background-color: $pink-btn;
-      color: $white;
-      border: none;
-      border-radius: 20px;
-      padding: 8px 24px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background-color 0.2s;
-
-      &:hover { background-color: $pink-btn-hover; }
-      &:disabled { opacity: 0.6; cursor: default; }
-      mat-icon { font-size: 18px; width: 18px; height: 18px; }
-    }
-
-    .btn-next-subject {
-      background-color: #2e7d32;
-      color: $white;
-      border: none;
-      border-radius: 20px;
-      padding: 8px 20px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.9rem;
-      animation: slideIn 0.3s ease;
-      transition: background-color 0.2s;
-
-      &:hover { background-color: #1b5e20; }
-      mat-icon { font-size: 18px; width: 18px; height: 18px; }
-    }
+  b {
+    color: $purple-dark;
   }
 }
 
-.save-error-msg {
-  color: #c62828;
+// ── Action Buttons (save/cancel) ──────────────────────────────
+.action-buttons {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 16px 24px;
-  font-size: 0.9rem;
-}
+  justify-content: flex-end;
+  gap: 12px;
 
-.save-success-msg {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 24px;
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  font-weight: 500;
-  font-size: 0.95rem;
-  border-top: 1px solid #c8e6c9;
-  animation: slideIn 0.3s ease;
-
-  mat-icon { color: #2e7d32; }
-
-  .all-done-hint {
-    color: #1b5e20;
-    font-style: italic;
+  .save-btn {
+    background-color: $purple-dark !important;
+    color: $white !important;
   }
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-// สถานะว่าง
+// ── Empty State ───────────────────────────────────────────────
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  color: #d1c4e9;
-  
+  color: $text-muted;
+  gap: 12px;
+
   mat-icon {
-    font-size: 64px;
-    width: 64px;
-    height: 64px;
-    margin-bottom: 16px;
+    font-size: 52px;
+    width: 52px;
+    height: 52px;
+    opacity: 0.35;
   }
+
   p {
-    color: $text-muted;
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin: 0;
   }
 }
 
-// ปุ่ม Next ด้านล่างสุด
-.navigation-container {
+// ── Save Error Message ─────────────────────────────────────────
+.save-error-msg {
   display: flex;
-  justify-content: flex-end;
-  padding: 0 20px 40px;
-
-  .btn-next {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background-color: $purple-primary;
-    color: $white;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:hover { background-color: darken($purple-primary, 10%); }
-    mat-icon { font-size: 20px; width: 20px; height: 20px; }
-  }
-}
-
-.btn-edit-mode {
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 20px; /* ปรับให้เท่ากัน */
-  background-color: #ff9800; /* สีส้ม */
-  color: $white;
-  border: none;
-  border-radius: 50px; /* ปรับเป็นทรงแคปซูลมนเท่ากัน */
+  gap: 8px;
+  color: #c62828;
+  background: #ffebee;
+  border: 1px solid #ef9a9a;
+  border-radius: 8px;
+  padding: 10px 16px;
   font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  line-height: 1;
-
-  &:hover {
-    background-color: #e68a00;
-    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
-  }
 
   mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-/* ปุ่มย้อนกลับดีไซน์ทรงแคปซูล ขนาดกะทัดรัด */
-.btn-back-outline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 20px; /* เท่ากับ btn-next-subject */
-  background-color: #5a6578; /* สีเทาอมฟ้าพาสเทลตามรูป */
-  color: $white;
-  border: none;
-  border-radius: 50px; /* ทรงแคปซูลมนเท่ากัน */
-  font-size: 0.9rem; /* 14.4px เท่ากับวิชาถัดไป */
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  line-height: 1;
-
-  &:hover:not(:disabled) {
-    background-color: #4a5464;
-    box-shadow: 0 2px 8px rgba(90, 101, 120, 0.3);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  mat-icon {
-    font-size: 18px; /* ขนาดเท่ากันทุกปุ่ม */
-    width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
   }
 }

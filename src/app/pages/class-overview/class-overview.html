@@ -10,19 +10,34 @@
 
   <div class="page-wrapper">
     
-    <!-- 🔍 เมนู: สรุปผลการเรียนรวม (เกรดเฉลี่ย) สามารถเลือกเฉพาะรุ่นได้ -->
-    <div class="center-content">
-      <div class="course-container">
-        <div class="menu-sub-title">
-          <mat-icon>analytics</mat-icon> เมนู: สรุปผลการเรียนรวม (เกรดเฉลี่ย)
+    <!-- 🔍 เมนูฟิลเตอร์หลัก: เลือกโครงสร้างหลักสูตร และ เลือกรุ่น -->
+    <div class="filter-card">
+      <div class="menu-sub-title">
+        <mat-icon>tune</mat-icon>
+        <span>ตัวเลือกกรองข้อมูลผลการเรียน</span>
+      </div>
+      
+      <div class="filter-row">
+        <!-- 1. เลือกโครงสร้างหลักสูตร -->
+        <div class="form-group">
+          <label class="form-label">เลือกโครงสร้างหลักสูตร</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="selectedCourse" (change)="onCourseChange()">
+              <option value="">-- กรุณาเลือกโครงสร้างหลักสูตร --</option>
+              @for (course of courses; track course.id) {
+                <option [value]="course.id">{{ course.group_name }}</option>
+              }
+            </select>
+            <span class="arrow-icon">▼</span>
+          </div>
         </div>
-        
-        <!-- ส่วนเลือกรุ่นสำหรับฟิลเตอร์ข้อมูล -->
+
+        <!-- 2. เลือกรุ่น -->
         <div class="form-group">
           <label class="form-label">เลือกรุ่น</label>
           <div class="select-wrapper">
             <select [(ngModel)]="selectedBatch" (change)="onBatchChange()">
-              <option value="">กรุณาเลือกรุ่น</option>
+              <option value="">-- กรุณาเลือกรุ่น --</option>
               @for (batch of batches; track batch.id) {
                 <option [value]="batch.id">{{ batch.name }}</option>
               }
@@ -33,70 +48,266 @@
       </div>
     </div>
 
-    <!-- ⚙️ แถบปุ่ม Action หลักบนตาราง -->
-    <div class="table-actions-bar">
-      <div></div>
-      <div class="action-buttons-inline">
-        <button class="btn-inline btn-outline" (click)="reProcess()">
-          <mat-icon>refresh</mat-icon> ประมวลผลใหม่
-        </button>
-        <button class="btn-inline btn-excel" (click)="exportToExcel()">
-          <mat-icon>description</mat-icon> ส่งออก Excel
-        </button>
-        <button class="btn-inline btn-print" (click)="printReport()">
-          <mat-icon>print</mat-icon> พิมพ์รายงาน
-        </button>
+    <!-- ⚠️ กรณีผู้ใช้ยังไม่ได้เลือกรุ่น -->
+    @if (!selectedBatch) {
+      <div class="empty-state-container">
+        <div class="empty-icon-circle">
+          <mat-icon>analytics</mat-icon>
+        </div>
+        <h3 class="empty-title">กรุณาเลือกรุ่นเพื่อแสดงข้อมูลสรุปผลการเรียน</h3>
+        <p class="empty-desc">เลือกรุ่นจากเมนูด้านบนเพื่อดึงข้อมูลเกรดเฉลี่ยภาพรวม (Tab 1) และตารางคะแนนรวม Master Grid (Tab 2)</p>
       </div>
-    </div>
+    } @else {
 
-    <!-- 📊 ตารางคะแนนสรุปผลภาพรวมรายรุ่น -->
-    <div class="table-responsive">
-      <table class="score-table">
-        <thead class="highlight-top-bar">
-          <tr>
-            <th>ลำดับ</th>
-            <th>รหัสประจำตัว</th>
-            <th>ยศ ชื่อ-นามสกุล</th>
-            <th>วิชาทหารสื่อสาร (2 นก.)</th>
-            <th>3 วิชารวมกัน (2 นก.)</th>
-            <th>วิชาวิทยุ (1 นก.)</th>
-            <th>เกรดเฉลี่ยรวม (GPA)</th>
-            <th>สถานะ</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (student of students; track student.id; let i = $index) {
-            <tr>
-              <td>{{ i + 1 }}</td>
-              <td>{{ student.code }}</td>
-              <td class="text-left">{{ student.rank }} {{ student.name }}</td>
-              
-              <!-- 💡 อัปเดตการแสดงผลรายวิชาเป็นแบบโครงสร้าง Object รองรับวิชาเยอะๆ -->
-              <td class="text-left font-sm">
-                <div class="subject-tags-container">
-                  @for (sub of student.subjects; track sub.name) {
-                    <span class="badge-subject">
-                      {{ sub.name }} <strong class="text-purple-dark">({{ sub.credit }} นก.)</strong>
-                    </span>
-                  }
+      <!-- ⏳ สถานะกำลังโหลดข้อมูล -->
+      @if (isLoading) {
+        <div class="loading-state">
+          <mat-icon class="spinning">sync</mat-icon>
+          <span>กำลังโหลดข้อมูลสรุปผลการเรียน...</span>
+        </div>
+      } @else {
+
+        <!-- 📝 ปุ่มกรอกคะแนนพิเศษ (อยู่นอก Tabs) -->
+        <div class="global-actions-top" style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+          <button mat-raised-button (click)="openSpecialScoreModal()" style="background-color: #8e44ad; color: white; border-radius: 8px; font-family: inherit;">
+            <mat-icon style="margin-right: 8px;">edit_square</mat-icon> บันทึกคะแนนพิเศษ (ฝึกอบรม/สอบ/ความประพฤติ)
+          </button>
+        </div>
+
+        <!-- 🗂️ ส่วนของ Tabs (แท็บสลับหน้าจอ) -->
+        <div class="tabs-wrapper">
+          <mat-tab-group animationDuration="200ms" class="custom-mat-tabs">
+            
+            <!-- 🔘 Tab 1: สรุปเกรดเฉลี่ย (Overview Component) -->
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <mat-icon class="tab-icon">dashboard</mat-icon>
+                <span>Tab 1: สรุปเกรดเฉลี่ย (Overview)</span>
+              </ng-template>
+
+              <div class="tab-content-container">
+                <!-- Action Bar สำหรับ Tab 1 -->
+                <div class="tab-action-header">
+                  <div class="info-badge-summary">
+                    <mat-icon>info</mat-icon>
+                    <span>แสดงเกรดเฉลี่ยภาพรวม เหมาะสำหรับผู้บังคับบัญชาตรวจดูภาพรวมนักเรียนทั้งหมด</span>
+                  </div>
+                  <div class="action-buttons-inline">
+                    <button class="btn-inline btn-outline" (click)="reProcess()">
+                      <mat-icon>refresh</mat-icon> ประมวลผลใหม่
+                    </button>
+                  </div>
                 </div>
-              </td>
-              
-              <td>{{ student.totalCredit || '0' }}</td>
-              <td class="text-bold text-purple-dark">{{ student.gpa || '0.00' }}</td>
-              <td>
-                <span class="status-badge" [ngClass]="student.isPassed ? 'pass' : 'fail'">
-                  {{ student.isPassed ? 'ผ่านเกณฑ์' : 'ไม่ผ่านเกณฑ์' }}
-                </span>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="7" class="empty-row">กรุณาเลือกรุ่นเพื่อแสดงข้อมูลสรุปผลการเรียนรวมของรุ่นชั้น</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+
+                <!-- ตารางแสดงผล Tab 1 -->
+                <div class="table-responsive">
+                  <table class="overview-table">
+                    <thead>
+                      <tr>
+                        <th class="text-center" style="width: 70px;">ลำดับที่</th>
+                        <th class="text-center" style="width: 120px;">รหัสประจำตัว</th>
+                        <th class="text-left" style="width: 260px;">ยศ-ชื่อ-นามสกุล</th>
+                        <th class="text-center" style="width: 140px;">เกรดเฉลี่ยสะสม (GPA)</th>
+                        <th class="text-center" style="width: 140px;">สถานะ</th>
+                        <th class="text-center" style="width: 150px;">ดูเกรดรายวิชา</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (student of students; track student.id || student.code || $index; let i = $index) {
+                        <tr>
+                          <td class="text-center font-bold">{{ i + 1 }}</td>
+                          <td class="text-center code-cell">{{ student.code }}</td>
+                          <td class="text-left font-medium student-name-cell">
+                            <span class="rank-tag">{{ student.rank }}</span> {{ student.name }}
+                          </td>
+                          <td class="text-center">
+                            <span class="gpa-pill">{{ student.gpa }}</span>
+                          </td>
+                          <td class="text-center">
+                            <span class="status-badge" [ngClass]="student.isPassed ? 'pass' : 'fail'">
+                              {{ getGradeDescription(student.gpa) || (student.isPassed ? 'ผ่านเกณฑ์' : 'ไม่ผ่านเกณฑ์') }}
+                            </span>
+                          </td>
+                          <td class="text-center">
+                            <!-- Action 👁️ ไอคอนดูเกรดรายวิชา -->
+                            <button class="btn-eye-action" (click)="openStudentGradeModal(student)" title="ดูเกรดรายวิชาของนักเรียน">
+                              <mat-icon>visibility</mat-icon>
+                              <span>ดูเกรด</span>
+                            </button>
+                          </td>
+                        </tr>
+                      } @empty {
+                        <tr>
+                          <td colspan="6" class="empty-row">ไม่พบข้อมูลนักเรียนในรุ่นที่เลือก</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </mat-tab>
+
+            <!-- 🔘 Tab 2: ตารางคะแนนรวมทุกรายวิชา (Master Grid Component) -->
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <mat-icon class="tab-icon">grid_on</mat-icon>
+                <span>Tab 2: ตารางคะแนนรวมทุกรายวิชา (Master Grid)</span>
+              </ng-template>
+
+              <div class="tab-content-container">
+                <!-- Action Bar สำหรับ Tab 2: ปุ่มส่งออก Excel ด้านขวาบน -->
+                <div class="tab-action-header justify-between">
+                  <div class="info-badge-summary">
+                    <mat-icon>view_column</mat-icon>
+                    <span>ตารางคะแนนรวมดิบทุกวิชา พร้อม Freeze Pane 3 คอลัมน์แรกเมื่อเลื่อนหน้าจอขวา</span>
+                  </div>
+                  <button class="btn-inline btn-excel" (click)="exportToExcel()">
+                    <mat-icon>description</mat-icon> ส่งออก Excel
+                  </button>
+                </div>
+
+                <!-- ตาราง Master Grid พร้อม Freeze Pane (sticky 3 คอลัมน์แรก) -->
+                <div class="table-responsive freeze-pane-wrapper">
+                  <table class="master-grid-table">
+                    <thead>
+                      @if (subjectGroups.length > 0) {
+                        <!-- แถวที่ 1: วิชาเดี่ยว = ชื่อวิชา (พื้นชมพู) | วิชากลุ่ม = ชื่อกลุ่ม (พื้นเขียว) -->
+                        <tr>
+                          <th rowspan="2" class="sticky-col-1 text-center">ลำดับที่</th>
+                          <th rowspan="2" class="sticky-col-2 text-center">รหัสประจำตัว</th>
+                          <th rowspan="2" class="sticky-col-3 text-left">ยศ-ชื่อ-นามสกุล</th>
+                          @for (grp of subjectGroups; track grp.groupId) {
+                            <th [attr.colspan]="grp.subjects.length"
+                                class="text-center"
+                                [class.group-header-single]="grp.isSingle"
+                                [class.group-header-multi]="!grp.isSingle">
+                              <div class="grp-header-title">{{ grp.groupName }}</div>
+                              @if (grp.isSingle) {
+                                <div class="grp-header-credit">{{ grp.credit }} นก.</div>
+                              } @else {
+                                <div class="grp-header-credit">รวม {{ grp.subjects.length }} วิชา {{ grp.credit }} นก.</div>
+                              }
+                            </th>
+                          }
+                          <th rowspan="2" class="text-center highlight-col">ฝึกอบรม<br><small>(100)</small></th>
+                          <th rowspan="2" class="text-center highlight-col">สอบ<br><small>(100)</small></th>
+                          <th rowspan="2" class="text-center highlight-col">ความประพฤติ<br><small>(200)</small></th>
+                          <th rowspan="2" class="text-center highlight-col">คะแนนรวม</th>
+                          <th rowspan="2" class="text-center highlight-col">GPA</th>
+                          <th rowspan="2" class="text-center highlight-col">สถานะ</th>
+                        </tr>
+                        <!-- แถวที่ 2: รายชื่อวิชาแต่ละวิชา -->
+                        <tr>
+                          @for (sub of masterSubjects; track sub.id) {
+                            <th class="text-center subject-col-row2">
+                              <div class="sub-header-title">{{ sub.name }}</div>
+                            </th>
+                          }
+                        </tr>
+                      } @else {
+                        <tr>
+                          <th class="sticky-col-1 text-center">ลำดับที่</th>
+                          <th class="sticky-col-2 text-center">รหัสประจำตัว</th>
+                          <th class="sticky-col-3 text-left">ยศ-ชื่อ-นามสกุล</th>
+                          @for (sub of masterSubjects; track sub.id) {
+                            <th class="text-center subject-col">
+                              <div class="sub-header-title">{{ sub.name }}</div>
+                              <div class="sub-header-credit">({{ sub.credit }} นก.)</div>
+                            </th>
+                          }
+                          <th class="text-center highlight-col">ฝึกอบรม (100)</th>
+                          <th class="text-center highlight-col">สอบ (100)</th>
+                          <th class="text-center highlight-col">ความประพฤติ (200)</th>
+                          <th class="text-center highlight-col">คะแนนรวม</th>
+                          <th class="text-center highlight-col">GPA</th>
+                          <th class="text-center highlight-col">สถานะ</th>
+                        </tr>
+                      }
+                    </thead>
+                    <tbody>
+                      @for (student of students; track student.id || student.code || $index; let i = $index) {
+                        <tr>
+                          <td class="sticky-col-1 text-center font-bold">{{ i + 1 }}</td>
+                          <td class="sticky-col-2 text-center code-cell">{{ student.code }}</td>
+                          <td class="sticky-col-3 text-left font-medium student-name-cell">
+                            <span class="rank-tag">{{ student.rank }}</span> {{ student.name }}
+                          </td>
+                          @if (subjectGroups.length > 0) {
+                            <!-- แสดงตาม subjectGroups: วิชาเดี่ยว = คอลัมน์เดียว, วิชากลุ่ม = colspan -->
+                            @for (grp of subjectGroups; track grp.groupId) {
+                              <!-- ดึงผลการตัดเกรดของกลุ่มนี้มาเก็บในตัวแปร result -->
+                              @let result = student.group_results?.[grp.groupId];
+                              
+                              @if (grp.isSingle) {
+                                <td class="text-center score-cell">
+                                  @if (result) {
+                                    <span class="font-bold text-purple">{{ result.grade }}</span>
+                                    <span class="text-muted text-sm"> ({{ result.index_value }})</span>
+                                  } @else {
+                                    <span class="text-muted">-</span>
+                                  }
+                                </td>
+                              } @else {
+                                <td [attr.colspan]="grp.subjects.length" class="text-center score-cell score-cell-group">
+                                  @if (result) {
+                                    <span class="font-bold text-purple">{{ result.grade }}</span>
+                                    <span class="text-muted text-sm"> ({{ result.index_value }})</span>
+                                  } @else {
+                                    <span class="text-muted">-</span>
+                                  }
+                                </td>
+                              }
+                            }
+                          } @else {
+                            <!-- ไม่มีกลุ่ม: แสดงทีละวิชา -->
+                            @for (sub of student.subjects; track sub.name) {
+                              <td class="text-center score-cell">
+                                @let info = formatGradeWithIndex(sub);
+                                @if (info.isSU) {
+                                  <span class="font-bold text-success">{{ info.gradeDisplay }}</span>
+                                } @else {
+                                  <span class="font-bold text-purple">{{ info.gradeDisplay }}</span>
+                                  @if (info.indexDisplay) {
+                                    <span class="index-val">{{ info.indexDisplay }}</span>
+                                  }
+                                }
+                              </td>
+                            }
+                          }
+                          <td class="text-center highlight-cell font-medium">{{ student.trainingTimeScore || '-' }}</td>
+                          <td class="text-center highlight-cell font-medium">{{ student.examTimeScore || '-' }}</td>
+                          <td class="text-center highlight-cell font-medium">{{ student.behaviorScore || '-' }}</td>
+                          <td class="text-center text-bold highlight-cell">{{ student.totalScore || '-' }}</td>
+                          <td class="text-center text-bold text-purple highlight-cell">{{ student.gpa }}</td>
+                          <td class="text-center highlight-cell">
+                            <span class="status-badge" [ngClass]="student.isPassed ? 'pass' : 'fail'">
+                              {{ student.isPassed ? 'ผ่าน' : 'ตก' }}
+                            </span>
+                          </td>
+                        </tr>
+                      } @empty {
+                        <tr>
+                          <td [attr.colspan]="3 + masterSubjects.length + 6" class="empty-row">ไม่พบข้อมูลคะแนนวิชาในรุ่นที่เลือก</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </mat-tab>
+
+          </mat-tab-group>
+        </div>
+
+      }
+    }
+
+    <!-- สถานะการประมวลผลท้ายหน้า -->
+    <div class="page-footer-status">
+      <div class="process-status-bottom">
+        <mat-icon>schedule</mat-icon>
+        <span>อัปเดตข้อมูลล่าสุดเมื่อ: <strong class="text-purple">{{ lastProcessedTime }}</strong></span>
+      </div>
     </div>
 
   </div> 

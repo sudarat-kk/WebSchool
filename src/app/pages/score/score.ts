@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
@@ -28,6 +28,7 @@ export class Score implements OnInit {
     private authService: AuthService,
     private scoreService: ScoreService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -47,25 +48,30 @@ export class Score implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.scoreService.getStudentScores(studentId, batchId).pipe(
-      timeout(30000) // หมดเวลา 30 วินาที
-    ).subscribe({
-      next: (res) => {
-        this.subjectDetails = res.subject_details || [];
-        this.groupSummaries = res.group_summaries || [];
-        this.buildGroupedSubjects();
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.isLoading = false;
-        if (err instanceof TimeoutError) {
-          this.errorMessage = 'เซิร์ฟเวอร์ใช้เวลานานเกินไป (Server cold start) กรุณากด ลองใหม่';
-        } else {
-          this.errorMessage = 'ไม่สามารถดึงข้อมูลคะแนนได้ กรุณาลองใหม่อีกครั้ง';
-        }
-        console.error('ดึงข้อมูลคะแนนไม่สำเร็จ:', err);
-      }
-    });
+    this.scoreService
+      .getStudentScores(studentId, batchId)
+      .pipe(
+        timeout(30000), // หมดเวลา 30 วินาที
+      )
+      .subscribe({
+        next: (res) => {
+          this.subjectDetails = res.subject_details || [];
+          this.groupSummaries = res.group_summaries || [];
+          this.buildGroupedSubjects();
+          this.isLoading = false;
+          setTimeout(() => this.cdr.detectChanges());
+        },
+        error: (err) => {
+          this.isLoading = false;
+          if (err instanceof TimeoutError) {
+            this.errorMessage = 'เซิร์ฟเวอร์ใช้เวลานานเกินไป (Server cold start) กรุณากด ลองใหม่';
+          } else {
+            this.errorMessage = 'ไม่สามารถดึงข้อมูลคะแนนได้ กรุณาลองใหม่อีกครั้ง';
+          }
+          console.error('ดึงข้อมูลคะแนนไม่สำเร็จ:', err);
+          setTimeout(() => this.cdr.detectChanges());
+        },
+      });
   }
 
   // จัดกลุ่ม subjects ตาม group_name
@@ -82,7 +88,7 @@ export class Score implements OnInit {
 
   // คืนค่า GroupSummary ของ group_name นั้น
   getSummaryForGroup(groupName: string): GroupSummary | undefined {
-    return this.groupSummaries.find(g => g.group_name === groupName);
+    return this.groupSummaries.find((g) => g.group_name === groupName);
   }
 
   // แปลง String เปอร์เซ็นต์เป็น Number สำหรับ Progress Bar

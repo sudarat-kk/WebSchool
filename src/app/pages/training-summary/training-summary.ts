@@ -62,5 +62,6 @@ export class TrainingSummary {
   // Helper คำนวณผลต่าง (+/-)
   getDiff(c62: number, c63: number): number {
     return Number((c63 - c62).toFixed(1));
+
   }
 }

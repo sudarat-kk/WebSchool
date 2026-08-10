@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap');
 
 // ── ประกาศตัวแปรไว้บนสุด (แก้ไขชื่อให้ระบบรู้จักเรียบร้อยครับ) ───────────────────
-$purple-hover: #3e0549;         // 💜 สีม่วงเข้มสำหรับตัวหนังสือ (ตัวแปรเดิมของคุณ)
-$bg-menu-purple: #f4f0fa;       // สีม่วงอ่อนมากๆ เกือบขาวที่เป็นพื้นหลังของตัวกล่องหลัก
-$passed-parent-bg: #d2c7de;     // สีเทาอมม่วงหม่น (แถบเมนูตัวแม่ที่โดนเมาส์เลื่อนผ่านไปแล้ว)
-$active-child-bg: #e1d2f0;      // สีม่วงพาสเทลไฮไลต์ (แถบเมนูตัวลูกที่เมาส์กำลังชี้อยู่จริงๆ)
-$purple-hover: #3e0549;         // สีม่วงเข้มสำหรับตัวหนังสือ
-$bg-menu-purple: #f4f0fa;       // 💜 สีม่วงพาสเทลอ่อนมากๆ เกือบขาวที่เป็นพื้นหลังกล่องตามรูป
-$active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ตอนเมาส์ชี้ (รุ่นที่ 63)
+$purple-hover: #3e0549; // 💜 สีม่วงเข้มสำหรับตัวหนังสือ (ตัวแปรเดิมของคุณ)
+$bg-menu-purple: #f4f0fa; // สีม่วงอ่อนมากๆ เกือบขาวที่เป็นพื้นหลังของตัวกล่องหลัก
+$passed-parent-bg: #d2c7de; // สีเทาอมม่วงหม่น (แถบเมนูตัวแม่ที่โดนเมาส์เลื่อนผ่านไปแล้ว)
+$active-child-bg: #e1d2f0; // สีม่วงพาสเทลไฮไลต์ (แถบเมนูตัวลูกที่เมาส์กำลังชี้อยู่จริงๆ)
+$purple-hover: #3e0549; // สีม่วงเข้มสำหรับตัวหนังสือ
+$bg-menu-purple: #f4f0fa; // 💜 สีม่วงพาสเทลอ่อนมากๆ เกือบขาวที่เป็นพื้นหลังกล่องตามรูป
+$active-child-bg: #e1d2f0; // 💜 สีม่วงไฮไลต์ตอนเมาส์ชี้ (รุ่นที่ 63)
 
 :host {
   position: sticky;
@@ -87,7 +87,7 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
     padding: 10px 14px;
 
     font-family: 'Sarabun', sans-serif;
-    font-size: 20px; 
+    font-size: 20px;
     font-weight: 500;
     color: #3d3d3d;
     line-height: 1.4;
@@ -119,6 +119,19 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
   &:hover > .dropdown-menu {
     display: block;
   }
+
+  // ✅ เพิ่ม invisible bridge ด้านบนปิดช่องว่างระหว่างปุ่มกับ dropdown-menu
+  // ป้องกันเมาส์ออกจาก hover zone ตอนเลื่อนลงมา
+  > a::after,
+  > button::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    display: block;
+  }
 }
 
 .dropdown-menu {
@@ -130,14 +143,29 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
   min-width: 260px;
   width: max-content;
   max-width: 90vw;
-  
+
   background: $bg-menu-purple; // พื้นหลังสีม่วงอ่อนนวลตามรูป
   list-style: none;
-  padding: 8px; 
+  padding: 8px;
   margin: 0;
   border-radius: 16px; // โค้งมนตามรูป
   box-shadow: 0 4px 20px rgba(74, 46, 90, 0.12);
   z-index: 1000;
+
+  // ✅ กล่องเนื้อหาจริงของ dropdown (ใช้ wrapper แทนให้เนื้อหามีสี/border-radius)
+  &::after {
+    content: '';
+    position: absolute;
+    top: 12px; // เริ่มต้นที่ offset ของ padding-top
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: $bg-menu-purple;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(74, 46, 90, 0.12);
+    z-index: -1; // วางไว้หลัง li
+    pointer-events: none;
+  }
 
   li {
     position: relative;
@@ -149,17 +177,17 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
 
     // เมื่อเมาส์ชี้ตรงๆ ที่ชั้นที่ 1 -> ไฮไลต์เป็นแถบสีม่วงอ่อน โค้งมน
     &:hover > a {
-      background: $active-child-bg; 
+      background: $active-child-bg;
       color: $purple-hover; // เรียกใช้ตัวแปรเดิมได้สมบูรณ์แล้วครับ
     }
   }
 
-  // ── 🎯 เมื่อเมาส์ไหลข้ามไปเล่นที่ชั้นที่ 2 (Submenu) แล้ว 
+  // ── 🎯 เมื่อเมาส์ไหลข้ามไปเล่นที่ชั้นที่ 2 (Submenu) แล้ว
   // เปลี่ยนแถบเมนูตัวแม่ (ชั้นที่ 1) ให้กลายเป็น "สีเทาอมม่วงหม่น" ตามรูปภาพ
   li.dropdown-submenu:hover {
     &:has(.submenu-side:hover) > a {
       color: $purple-hover;
-      background: $passed-parent-bg; 
+      background: $passed-parent-bg;
     }
   }
 
@@ -167,18 +195,31 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
     display: block;
     padding: 12px 16px;
     text-decoration: none;
-    color: #333; 
+    color: #333;
     font-size: 16px;
     line-height: 1.4;
     white-space: nowrap;
     border-radius: 12px; // กรอบข้างในโค้งมน
-    transition: color 0.15s, background-color 0.15s;
+    transition:
+      color 0.15s,
+      background-color 0.15s;
   }
 }
 
-
 .dropdown-submenu {
   &:hover > .submenu-side {
+    display: block;
+  }
+
+  // ✅ invisible bridge คลุม gap ระหว่าง dropdown-menu ชั้น 1 กับ submenu-side
+  // ป้องกันเมาส์ออกจาก hover zone ขณะเลื่อนข้ามไปฝั่งขวา
+  > a::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -2px; // คลุม rounding gap ของ submenu-side
+    width: 2px;
+    height: 100%;
     display: block;
   }
 }
@@ -196,10 +237,10 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
 
   min-width: 220px;
   width: max-content;
-  
+
   /* 🎯 [จุดแก้ไข] เปลี่ยนจาก #fff (สีขาว) เป็นสีม่วงอ่อนพาสเทลตามรูปภาพ */
-  background: $bg-menu-purple; 
-  
+  background: $bg-menu-purple;
+
   list-style: none;
   padding: 8px; /* เพิ่มพื้นที่ให้กรอบโค้งมนด้านในลอยเด่นขึ้นมา */
   margin-top: 0;
@@ -209,7 +250,7 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
 
   li {
     margin-bottom: 2px;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
@@ -217,7 +258,7 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
     /* 🎯 เมื่อเมาส์ชี้ที่เมนูย่อย (เช่น รุ่นที่ 63) ให้ไฮไลต์เป็นสีม่วงที่ชัดขึ้น */
     &:hover > a {
       background: $active-child-bg;
-      color: $purple-hover; 
+      color: $purple-hover;
     }
   }
 
@@ -229,7 +270,9 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
     white-space: nowrap;
     line-height: 1.4;
     border-radius: 12px; /* ทำไฮไลต์ด้านในให้โค้งมนรับกับตัวกล่อง */
-    transition: color 0.15s, background-color 0.15s;
+    transition:
+      color 0.15s,
+      background-color 0.15s;
   }
 }
 
@@ -270,7 +313,6 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
   }
 }
 
-
 @media (max-width: 1366px) and (min-width: 769px) {
   .desktop-nav {
     .menu-list {
@@ -290,11 +332,10 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
   }
 }
 
-
 // ── Responsive (สลับเข้าโหมดมือถือเมื่อขนาดจอต่ำกว่า 1280px) ───────────────────
-@media (max-width: 1280px) { 
+@media (max-width: 1280px) {
   .school-header {
-    height: 64px !important; 
+    height: 64px !important;
   }
 
   .desktop-nav {
@@ -322,7 +363,7 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
     // ล้างตำแหน่งเอฟเฟกต์ที่ระบบพยายามดันเมนูหลุดเฟรม
     .cdk-overlay-connected-position-bounding-box {
       .cdk-overlay-pane {
-        transform: none !important; 
+        transform: none !important;
       }
     }
 
@@ -343,16 +384,16 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
     // เลเยอร์ที่ 1: เมนูหลัก (สำหรับผู้เรียน)
     .mat-mdc-menu-panel.mobile-step-menu-l1,
     .mobile-step-menu-l1 .mat-mdc-menu-content {
-      --mat-menu-container-color: #f7f3f9 !important; 
+      --mat-menu-container-color: #f7f3f9 !important;
       background-color: #f7f3f9 !important;
     }
 
     // เลเยอร์ที่ 2: ชั้นหลักสูตร (ชั้นนายพัน เหล่า ส.)
     .mat-mdc-menu-panel.mobile-step-menu-l2,
     .mobile-step-menu-l2 .mat-mdc-menu-content {
-      --mat-menu-container-color: #ede2f5 !important; 
+      --mat-menu-container-color: #ede2f5 !important;
       background-color: #ede2f5 !important;
-      margin-left: 20px !important;  /* เยื้องไปทางขวาพอดีขอบ */
+      margin-left: 20px !important; /* เยื้องไปทางขวาพอดีขอบ */
       margin-top: 8px !important;
       position: relative !important;
     }
@@ -360,10 +401,10 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
     // เลเยอร์ที่ 3: ชั้นรุ่น (รุ่นที่ 63) -> ปรับให้กว้างเท่าเพื่อน แต่จัดซ้อนเหลื่อมลงมาสวย ๆ
     .mat-mdc-menu-panel.mobile-step-menu-l3,
     .mobile-step-menu-l3 .mat-mdc-menu-content {
-      --mat-menu-container-color: #e2d1f0 !important; 
+      --mat-menu-container-color: #e2d1f0 !important;
       background-color: #e2d1f0 !important;
-      margin-left: 35px !important;  /* ขยับเหลื่อมขวาตามสเต็ปบันทึก */
-      margin-top: 10px !important;   /* ขยับลงมาให้สอดรับกับปุ่มที่กด */
+      margin-left: 35px !important; /* ขยับเหลื่อมขวาตามสเต็ปบันทึก */
+      margin-top: 10px !important; /* ขยับลงมาให้สอดรับกับปุ่มที่กด */
       position: relative !important;
     }
 
@@ -373,7 +414,7 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
     .mobile-step-menu-l3 .mat-mdc-menu-item {
       font-size: 15px !important;
       font-weight: 500 !important;
-      color: #2c212e !important; 
+      color: #2c212e !important;
       padding: 14px 18px !important; /* จัดพื้นที่ให้กดง่ายในมือถือ */
       white-space: nowrap !important;
       border-bottom: 1px solid rgba(62, 5, 73, 0.04) !important;
@@ -382,35 +423,39 @@ $active-child-bg: #e1d2f0;      // 💜 สีม่วงไฮไลต์ต�
         border-bottom: none !important;
       }
 
-      .mat-mdc-menu-submenu-icon, .mat-menu-ripple {
+      .mat-mdc-menu-submenu-icon,
+      .mat-menu-ripple {
         color: #6a5370 !important;
       }
 
-      &:hover, &:focus, &.cdk-program-focused {
+      &:hover,
+      &:focus,
+      &.cdk-program-focused {
         background-color: #d3beeb !important;
       }
     }
 
     // ✨ จัดรูปแบบปุ่มในชั้น "รุ่นที่ 63" ให้ดูสมส่วน ไม่โล่งโจ้งเกินไป
-   .mobile-step-menu-l3 .mat-mdc-menu-item {
+    .mobile-step-menu-l3 .mat-mdc-menu-item {
       font-size: 15px !important;
       font-weight: 500 !important;
-      color: #2c212e !important; 
+      color: #2c212e !important;
       white-space: nowrap !important;
-      justify-content: flex-start !important; 
-      
+      justify-content: flex-start !important;
+
       // ลดระยะด้านในของปุ่มลง ให้กล่องรุ่นหดแคบแนวตั้งลงตามต้องการ
-      height: 36px !important;       /* บังคับความสูงคงที่ให้ดูกะทัดรัด */
+      height: 36px !important; /* บังคับความสูงคงที่ให้ดูกะทัดรัด */
       min-height: 36px !important;
-      padding: 0px 10px !important;   /* ปล่อยพื้นที่แนวตั้งให้แฟบลง */
-      
-      &:hover, &:focus, &.cdk-program-focused {
+      padding: 0px 10px !important; /* ปล่อยพื้นที่แนวตั้งให้แฟบลง */
+
+      &:hover,
+      &:focus,
+      &.cdk-program-focused {
         background-color: #d3beeb !important;
       }
     }
   }
 }
-
 
 // ── Chevron Banner ────────────────────────────────────────
 .chevron-banner {

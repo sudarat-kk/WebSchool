@@ -1,0 +1,136 @@
+$primary-purple: #8e44ad;
+$border-purple: #dcd0ea;
+$text-dark: #2c3e50;
+$text-muted: #7f8c8d;
+$white: #ffffff;
+
+.special-score-dialog-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 85vh;
+  background-color: $white;
+  font-family: 'Prompt', 'Sarabun', sans-serif;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background-color: #fcfaff;
+  border-bottom: 1px solid $border-purple;
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: $primary-purple;
+
+    .header-icon {
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+
+  .close-btn {
+    color: $text-muted;
+  }
+}
+
+.dialog-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+
+  .table-container {
+    border: 1px solid $border-purple;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .special-score-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0e6f7;
+    }
+
+    th {
+      background-color: #f7f3f9;
+      font-weight: 600;
+      font-size: 14px;
+      color: $text-dark;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    td {
+      font-size: 14px;
+      color: $text-dark;
+    }
+
+    .score-input {
+      width: 60px;
+      padding: 6px;
+      text-align: center;
+      border: 1px solid $border-purple;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      background-color: #faf7fc;
+      transition: all 0.2s ease;
+      color: $primary-purple;
+      font-weight: 500;
+
+      &:focus {
+        border-color: $primary-purple;
+        box-shadow: 0 0 0 2px rgba(142, 68, 173, 0.15);
+        background-color: $white;
+      }
+    }
+  }
+}
+
+.dialog-footer {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid $border-purple;
+  background-color: #fcfaff;
+
+  .btn-cancel {
+    color: $text-muted;
+    font-family: inherit;
+  }
+
+  .btn-save {
+    background-color: $primary-purple;
+    color: white;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}

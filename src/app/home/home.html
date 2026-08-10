@@ -265,7 +265,12 @@
       <div class="form-list">
         <div class="form-item-card" *ngFor="let item of forms" (click)="viewForm(item.viewUrl)">
           <span class="form-title">{{ item.title }}</span>
-          <a [href]="item.downloadUrl" class="download-btn" (click)="$event.stopPropagation()" target="_blank">
+          <a
+            [href]="item.downloadUrl"
+            class="download-btn"
+            (click)="$event.stopPropagation()"
+            target="_blank"
+          >
             <mat-icon class="dl-icon">arrow_circle_down</mat-icon>
             <span class="dl-text">ดาวน์โหลด</span>
           </a>

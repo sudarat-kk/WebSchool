@@ -51,10 +51,9 @@ export interface AdminSubjectScoresResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ScoreService {
-
   constructor(
     private http: HttpClient,
     private authService: AuthService,
@@ -65,7 +64,7 @@ export class ScoreService {
     const token = this.authService.getToken();
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
   }
 
@@ -73,12 +72,15 @@ export class ScoreService {
   getStudentScores(studentId: number, batchId: number): Observable<ScoreResponse> {
     return this.http.get<ScoreResponse>(
       `${environment.apiUrl}/students/${studentId}/scores?batch_id=${batchId}`,
-      { headers: this.getHeaders() }
+      { headers: this.getHeaders() },
     );
   }
 
   // 3. แอดมินดึงรายชื่อนักเรียนพร้อมคะแนนของวิชาที่เลือก (ทั้งห้อง)
-  getAdminSubjectScores(batchId: number, subjectId: number): Observable<AdminSubjectScoresResponse> {
+  getAdminSubjectScores(
+    batchId: number,
+    subjectId: number,
+  ): Observable<AdminSubjectScoresResponse> {
     const token = localStorage.getItem('admin_token');
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -86,27 +88,26 @@ export class ScoreService {
     });
     return this.http.get<AdminSubjectScoresResponse>(
       `${environment.apiUrl}/admin/scores?batch_id=${batchId}&subject_id=${subjectId}`,
-      { headers }
+      { headers },
     );
   }
-
 
   // 5. อัปเดตคะแนนเต็มรายวิชา (แอดมิน)
   updateMaxScore(payload: UpdateMaxScoreRequest): Observable<any> {
-    return this.http.put<any>(
-      `${environment.apiUrl}/settings/max-score`,
-      payload,
-      { headers: this.getHeaders() }
-    );
+    return this.http.put<any>(`${environment.apiUrl}/settings/max-score`, payload, {
+      headers: this.getHeaders(),
+    });
   }
 
   // 6. บันทึกคะแนนแบบ Bulk (แอดมิน - ทั้งห้อง)
-  saveAdminBulkScores(payload: { batch_id: number; subject_id: number; scores: { student_id: number; raw_score: number | null }[] }): Observable<any> {
-    return this.http.post<any>(
-      `${environment.apiUrl}/admin/scores/bulk`,
-      payload,
-      { headers: this.getHeaders() }
-    );
+  saveAdminBulkScores(payload: {
+    batch_id: number;
+    subject_id: number;
+    scores: { student_id: number; raw_score: number | null }[];
+  }): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/admin/scores/bulk`, payload, {
+      headers: this.getHeaders(),
+    });
   }
 
   // 7. ประมวลผลคะแนนตามกลุ่มวิชา
@@ -115,7 +116,30 @@ export class ScoreService {
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
     return this.http.get<any>(
       `${environment.apiUrl}/score/process-group?batch_id=${batchId}&group_id=${groupId}`,
-      { headers }
+      { headers },
     );
+  }
+
+  // ฟังก์ชันดึงข้อมูลสรุปผลการเรียนทั้งรุ่น
+  getBatchScoresSummary(batchId: number): Observable<any> {
+    const token = localStorage.getItem('admin_token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+
+    return this.http.get<any>(`${environment.apiUrl}/score/process-batch?batch_id=${batchId}`, {
+      headers,
+    });
+  }
+
+  // 8. บันทึกคะแนนพิเศษแบบ Bulk (ฝึกอบรม, สอบ, ความประพฤติ)
+  saveSpecialScoresBulk(payload: any): Observable<any> {
+    const token = localStorage.getItem('admin_token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http.post<any>(`${environment.apiUrl}/scores/special-bulk`, payload, {
+      headers,
+    });
   }
 }

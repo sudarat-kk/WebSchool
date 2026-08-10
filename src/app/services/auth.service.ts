@@ -28,18 +28,14 @@ export interface StudentLoginResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // ฟังก์ชันยิง API Login
   studentLogin(payload: StudentLoginRequest): Observable<StudentLoginResponse> {
-    return this.http.post<StudentLoginResponse>(
-      `${environment.apiUrl}/student-login`,
-      payload
-    );
+    return this.http.post<StudentLoginResponse>(`${environment.apiUrl}/student-login`, payload);
   }
 
   // บันทึก Token ลง localStorage
@@ -69,7 +65,7 @@ export class AuthService {
     localStorage.removeItem('student_data');
   }
 
-// ตรวจสอบว่า Login อยู่หรือไม่
+  // ตรวจสอบว่า Login อยู่หรือไม่
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
@@ -80,10 +76,7 @@ export class AuthService {
 
   // ฟังก์ชันยิง API Admin Login
   adminLogin(payload: any): Observable<any> {
-    return this.http.post<any>(
-      `${environment.apiUrl}/admin/login`,
-      payload
-    );
+    return this.http.post<any>(`${environment.apiUrl}/admin/login`, payload);
   }
 
   // บันทึก Admin Token ลง localStorage

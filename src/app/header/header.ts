@@ -42,21 +42,18 @@ export class Header implements OnInit {
     },
     {
       title: 'สำหรับคณะกับกำหลักสูตร',
-      path: '/admin',
+      path: '/committee',
       submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
       title: 'แบบประเมินติดตามผู้สำเร็จฯ',
-      submenus: [
-        { course_name: 'นายสิบอาวุโส (เร่งรัด)', batches: [] },
-        { course_name: 'นายสิบชั้นต้น (เร่งรัด)', batches: [] },
-        { course_name: 'ช่างอิเล็กทรอนิกส์', batches: [] },
-        { course_name: 'นนส.ทบ. เหล่า ส.', batches: [] },
-      ], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
+      path: '/follow-up',
+      submenus: [], // เราจะเอาข้อมูล API มายัดใส่ตรงนี้
     },
     {
       title: 'สรุปผลการฝึกอบรม',
       path: '/training-results',
+
       simpleItems: [
         { title: 'ชั้นนายพัน', courseName: 'ชั้นนายพัน' },
         { title: 'นายสิบอาวุโส', courseName: 'นายสิบอาวุโส' },
@@ -67,7 +64,7 @@ export class Header implements OnInit {
     },
     {
       title: 'สรุปผลการประเมินฯ',
-      path: 'evaluation-summary',
+      path: '/evaluation-summary',
       simpleItems: [
         'ชั้นนายพัน',
         'ชั้นนายร้อย',
@@ -107,7 +104,7 @@ export class Header implements OnInit {
     // แปลงเป็นตัวพิมพ์เล็กทั้งหมดเพื่อป้องกัน Error จากพิมพ์เล็กพิมพ์ใหญ่ เช่น /Admin หรือ /Admin/dashboard
     const lowerUrl = url.toLowerCase();
 
-    this.isAdmin = lowerUrl.includes('/admin') || lowerUrl.includes('/teacher');
+    this.isAdmin = lowerUrl.includes('/admin');
 
     // เปิดคอนโซลใน Browser (กด F12) ดูว่าหน้าปัจจุบัน URL คืออะไร และระบบมองว่าเป็นแอดมินไหม
     console.log('Current URL:', lowerUrl, 'Is Admin?:', this.isAdmin);
@@ -138,6 +135,15 @@ export class Header implements OnInit {
           if (committeeMenuIndex !== -1) {
             this.menuData[committeeMenuIndex].submenus = response.data;
           }
+
+          // 4. ใส่ข้อมูลให้เมนู "แบบประเมินติดตามผู้สำเร็จฯ"
+          const followUpMenuIndex = this.menuData.findIndex(
+            (m) => m.title === 'แบบประเมินติดตามผู้สำเร็จฯ',
+          );
+          if (followUpMenuIndex !== -1) {
+            this.menuData[followUpMenuIndex].submenus = response.data;
+          }
+
           this.cdr.detectChanges();
         }
       },
