@@ -52,10 +52,7 @@
       [matMenuTriggerData]="{ submenus: menu.submenus, path: menu.path }">
       {{ menu.title }}
     </button>
-    <button mat-menu-item *ngIf="menu.simpleItems" [matMenuTriggerFor]="simpleMenu"
-      [matMenuTriggerData]="{ simpleItems: menu.simpleItems, path: menu.path }">
-      {{ menu.title }}
-    </button>
+    
   </ng-container>
 </mat-menu>
 
@@ -77,18 +74,6 @@
       [queryParams]="{ batchId: batch.batch_id, title: courseName + ' ' + batch.batch_name, courseName: courseName, batchName: batch.batch_name }"
     >
       {{ batch.batch_name }}
-    </a>
-  </ng-template>
-</mat-menu>
-<mat-menu #simpleMenu="matMenu" class="mobile-step-menu-l2">
-  <ng-template matMenuContent let-simpleItems="simpleItems" let-path="path">
-    <a
-      mat-menu-item
-      *ngFor="let item of simpleItems"
-      [routerLink]="item"
-      [queryParams]="{ course: item }"
-    >
-      {{ item }}
     </a>
   </ng-template>
 </mat-menu>
