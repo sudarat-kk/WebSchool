@@ -31,6 +31,39 @@
           <button type="submit" class="btn-submit">บันทึกหลักสูตร</button>
         </div>
       </form>
+
+      <!-- ส่วนจัดการหลักสูตรที่มีอยู่แล้ว (Manage Existing Courses) -->
+      <div class="existing-courses" *ngIf="courses.length > 0" style="margin-top: 24px; padding-top: 16px; border-top: 1px dashed #ccc;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="font-size: 14px; color: #673ab7; margin: 0; font-weight: 500;">
+            หลักสูตรทั้งหมดที่มีในระบบ
+          </h3>
+          <button type="button" mat-button (click)="showCoursesTable = !showCoursesTable" style="color: #673ab7; font-size: 13px;">
+            {{ showCoursesTable ? 'ซ่อนรายการ' : 'ดูหลักสูตรทั้งหมด' }}
+          </button>
+        </div>
+        
+        <table *ngIf="showCoursesTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="background-color: #f3e8ff; color: #4c1d95; text-align: left;">
+              <th style="padding: 8px; border: 1px solid #ddd;">ปีการศึกษา</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">ชื่อหลักสูตร</th>
+              <th style="padding: 8px; border: 1px solid #ddd; text-align: center; width: 60px;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of courses; trackBy: trackByCourseId">
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ c.curriculum_year }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ c.course_name }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                <button type="button" mat-icon-button (click)="deleteCourse(c)" style="color: #f44336; transform: scale(0.8);" title="ลบหลักสูตร">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- 2. ส่วนเพิ่มรุ่น -->
@@ -93,11 +126,11 @@
           รุ่นที่มีอยู่แล้วในหลักสูตร "{{ selectedCourseNameForBatch }}"
         </h3>
         
-        <div *ngIf="getCoursesByName(selectedCourseNameForBatch).length === 0" style="color: #888; font-size: 13px;">
+        <div *ngIf="getBatchesForSelectedCourseName().length === 0" style="color: #888; font-size: 13px;">
           ยังไม่มีรุ่นในหลักสูตรนี้
         </div>
         
-        <table *ngIf="getCoursesByName(selectedCourseNameForBatch).length > 0" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <table *ngIf="getBatchesForSelectedCourseName().length > 0" style="width: 100%; border-collapse: collapse; font-size: 13px;">
           <thead>
             <tr style="background-color: #f3e8ff; color: #4c1d95; text-align: left;">
               <th style="padding: 8px; border: 1px solid #ddd;">ปีการศึกษา</th>
@@ -107,7 +140,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let batch of getCoursesByName(selectedCourseNameForBatch)">
+            <tr *ngFor="let batch of getBatchesForSelectedCourseName(); trackBy: trackByBatchId">
               <td style="padding: 8px; border: 1px solid #ddd;">{{ batch.curriculum_year }}</td>
               <td style="padding: 8px; border: 1px solid #ddd;">{{ batch.batch_name }}</td>
               <td style="padding: 8px; border: 1px solid #ddd;">

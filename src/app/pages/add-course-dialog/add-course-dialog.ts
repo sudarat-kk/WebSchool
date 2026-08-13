@@ -1,8 +1,10 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms'; 
 import { CourseService } from '../../services/course.service';
+import { AuthService } from '../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import Swal from 'sweetalert2';
 import { lastValueFrom } from 'rxjs';
 
@@ -16,7 +18,7 @@ interface CourseBatch {
 @Component({
   selector: 'app-add-course',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
   templateUrl: './add-course-dialog.html',
   styleUrl: './add-course-dialog.scss',
 })
@@ -28,6 +30,7 @@ export class AddCourse implements OnInit {
   groups: any[] = [];
   
   // Form states
+  showCoursesTable: boolean = false;
   courseForm = { course_name: '', curriculum_year: null };
   
   // Cascading states for Batch Form
@@ -46,7 +49,12 @@ export class AddCourse implements OnInit {
   subjectForm = { group_id: '' };
   subjectsList: { subject_name: string }[] = [{ subject_name: '' }];
 
-  constructor(private location: Location, private courseService: CourseService) {}
+  constructor(
+    private location: Location, 
+    private courseService: CourseService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadAllData();
@@ -54,15 +62,30 @@ export class AddCourse implements OnInit {
 
   loadAllData() {
     this.courseService.getAllCourses().subscribe({
-      next: (res) => { if(res.success) this.courses = res.data; },
+      next: (res) => { 
+        if(res.success) {
+          this.courses = res.data;
+          this.cdr.detectChanges(); // บังคับอัปเดต UI ทันที
+        }
+      },
       error: (err) => console.error(err)
     });
     this.courseService.getAllBatches().subscribe({
-      next: (res) => { if(res.success) this.batches = res.data; },
+      next: (res) => { 
+        if(res.success) {
+          this.batches = res.data;
+          this.cdr.detectChanges(); // บังคับให้ UI อัปเดตทันที
+        }
+      },
       error: (err) => console.error(err)
     });
     this.courseService.getAllSubjectGroups().subscribe({
-      next: (res) => { if(res.success) this.groups = res.data; },
+      next: (res) => { 
+        if(res.success) {
+          this.groups = res.data; 
+          this.cdr.detectChanges(); // บังคับให้ UI อัปเดตทันที
+        }
+      },
       error: (err) => console.error(err)
     });
   }
@@ -76,6 +99,28 @@ export class AddCourse implements OnInit {
   getCoursesByName(name: string): any[] {
     if (!name) return [];
     return this.courses.filter(c => c.course_name === name);
+  }
+
+  // Get batches for the selected course name (for the manage batches table)
+  getBatchesForSelectedCourseName(): any[] {
+    if (!this.selectedCourseNameForBatch) return [];
+    const matchingCourses = this.getCoursesByName(this.selectedCourseNameForBatch);
+    const courseIds = matchingCourses.map(c => c.id);
+    
+    return this.batches
+      .filter(b => courseIds.includes(b.course_id))
+      .map(b => {
+        const course = matchingCourses.find(c => c.id === b.course_id);
+        return {
+          ...b,
+          curriculum_year: course ? course.curriculum_year : '-'
+        };
+      });
+  }
+
+  // TrackBy function to prevent *ngFor from recreating DOM elements continuously
+  trackByBatchId(index: number, batch: any): any {
+    return batch.id;
   }
 
   // Filter methods for cascading dropdowns
@@ -251,8 +296,11 @@ export class AddCourse implements OnInit {
       title: 'แก้ไขข้อมูลรุ่น',
       html: `
         <div style="display: flex; flex-direction: column; gap: 10px; text-align: left; margin-top: 10px;">
-          <label style="font-size: 14px; color: #555;">ชื่อรุ่น</label>
-          <input id="swal-batch-name" class="swal2-input" placeholder="ชื่อรุ่น" value="${batch.batch_name}" style="margin: 0; width: 100%; box-sizing: border-box;">
+          <label style="font-size: 14px; color: #555;">ปีการศึกษา</label>
+          <input class="swal2-input" value="${batch.curriculum_year || '-'}" style="margin: 0; width: 100%; box-sizing: border-box; background-color: #f5f5f5;" disabled>
+          
+          <label style="font-size: 14px; color: #555; margin-top: 8px;">ชื่อรุ่น</label>
+          <input id="swal-batch-name" class="swal2-input" placeholder="ชื่อรุ่น" value="${batch.batch_name || ''}" style="margin: 0; width: 100%; box-sizing: border-box;">
           
           <label style="font-size: 14px; color: #555; margin-top: 8px;">วันที่เริ่มต้น</label>
           <input type="date" id="swal-start-date" class="swal2-input" value="${startDate}" style="margin: 0; width: 100%; box-sizing: border-box;">
@@ -303,8 +351,44 @@ export class AddCourse implements OnInit {
   }
 
   deleteBatch(batch: any) {
+    const adminData = this.authService.getAdminData();
+    if (!adminData || !adminData.email) {
+      Swal.fire('ข้อผิดพลาด', 'ไม่พบข้อมูลผู้ดูแลระบบ กรุณาเข้าสู่ระบบใหม่', 'error');
+      return;
+    }
+
     Swal.fire({
-      title: '⚠️ ลบรุ่นอย่างถาวร?',
+      title: '⚠️ ยืนยันสิทธิ์',
+      text: 'กรุณากรอกรหัสผ่านแอดมินเพื่อยืนยันการลบรุ่น',
+      input: 'password',
+      inputPlaceholder: 'รหัสผ่านแอดมิน',
+      inputAttributes: {
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+      showLoaderOnConfirm: true,
+      preConfirm: (password) => {
+        if (!password) {
+          Swal.showValidationMessage('กรุณากรอกรหัสผ่าน');
+          return false;
+        }
+        return lastValueFrom(this.authService.adminLogin({ email: adminData.email, password }))
+          .then(res => {
+            if (!res.success) throw new Error(res.message);
+            return true;
+          })
+          .catch(error => {
+            Swal.showValidationMessage(`รหัสผ่านไม่ถูกต้อง`);
+          });
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    }).then((authResult) => {
+      if (authResult.isConfirmed) {
+        Swal.fire({
+          title: '⚠️ ลบรุ่นอย่างถาวร?',
       html: `
         <p style="color: #d32f2f; margin-bottom: 8px; text-align: left;">
           การลบรุ่น "${batch.batch_name}" จะส่งผลให้ข้อมูลต่อไปนี้ถูก <b>ลบทิ้งอย่างถาวร</b>:
@@ -352,6 +436,108 @@ export class AddCourse implements OnInit {
             Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
           }
         });
+      }
+    });
+      }
+    });
+  }
+
+  // ==========================================
+  // จัดการหลักสูตร (Delete)
+  // ==========================================
+  trackByCourseId(index: number, course: any): any {
+    return course.id;
+  }
+
+  deleteCourse(course: any) {
+    const adminData = this.authService.getAdminData();
+    if (!adminData || !adminData.email) {
+      Swal.fire('ข้อผิดพลาด', 'ไม่พบข้อมูลผู้ดูแลระบบ กรุณาเข้าสู่ระบบใหม่', 'error');
+      return;
+    }
+
+    Swal.fire({
+      title: '⚠️ ยืนยันสิทธิ์',
+      text: 'กรุณากรอกรหัสผ่านแอดมินเพื่อยืนยันการลบหลักสูตร',
+      input: 'password',
+      inputPlaceholder: 'รหัสผ่านแอดมิน',
+      inputAttributes: {
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+      showLoaderOnConfirm: true,
+      preConfirm: (password) => {
+        if (!password) {
+          Swal.showValidationMessage('กรุณากรอกรหัสผ่าน');
+          return false;
+        }
+        return lastValueFrom(this.authService.adminLogin({ email: adminData.email, password }))
+          .then(res => {
+            if (!res.success) throw new Error(res.message);
+            return true;
+          })
+          .catch(error => {
+            Swal.showValidationMessage(`รหัสผ่านไม่ถูกต้อง`);
+          });
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    }).then((authResult) => {
+      if (authResult.isConfirmed) {
+        Swal.fire({
+          title: '⚠️ ลบหลักสูตรอย่างถาวร?',
+      html: `
+        <p style="color: #d32f2f; margin-bottom: 8px; text-align: left;">
+          การลบหลักสูตร "<b>${course.course_name} (ปี ${course.curriculum_year})</b>" จะส่งผลให้ข้อมูลต่อไปนี้ถูก <b>ลบทิ้งอย่างถาวร</b>:
+        </p>
+        <ul style="color: #d32f2f; text-align: left; font-size: 14px; padding-left: 24px; margin-top: 0;">
+          <li><b>รุ่น (Batches)</b> ทั้งหมดที่อยู่ในหลักสูตรนี้</li>
+          <li><b>กลุ่มวิชาและรายวิชา</b> ทั้งหมดในทุกรุ่นของหลักสูตรนี้</li>
+          <li><b>รายชื่อนักเรียนและคะแนน</b> ทั้งหมดในทุกรุ่นของหลักสูตรนี้</li>
+          <li>แบบฟอร์มประเมินที่ผูกกับหลักสูตรนี้</li>
+        </ul>
+        <p style="text-align: left; font-weight: bold; margin-top: 16px;">
+          คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลทั้งหมดอย่างถาวร?
+        </p>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ลบเลย!',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#d32f2f',
+      cancelButtonColor: '#9e9e9e',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.courseService.deleteCourse(course.id).subscribe({
+          next: (res) => {
+            if (res.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบสำเร็จ!',
+                text: 'ลบหลักสูตรและข้อมูลที่เกี่ยวข้องเรียบร้อยแล้ว',
+                timer: 1500,
+                showConfirmButton: false
+              });
+              
+              // Reset some fields if the deleted course was selected
+              if (this.selectedCourseNameForBatch === course.course_name) this.selectedCourseNameForBatch = '';
+              if (this.selectedCourseNameForGroup === course.course_name) this.selectedCourseNameForGroup = '';
+              if (this.selectedCourseNameForSubject === course.course_name) this.selectedCourseNameForSubject = '';
+              
+              this.loadAllData();
+            } else {
+              Swal.fire('ข้อผิดพลาด', res.message, 'error');
+            }
+          },
+          error: (err) => {
+            console.error('Error deleting course:', err);
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
+          }
+        });
+      }
+    });
       }
     });
   }

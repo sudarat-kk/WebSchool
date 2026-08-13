@@ -1,24 +1,28 @@
-<div class="page-container">
+<div class="page-container screen-only">
     <!-- ส่วนหัว -->
     <header class="header">
         <div class="header-left">
-            <button class="back-button">
+            <button class="back-button" (click)="goBack()">
                 <i class="material-icons">arrow_back_ios</i>
             </button>
             <h1 class="page-title">ตรวจสอบการส่งคะแนน</h1>
         </div>
         <div class="header-right">
+            <!-- Dropdown หลักสูตร -->
             <div class="dropdown-wrapper">
-                <button class="dropdown-button">
-                    หลักสูตร
-                    <i class="material-icons">arrow_drop_down</i>
-                </button>
+                <select class="dropdown-button" [(ngModel)]="selectedCourseName" (change)="onCourseChange()">
+                    <option value="" disabled selected>เลือกหลักสูตร</option>
+                    <option *ngFor="let group of courseGroups" [value]="group.course_name">{{ group.course_name }}</option>
+                </select>
+                <i class="material-icons select-icon">arrow_drop_down</i>
             </div>
+            <!-- Dropdown รุ่น -->
             <div class="dropdown-wrapper">
-                <button class="dropdown-button">
-                    รุ่น
-                    <i class="material-icons">arrow_drop_down</i>
-                </button>
+                <select class="dropdown-button" [(ngModel)]="selectedBatchId" (change)="onBatchChange()" [disabled]="!selectedCourseName">
+                    <option value="" disabled selected>เลือกรุ่น</option>
+                    <option *ngFor="let batch of filteredBatches" [value]="batch.batch_id">{{ batch.batch_name }} (ปี {{ batch.curriculum_year }})</option>
+                </select>
+                <i class="material-icons select-icon">arrow_drop_down</i>
             </div>
         </div>
     </header>
@@ -78,41 +82,111 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- ถ้ายังไม่เลือกรุ่น ให้แสดงข้อความว่างๆ -->
+                <tr *ngIf="gradeItems.length === 0">
+                    <td colspan="5" style="text-align: center; color: #999; padding: 40px;">
+                        {{ selectedBatchId ? 'ไม่พบข้อมูลรายวิชาในรุ่นนี้' : 'กรุณาเลือกหลักสูตรและรุ่น เพื่อตรวจสอบการส่งคะแนน' }}
+                    </td>
+                </tr>
+
                 <tr *ngFor="let item of gradeItems; let i = index">
                     <td class="col-check">
-                        <input type="checkbox" [(ngModel)]="item.checked" [id]="'check-' + i" [name]="'check-' + i">
-                        <label [for]="'check-' + i">
-                            <span class="custom-checkbox"></span>
-                        </label>
-                    </td>
-                    <td class="col-subject">{{ item.subjectName }}</td>
-                    <td class="col-date">{{ item.submitDate }}</td>
-                    <td class="col-time">{{ item.submitTime }}</td>
-                    <td class="col-note">{{ item.note }}</td> <!-- 👈 เพิ่มช่องหมายเหตุ -->
-                </tr>
-            </tbody>
-
-            <tfoot>
-                <tr>
-                    <!-- colspan="5" ครอบคลุมทั้ง 5 คอลัมน์ (เลือก, วิชา, วันที่, เวลา, หมายเหตุ) -->
-                    <td colspan="5" class="table-footer-actions">
-                        <div class="action-buttons">
-                            <button class="btn btn-pdf" (click)="exportToPDF()">
-                                <i class="material-icons">save_alt</i>
-                                Export as PDF
-                            </button>
-                            <button class="btn btn-cancel" (click)="cancelAllSelection()">
-                                <i class="material-icons">delete_sweep</i>
-                                ยกเลิกการเลือกทั้งหมด
-                            </button>
-                            <button class="btn btn-save" (click)="saveVerification()">
-                                <i class="material-icons">save</i>
-                                บันทึกการตรวจสอบ
-                            </button>
+                        <div class="screen-only">
+                            <input type="checkbox" [(ngModel)]="item.checked" (change)="onItemCheckChange(item)" [id]="'check-' + i" [name]="'check-' + i">
+                            <label [for]="'check-' + i">
+                                <span class="custom-checkbox"></span>
+                            </label>
+                        </div>
+                        <div class="print-only">
+                            {{ item.checked ? '✔' : '' }}
                         </div>
                     </td>
+                    <td class="col-subject">{{ item.subjectName }}</td>
+                    <td class="col-date">{{ item.submitDate || '-' }}</td>
+                    <td class="col-time">{{ item.submitTime || '-' }}</td>
+                    <td class="col-note">
+                        <input type="text" [(ngModel)]="item.note" placeholder="เพิ่มหมายเหตุ..." class="note-input">
+                    </td>
                 </tr>
-            </tfoot>
+            </tbody>
         </table>
     </main>
+
+    <!-- ส่วนปุ่มดำเนินการด้านล่าง -->
+    <div class="bottom-action-bar">
+        <div class="action-buttons">
+            <button class="btn btn-pdf" (click)="exportToPDF()" [disabled]="gradeItems.length === 0">
+                <i class="material-icons">save_alt</i>
+                Export as PDF
+            </button>
+            <button class="btn btn-cancel" (click)="cancelAllSelection()" [disabled]="gradeItems.length === 0">
+                <i class="material-icons">delete_sweep</i>
+                ยกเลิกการเลือกทั้งหมด
+            </button>
+            <button class="btn btn-save" (click)="saveVerification()" [disabled]="gradeItems.length === 0">
+                <i class="material-icons">save</i>
+                บันทึกการตรวจสอบ
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- 🖨️ รูปแบบเฉพาะสำหรับ Print (แบบกะทัดรัด หน้าเดียว) -->
+<!-- ============================================== -->
+<div class="print-only print-layout">
+    <div class="print-title-bar">
+        รายชื่อวิชาหลักสูตร {{ selectedCourseName }} {{ selectedBatchText }}
+    </div>
+
+    <table class="print-compact-table">
+        <thead>
+            <tr>
+                <th class="col-index">ลำดับ</th>
+                <th class="col-subj">วิชา / กิจกรรม</th>
+                <th class="col-datetime">วันที่ส่งคะแนน</th>
+                <th class="col-datetime">เวลาที่ส่ง</th>
+                <th class="col-check-status">ส่งคะแนน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of gradeItems; let i = index">
+                <td class="text-center">{{ i + 1 }}</td>
+                <td>{{ item.subjectName }}</td>
+                <td class="text-center">{{ item.submitDate || '-' }}</td>
+                <td class="text-center">{{ item.submitTime || '-' }}</td>
+                <td class="text-center">
+                    <div class="print-box-check">
+                        {{ item.checked ? '✓' : '' }}
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="print-summary-section">
+        <table class="print-summary-table">
+            <thead>
+                <tr>
+                    <th colspan="3" class="summary-main-header">สรุปจำนวนวิชาทั้งหมด</th>
+                </tr>
+                <tr>
+                    <th>วิชาเรียนทั้งหมด</th>
+                    <th>ส่งคะแนนแล้ว</th>
+                    <th>ขาดส่ง</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">{{ summaryData.totalSubjects }}</td>
+                    <td class="text-center">{{ summaryData.verifiedSubjects }}</td>
+                    <td class="text-center">{{ summaryData.pendingVerifications }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="print-footer-time">
+        {{ exportTimestamp }}
+    </div>
 </div>

@@ -19,19 +19,21 @@
             <a href="javascript:void(0)">{{ sub.course_name }} <span class="arrow">❯</span></a>
 
             <ul class="submenu-side">
-              <li *ngFor="let batch of sub.batches">
-                <a
-                  [routerLink]="menu.path"
-                  [queryParams]="{
-                    batchId: batch.batch_id,
-                    title: sub.course_name + ' ' + batch.batch_name,
-                    courseName: sub.course_name,
-                    batchName: batch.batch_name,
-                  }"
-                >
-                  {{ batch.batch_name }}
-                </a>
-              </li>
+              <ng-container *ngFor="let batch of sub.batches">
+                <li *ngIf="batch.batch_name && batch.batch_name.trim() !== ''">
+                  <a
+                    [routerLink]="menu.path"
+                    [queryParams]="{
+                      batchId: batch.batch_id,
+                      title: sub.course_name + ' ' + batch.batch_name,
+                      courseName: sub.course_name,
+                      batchName: batch.batch_name,
+                    }"
+                  >
+                    {{ batch.batch_name }}
+                  </a>
+                </li>
+              </ng-container>
             </ul>
           </li>
         </ul>
@@ -95,19 +97,21 @@
 </mat-menu>
 <mat-menu #genSubMenu="matMenu">
   <ng-template matMenuContent let-batches="batches" let-path="path" let-courseName="courseName">
-    <a
-      mat-menu-item
-      *ngFor="let batch of batches"
-      [routerLink]="path"
-      [queryParams]="{
-        batchId: batch.batch_id,
-        title: courseName + ' ' + batch.batch_name,
-        courseName: courseName,
-        batchName: batch.batch_name,
-      }"
-    >
-      {{ batch.batch_name }}
-    </a>
+    <ng-container *ngFor="let batch of batches">
+      <a
+        mat-menu-item
+        *ngIf="batch.batch_name && batch.batch_name.trim() !== ''"
+        [routerLink]="path"
+        [queryParams]="{
+          batchId: batch.batch_id,
+          title: courseName + ' ' + batch.batch_name,
+          courseName: courseName,
+          batchName: batch.batch_name,
+        }"
+      >
+        {{ batch.batch_name }}
+      </a>
+    </ng-container>
   </ng-template>
 </mat-menu>
 
