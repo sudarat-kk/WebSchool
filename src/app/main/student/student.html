@@ -1,60 +1,92 @@
 <div class="student-page">
   <div class="page-header">
-    <button mat-icon-button class="back-button" routerLink="/">
+    <button mat-icon-button class="back-button" (click)="isLoggedIn ? logout() : null" [routerLink]="!isLoggedIn ? '/' : null">
       <mat-icon>chevron_left</mat-icon>
     </button>
-    <!-- เปลี่ยนเป็นดึงข้อมูลจากตัวแปรแบบนี้ -->
     <h1 class="course-title">{{ pageTitle }}</h1>
+    <button *ngIf="isLoggedIn" class="logout-btn" (click)="logout()">
+      <mat-icon>logout</mat-icon> ออกจากระบบ
+    </button>
   </div>
 
-  <div class="alert-title-container">
-    <a [routerLink]="['/student/login']" [queryParams]="{ batchId: currentBatchId, title: pageTitle, courseName: currentCourseName, batchName: currentBatchName }" class="alert-title">
-      ระบบแจ้งผลคะแนนผู้เรียน
-      <mat-icon class="alert-icon">warning</mat-icon>
-    </a>
-  </div>
-
-  <div class="chart-container">
-    <iframe
-      width="80%"
-      height="450"
-      src="https://lookerstudio.google.com/embed/reporting/b482bd10-b6da-447f-8651-b8ba6a71b73f/page/p_9vcxiz9lxd"
-      frameborder="0"
-      style="border: 0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05)"
-      allowfullscreen
-      sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-    >
-    </iframe>
-  </div>
-
-  <div class="filter-row">
-    <div class="filter-left">
-      <div class="custom-select-wrapper">
-        <select class="custom-select" (change)="onAssessmentChange($event)">
-          <option value="" disabled selected>กรุณาเลือกแบบประเมิน</option>
-          <option value="1">ประเมินอาจารย์ผู้สอน</option>
-          <option value="2">ประเมินอาจารย์กำกับหลักสูตร</option>
-          <option value="3">ประเมินหลักสูตร</option>
-        </select>
+  <!-- ================= GUEST VIEW ================= -->
+  <ng-container *ngIf="!isLoggedIn">
+    <div class="guest-welcome-container">
+      <div class="welcome-banner">
+        <h2>ระบบประเมินและแจ้งผลคะแนน</h2>
+        <p>กรุณาเข้าสู่ระบบเพื่อทำแบบประเมินและดูผลคะแนนของคุณ</p>
+        <button class="login-action-btn" [routerLink]="['/student/login']" [queryParams]="{ batchId: currentBatchId, title: pageTitle, courseName: currentCourseName, batchName: currentBatchName }">
+          <mat-icon>login</mat-icon> เข้าสู่ระบบนักเรียน
+        </button>
       </div>
     </div>
-    <div class="filter-right">
-      <div class="search-wrapper">
-        <input
-          type="text"
-          class="search-input"
-          placeholder="ค้นหารายวิชา"
-          (input)="onSearch($event)"
-        />
-        <mat-icon class="search-icon">search</mat-icon>
+
+    <div class="chart-container">
+      <iframe
+        width="100%"
+        height="450"
+        src="https://lookerstudio.google.com/embed/reporting/b482bd10-b6da-447f-8651-b8ba6a71b73f/page/p_9vcxiz9lxd"
+        frameborder="0"
+        style="border: 0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05)"
+        allowfullscreen
+        sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+      >
+      </iframe>
+    </div>
+  </ng-container>
+
+  <!-- ================= STUDENT HUB VIEW ================= -->
+  <ng-container *ngIf="isLoggedIn">
+    <div class="hub-container">
+      <!-- Hub Dashboard Actions -->
+      <div class="hub-actions-container">
+        <div class="action-card score-action" (click)="goToScore()">
+          <div class="action-icon-wrapper"><mat-icon>assessment</mat-icon></div>
+          <div class="action-details">
+            <h3>ดูผลคะแนนการเรียน</h3>
+            <p>ตรวจสอบคะแนนสอบและสถานะการประเมินรายวิชาของคุณ</p>
+          </div>
+          <mat-icon class="arrow-icon">arrow_forward_ios</mat-icon>
+        </div>
+      </div>
+
+      <div class="hub-divider"></div>
+
+      <!-- Evaluation Section -->
+      <div class="section-title-wrapper">
+        <h2 class="section-title"><mat-icon>assignment</mat-icon> เลือกทำแบบประเมิน</h2>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-left">
+          <div class="custom-select-wrapper">
+            <select class="custom-select" (change)="onAssessmentChange($event)">
+              <option value="" disabled selected>กรุณาเลือกแบบประเมิน</option>
+              <option value="1">ประเมินอาจารย์ผู้สอน</option>
+              <option value="2">ประเมินอาจารย์กำกับหลักสูตร</option>
+              <option value="3">ประเมินหลักสูตร</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-right" *ngIf="selectedAssessment === '1'">
+          <div class="search-wrapper">
+            <input
+              type="text"
+              class="search-input"
+              placeholder="ค้นหารายวิชา"
+              (input)="onSearch($event)"
+            />
+            <mat-icon class="search-icon">search</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards-grid" *ngIf="selectedAssessment">
+        <div class="course-card" *ngFor="let course of filteredCourses" (click)="openForm(course)">
+          <div class="card-text">{{ course.text }}</div>
+          <div class="status-dot" [ngClass]="course.status"></div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="cards-grid" *ngIf="selectedAssessment">
-    <div class="course-card" *ngFor="let course of filteredCourses" (click)="openForm(course)">
-      <div class="card-text">{{ course.text }}</div>
-      <div class="status-dot" [ngClass]="course.status"></div>
-    </div>
-  </div>
+  </ng-container>
 </div>

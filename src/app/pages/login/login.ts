@@ -91,8 +91,8 @@ export class Login implements OnInit {
             }
             this.authService.saveStudentData(res.studentData);
           }
-          // นำผู้ใช้ไปยังหน้าผลคะแนน
-          this.router.navigate(['/score']);
+          // นำผู้ใช้ไปยังหน้าฮับนักเรียน (Student Hub)
+          this.router.navigate(['/student']);
         } else {
           this.errorMessage = res.message || 'รหัสนักเรียนหรือรหัสผ่านไม่ถูกต้อง';
         }

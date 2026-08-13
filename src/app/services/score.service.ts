@@ -9,6 +9,7 @@ import { AuthService } from './auth.service';
 // ==========================================
 export interface SubjectDetail {
   group_name: string;
+  subject_id: number;
   subject_name: string;
   max_score: string;
   raw_score: string;

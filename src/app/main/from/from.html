@@ -44,12 +44,20 @@
       <div class="form-row">
         <div class="form-group flex-1">
           <label class="input-label">ประเภทแบบฟอร์ม</label>
-          <select class="custom-input" [(ngModel)]="formData.formType" (change)="onTypeChange()">
-            <option value="" disabled selected>เลือกประเภท</option>
-            <option *ngFor="let type of formTypes" [value]="type.value">
-              {{ type.label }}
-            </option>
-          </select>
+          <div style="display: flex; gap: 8px;">
+            <select class="custom-input" [(ngModel)]="formData.formType" (change)="onTypeChange()" style="flex: 1;">
+              <option value="" disabled selected>เลือกประเภท</option>
+              <option *ngFor="let type of formTypes" [value]="type.value">
+                {{ type.label }}
+              </option>
+            </select>
+            <button type="button" class="btn-icon" style="background: #f3e8ff; color: #673ab7; border-radius: 6px; padding: 0 12px; border: 1px dashed #673ab7;" (click)="addNewFormType()" title="เพิ่มประเภทแบบประเมินใหม่">
+              <mat-icon style="font-size: 20px; width: 20px; height: 20px;">add</mat-icon>
+            </button>
+            <button *ngIf="isCustomFormType(formData.formType)" type="button" class="btn-icon" style="background: #ffebee; color: #f44336; border-radius: 6px; padding: 0 12px; border: 1px dashed #f44336;" (click)="removeCustomFormType()" title="ลบประเภทนี้ออก">
+              <mat-icon style="font-size: 20px; width: 20px; height: 20px;">delete</mat-icon>
+            </button>
+          </div>
         </div>
 
         <div class="form-group flex-1" *ngIf="formData.formType === 'instructor'">
@@ -102,7 +110,7 @@
           <div *ngFor="let c of q.choices; let cIndex = index" style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
             <span style="color: #999; font-size: 13px;">{{ cIndex + 1 }}.</span>
             <input type="text" class="custom-input" placeholder="ข้อความตัวเลือก" [(ngModel)]="c.choice_text" style="flex: 3;" />
-            <input type="number" class="custom-input" placeholder="คะแนน" [(ngModel)]="c.score_value" style="flex: 1;" />
+            <input type="number" class="custom-input" placeholder="คะแนน" [(ngModel)]="c.score_value" style="flex: 1; background-color: #f5f5f5; color: #888; cursor: not-allowed;" readonly title="คะแนนถูกกำหนดไว้คงที่" />
             <button mat-icon-button color="warn" (click)="removeChoice(qIndex, cIndex)" style="flex-shrink: 0;" title="ลบตัวเลือกนี้">
               <mat-icon style="font-size: 18px;">remove_circle_outline</mat-icon>
             </button>

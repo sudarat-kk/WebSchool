@@ -3,17 +3,19 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
 import { CourseService, CourseGroup, BatchItem } from '../../services/course.service';
+import Swal from 'sweetalert2';
 import { GeneralEvaluationService } from '../../services/general-evaluation.service';
 
 export interface Choice {
+  id?: number;
   choice_text: string;
   score_value: number;
 }
 
 export interface Question {
+  id?: number;
   question_text: string;
   question_type: 'choice' | 'text';
   choices?: Choice[];
@@ -22,14 +24,7 @@ export interface Question {
 @Component({
   selector: 'app-from',
   standalone: true,
-  imports: [
-    CommonModule, 
-    RouterLink,
-    MatButtonModule,
-    MatIconModule, 
-    MatSlideToggleModule,
-    FormsModule
-  ],
+  imports: [CommonModule, RouterLink, MatButtonModule, MatIconModule, FormsModule],
   templateUrl: './from.html',
   styleUrl: './from.scss',
 })
@@ -47,17 +42,17 @@ export class From implements OnInit {
     { value: 'director', label: 'แบบประเมินอาจารย์กำกับหลักสูตร' },
     { value: 'course', label: 'แบบประเมินหลักสูตร' },
     { value: 'committee', label: 'แบบประเมินสำหรับคณะกำกับหลักสูตร' },
-    { value: 'followup', label: 'แบบประเมินติดตามผู้สำเร็จการศึกษา' }
+    { value: 'followup', label: 'แบบประเมินติดตามผู้สำเร็จการศึกษา' },
   ];
 
   // โครงสร้างตัวแปรสำหรับผูกข้อมูลกับทุกช่องกรอกในฟอร์ม (ปรับใหม่ให้มี questions)
   formData = {
-    courseName: '', 
+    courseName: '',
     formType: '',
     formName: '',
     generationId: '',
     subjectId: '',
-    questions: [] as Question[]
+    questions: [] as Question[],
   };
 
   // รายการวิชาสำหรับรุ่นนั้นๆ
@@ -68,7 +63,7 @@ export class From implements OnInit {
 
   constructor(
     private courseService: CourseService,
-    private generalEvaluationService: GeneralEvaluationService
+    private generalEvaluationService: GeneralEvaluationService,
   ) {}
 
   ngOnInit(): void {
@@ -82,13 +77,13 @@ export class From implements OnInit {
       next: (res) => {
         if (res.success && res.data) {
           this.courseGroups = res.data;
-          this.fetchAllForms(); 
+          this.fetchAllForms();
         }
       },
       error: (err) => {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลหลักสูตร:', err);
-        this.fetchAllForms(); 
-      }
+        this.fetchAllForms();
+      },
     });
   }
 
@@ -101,7 +96,7 @@ export class From implements OnInit {
             let gName = 'ไม่ระบุรุ่น';
             if (item.batch_id) {
               for (const group of this.courseGroups) {
-                const foundBatch = group.batches?.find(b => b.batch_id == item.batch_id);
+                const foundBatch = group.batches?.find((b) => b.batch_id == item.batch_id);
                 if (foundBatch) {
                   cName = group.course_name;
                   gName = foundBatch.batch_name;
@@ -110,23 +105,29 @@ export class From implements OnInit {
               }
             }
 
-            const typeObj = this.formTypes.find(t => t.value === item.evaluation_type);
-            const typeLabel = typeObj ? typeObj.label : (item.evaluation_type || 'ไม่ระบุ');
+            const typeObj = this.formTypes.find((t) => t.value === item.evaluation_type);
+
+            // ถ้าเป็นประเภทแบบฟอร์มที่แอดมินสร้างใหม่ (ไม่มีใน list พื้นฐาน) ให้เพิ่มเข้าไปใน formTypes อัตโนมัติ
+            if (!typeObj && item.evaluation_type && item.evaluation_type.trim() !== '') {
+              this.formTypes.push({ value: item.evaluation_type, label: item.evaluation_type });
+            }
+
+            const typeLabel = typeObj ? typeObj.label : item.evaluation_type || 'ไม่ระบุ';
 
             return {
               id: item.id,
               courseName: cName,
-              generationId: item.batch_id, 
-              generationName: gName,       
+              generationId: item.batch_id,
+              generationName: gName,
               formType: item.evaluation_type,
               formTypeName: typeLabel,
               formName: item.form_name,
               subjectId: item.subject_id || '',
               subjectName: item.subject_name || '-',
-              isActive: item.is_active === 1 || item.is_active === true
+              isActive: item.is_active === 1 || item.is_active === true,
             };
           });
-          
+
           this.generateTableData();
         } else {
           this.formList = [];
@@ -137,18 +138,18 @@ export class From implements OnInit {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลแบบฟอร์ม:', err);
         this.formList = [];
         this.generateTableData();
-      }
+      },
     });
   }
 
   onCourseChange(resetGen: boolean = true): void {
-    const selectedGroup = this.courseGroups.find(c => c.course_name === this.formData.courseName);
+    const selectedGroup = this.courseGroups.find((c) => c.course_name === this.formData.courseName);
     if (selectedGroup) {
       this.availableBatches = selectedGroup.batches;
     } else {
       this.availableBatches = [];
     }
-    
+
     if (resetGen) {
       this.formData.generationId = '';
       this.formData.subjectId = '';
@@ -169,7 +170,7 @@ export class From implements OnInit {
                 group.subjects.forEach((s: any) => {
                   allSubjects.push({
                     id: s.id || s.subject_id || s.subjectId,
-                    name: s.subject_name || s.name || 'ไม่ระบุชื่อวิชา'
+                    name: s.subject_name || s.name || 'ไม่ระบุชื่อวิชา',
                   });
                 });
               }
@@ -182,7 +183,7 @@ export class From implements OnInit {
         error: (err) => {
           console.error('เกิดข้อผิดพลาดในการดึงข้อมูลวิชา:', err);
           this.availableSubjects = [];
-        }
+        },
       });
     } else {
       this.availableSubjects = [];
@@ -195,6 +196,66 @@ export class From implements OnInit {
     }
   }
 
+  async addNewFormType() {
+    const { value: newTypeLabel } = await Swal.fire({
+      title: 'เพิ่มประเภทแบบประเมินใหม่',
+      input: 'text',
+      inputLabel: 'ชื่อประเภทแบบประเมิน',
+      inputPlaceholder: 'เช่น แบบประเมินความพึงพอใจการศึกษาดูงาน',
+      showCancelButton: true,
+      confirmButtonText: 'เพิ่มประเภท',
+      cancelButtonText: 'ยกเลิก',
+      inputValidator: (value: string) => {
+        if (!value || !value.trim()) {
+          return 'กรุณาระบุชื่อประเภทแบบประเมิน!';
+        }
+        if (this.formTypes.find((t) => t.label === value.trim() || t.value === value.trim())) {
+          return 'ประเภทแบบประเมินนี้มีอยู่แล้ว!';
+        }
+        return null;
+      },
+    });
+
+    if (newTypeLabel) {
+      const newValue = newTypeLabel.trim();
+      this.formTypes.push({ value: newValue, label: newValue });
+      this.formData.formType = newValue;
+      this.onTypeChange();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'เพิ่มสำเร็จ',
+        text: `เพิ่ม "${newValue}" เรียบร้อยแล้ว`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    }
+  }
+
+  isCustomFormType(value: string): boolean {
+    if (!value) return false;
+    const baseTypes = ['instructor', 'director', 'course', 'committee', 'followup'];
+    return !baseTypes.includes(value);
+  }
+
+  removeCustomFormType() {
+    Swal.fire({
+      title: 'ลบประเภทฟอร์มนี้?',
+      text: `คุณต้องการลบประเภท "${this.formData.formType}" ออกจากรายการใช่หรือไม่? (หากมีแบบฟอร์มที่ใช้ประเภทนี้บันทึกอยู่ มันจะกลับมาอีกครั้งเมื่อรีเฟรชหน้าจอ)`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ลบเลย',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#f44336'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.formTypes = this.formTypes.filter(t => t.value !== this.formData.formType);
+        this.formData.formType = '';
+        this.onTypeChange();
+      }
+    });
+  }
+
   // ==========================================
   // ส่วนจัดการคำถาม (Dynamic Form Builder)
   // ==========================================
@@ -204,10 +265,10 @@ export class From implements OnInit {
       question_text: '',
       question_type: 'choice',
       choices: [
-        { choice_text: 'สามารถให้คำแนะนำ...อย่างเหมาะสม', score_value: 3 },
-        { choice_text: 'สามารถให้คำแนะนำ...พอสมควร', score_value: 2 },
-        { choice_text: 'ยังไม่เหมาะสม', score_value: 1 }
-      ]
+        { choice_text: '', score_value: 5 },
+        { choice_text: '', score_value: 3 },
+        { choice_text: '', score_value: 1 },
+      ],
     });
   }
 
@@ -232,11 +293,14 @@ export class From implements OnInit {
       this.formData.questions[qIndex].choices = [];
     } else {
       // ถ้าเปลี่ยนกลับมา choice ให้มีค่า default ไว้ให้
-      if (!this.formData.questions[qIndex].choices || this.formData.questions[qIndex].choices!.length === 0) {
+      if (
+        !this.formData.questions[qIndex].choices ||
+        this.formData.questions[qIndex].choices!.length === 0
+      ) {
         this.formData.questions[qIndex].choices = [
-          { choice_text: 'มาก', score_value: 3 },
-          { choice_text: 'ปานกลาง', score_value: 2 },
-          { choice_text: 'น้อย', score_value: 1 }
+          { choice_text: 'มาก', score_value: 5 },
+          { choice_text: 'ปานกลาง', score_value: 3 },
+          { choice_text: 'น้อย', score_value: 1 },
         ];
       }
     }
@@ -248,18 +312,31 @@ export class From implements OnInit {
 
   onCreateForm() {
     if (!this.formData.courseName || !this.formData.generationId || !this.formData.formType) {
-      alert('กรุณาเลือกหลักสูตร รุ่น และประเภทแบบฟอร์มให้ครบถ้วน');
+      Swal.fire({
+        icon: 'warning',
+        title: 'ข้อมูลไม่ครบถ้วน',
+        text: 'กรุณาเลือกหลักสูตร รุ่น และประเภทแบบฟอร์มให้ครบถ้วน',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#673ab7',
+      });
       return;
     }
 
     if (!this.formData.questions || this.formData.questions.length === 0) {
-      alert('กรุณาสร้างคำถามอย่างน้อย 1 ข้อ');
+      Swal.fire({
+        icon: 'warning',
+        title: 'ไม่มีคำถาม',
+        text: 'กรุณาสร้างคำถามอย่างน้อย 1 ข้อ',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#673ab7',
+      });
       return;
     }
 
-    const cleanSubjectId = (this.formData.subjectId === 'undefined' || !this.formData.subjectId) 
-      ? null 
-      : this.formData.subjectId;
+    const cleanSubjectId =
+      this.formData.subjectId === 'undefined' || !this.formData.subjectId
+        ? null
+        : this.formData.subjectId;
 
     const payload = {
       courseName: this.formData.courseName,
@@ -267,72 +344,208 @@ export class From implements OnInit {
       formName: this.formData.formName,
       generationId: this.formData.generationId || null,
       subjectId: cleanSubjectId,
-      questions: this.formData.questions
+      questions: this.formData.questions,
     };
 
     console.log('กำลังสร้างฟอร์มใหม่ด้วยข้อมูลนี้:', payload);
-    
+
     this.generalEvaluationService.createGeneralEvaluation(payload).subscribe({
       next: (res) => {
         if (res.success) {
-          alert('สร้างฟอร์มสำเร็จ');
+          Swal.fire({
+            icon: 'success',
+            title: 'สร้างฟอร์มสำเร็จ!',
+            text: 'แบบฟอร์มถูกบันทึกลงระบบเรียบร้อยแล้ว',
+            timer: 1500,
+            showConfirmButton: false,
+          });
           this.resetForm();
-          this.fetchAllForms(); 
+          this.fetchAllForms();
         } else {
-          alert('เกิดข้อผิดพลาดในการสร้างฟอร์ม: ' + (res.message || ''));
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: res.message || 'ไม่สามารถสร้างฟอร์มได้',
+            confirmButtonText: 'ตกลง',
+            confirmButtonColor: '#f44336',
+          });
         }
       },
       error: (err) => {
         console.error('Error จาก Backend:', err);
-        alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
-      }
+        Swal.fire({
+          icon: 'error',
+          title: 'เซิร์ฟเวอร์ขัดข้อง',
+          text: 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์',
+          confirmButtonText: 'ตกลง',
+          confirmButtonColor: '#f44336',
+        });
+      },
     });
   }
 
   onEditAction(item: any) {
     this.isEditMode = true;
     this.selectedFormId = item.id;
-    
+
+    // Load header first
     this.formData = {
       courseName: item.courseName || '',
       formType: item.formType || '',
       formName: item.formName || '',
       generationId: item.generationId || '',
       subjectId: item.subjectId || '',
-      // หมายเหตุ: โค้ด Backend ยังไม่รองรับการดึงชุดคำถามตอนแก้ไข 
-      // เพื่อไม่ให้ UI พัง เราจะสร้าง question เปล่าไปก่อน (หรือรอ Backend รองรับ)
-      questions: []
+      questions: [], // Will populate from API
     };
-    
-    this.onCourseChange(false); 
-    this.onGenerationChange(false); 
-    
+
+    this.onCourseChange(false);
+    this.onGenerationChange(false);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    alert('โหมดแก้ไขในขณะนี้ ยังไม่รองรับการดึงคำถามเดิมจากฐานข้อมูล (ต้องทำ API เพิ่มครับ)');
+
+    // Fetch real questions
+    this.generalEvaluationService.getFormById(item.id).subscribe({
+      next: (res) => {
+        if (res.success && res.data && res.data.questions) {
+          this.formData.questions = res.data.questions;
+        } else {
+          this.addQuestion(); // fallback
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching questions:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'โหลดข้อมูลล้มเหลว',
+          text: 'เกิดข้อผิดพลาดในการดึงชุดคำถามเดิม',
+          confirmButtonText: 'ตกลง',
+          confirmButtonColor: '#f44336',
+        });
+        this.addQuestion();
+      },
+    });
   }
 
   onUpdateForm() {
-    alert('ระบบแก้ไขคำถามต้องรอ API จาก Backend รบกวนสร้างฟอร์มใหม่ หรือลบฟอร์มเก่าทิ้งแทนไปก่อนครับ');
+    if (!this.selectedFormId) return;
+    if (!this.formData.questions || this.formData.questions.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'ไม่มีคำถาม',
+        text: 'กรุณาสร้างคำถามอย่างน้อย 1 ข้อ',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#673ab7',
+      });
+      return;
+    }
+
+    const cleanSubjectId =
+      this.formData.subjectId === 'undefined' || !this.formData.subjectId
+        ? null
+        : this.formData.subjectId;
+
+    const payload = {
+      courseName: this.formData.courseName,
+      formType: this.formData.formType,
+      formName: this.formData.formName,
+      generationId: this.formData.generationId || null,
+      subjectId: cleanSubjectId,
+      questions: this.formData.questions,
+    };
+
+    this.generalEvaluationService.updateGeneralEvaluation(this.selectedFormId, payload).subscribe({
+      next: (res) => {
+        if (res.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'อัปเดตสำเร็จ!',
+            text: 'บันทึกการแก้ไขข้อมูลแบบฟอร์มเรียบร้อยแล้ว',
+            timer: 1500,
+            showConfirmButton: false,
+          });
+          this.resetForm();
+          this.fetchAllForms();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: res.message || 'ไม่สามารถอัปเดตฟอร์มได้',
+            confirmButtonText: 'ตกลง',
+            confirmButtonColor: '#f44336',
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error update:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'ไม่สามารถบันทึกได้',
+          text: err.error?.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์',
+          confirmButtonText: 'รับทราบ',
+          confirmButtonColor: '#f44336',
+        });
+      },
+    });
   }
 
   onDeleteAction(id: any) {
-    if(confirm('คุณแน่ใจหรือไม่ว่าต้องการลบแบบฟอร์มนี้?')) {
-      console.log('ลบฟอร์ม ID:', id);
-      // TODO: เรียก API DELETE ไปที่ Backend
-      alert('ฟังก์ชันลบยังไม่เปิดใช้งาน');
-    }
+    Swal.fire({
+      title: 'ยืนยันการลบฟอร์ม?',
+      text: 'คุณแน่ใจหรือไม่ว่าต้องการลบแบบฟอร์มนี้? (หากมีนักเรียนตอบแล้วจะไม่สามารถลบได้)',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ใช่, ลบเลย!',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#f44336',
+      cancelButtonColor: '#9e9e9e'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.generalEvaluationService.deleteGeneralEvaluation(id).subscribe({
+          next: (res) => {
+            if (res.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบสำเร็จ!',
+                text: 'ลบแบบฟอร์มออกจากระบบเรียบร้อยแล้ว',
+                timer: 1500,
+                showConfirmButton: false
+              });
+              this.fetchAllForms();
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'ไม่สามารถลบได้',
+                text: res.message || 'เกิดข้อผิดพลาดในการลบแบบฟอร์ม',
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: '#f44336'
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Error delete:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'ไม่สามารถลบได้',
+              text: err.error?.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์',
+              confirmButtonText: 'รับทราบ',
+              confirmButtonColor: '#f44336'
+            });
+          }
+        });
+      }
+    });
   }
 
   resetForm() {
     this.isEditMode = false;
     this.selectedFormId = null;
-    this.formData = { 
-      courseName: '', 
-      formType: '', 
-      formName: '', 
+    this.formData = {
+      courseName: '',
+      formType: '',
+      formName: '',
       generationId: '',
       subjectId: '',
-      questions: []
+      questions: [],
     };
     this.addQuestion(); // สร้างข้อว่างเตรียมไว้ให้
     this.availableBatches = [];
@@ -345,54 +558,26 @@ export class From implements OnInit {
 
   filterCourse: string = '';
   filterGeneration: string = '';
-  filterType: string = 'instructor'; 
+  filterType: string = 'instructor';
 
   filterBatches: BatchItem[] = [];
-  filterSubjects: any[] = [];
   displayTableData: any[] = [];
 
   onFilterCourseChange() {
-    const selectedGroup = this.courseGroups.find(c => c.course_name === this.filterCourse);
+    const selectedGroup = this.courseGroups.find((c) => c.course_name === this.filterCourse);
     if (selectedGroup) {
       this.filterBatches = selectedGroup.batches;
     } else {
       this.filterBatches = [];
     }
     this.filterGeneration = '';
-    this.filterSubjects = [];
     this.displayTableData = [];
   }
 
   onFilterGenerationChange() {
     this.displayTableData = [];
     if (this.filterGeneration) {
-      this.courseService.getSubjectsByBatch(this.filterGeneration).subscribe({
-        next: (res) => {
-          if (res.success && res.data) {
-            let allSubjects: any[] = [];
-            res.data.forEach((group: any) => {
-              if (group.subjects && Array.isArray(group.subjects)) {
-                group.subjects.forEach((s: any) => {
-                  allSubjects.push({
-                    id: s.id || s.subject_id || s.subjectId,
-                    name: s.subject_name || s.name || 'ไม่ระบุชื่อวิชา'
-                  });
-                });
-              }
-            });
-            this.filterSubjects = allSubjects;
-            this.generateTableData();
-          } else {
-            this.filterSubjects = [];
-            this.generateTableData();
-          }
-        },
-        error: (err) => {
-          console.error('Error fetching subjects for filter:', err);
-          this.filterSubjects = [];
-          this.generateTableData();
-        }
-      });
+      this.generateTableData();
     }
   }
 
@@ -406,39 +591,42 @@ export class From implements OnInit {
       return;
     }
 
-    const matchedForms = this.formList.filter(f => 
-      f.generationId == this.filterGeneration && 
-      f.formType === this.filterType
+    const matchedForms = this.formList.filter(
+      (f) => f.generationId == this.filterGeneration && f.formType === this.filterType,
     );
 
     if (this.filterType === 'instructor') {
       // เปลี่ยนจากแสดงทุกวิชา เป็นแสดงแค่แถวเดียว สำหรับใช้กับทุกวิชาในรุ่น
       const form = matchedForms.length > 0 ? matchedForms[0] : null;
-      this.displayTableData = [{
-        isSubjectMode: false,
-        subjectId: null,
-        subjectName: 'ประเมินอาจารย์ (ใช้ร่วมกันทุกวิชาในรุ่น)',
-        hasForm: !!form,
-        formDetails: form || null
-      }];
+      this.displayTableData = [
+        {
+          isSubjectMode: false,
+          subjectId: null,
+          subjectName: 'ประเมินอาจารย์ (ใช้ร่วมกันทุกวิชาในรุ่น)',
+          hasForm: !!form,
+          formDetails: form || null,
+        },
+      ];
     } else {
       const form = matchedForms.length > 0 ? matchedForms[0] : null;
-      this.displayTableData = [{
-        isSubjectMode: false,
-        subjectId: null,
-        subjectName: '-',
-        hasForm: !!form,
-        formDetails: form || null
-      }];
+      this.displayTableData = [
+        {
+          isSubjectMode: false,
+          subjectId: null,
+          subjectName: '-',
+          hasForm: !!form,
+          formDetails: form || null,
+        },
+      ];
     }
   }
 
   onAddLinkAction(row: any) {
     this.formData.courseName = this.filterCourse;
     this.onCourseChange(false);
-    
+
     this.formData.generationId = this.filterGeneration;
-    this.onGenerationChange(false); 
+    this.onGenerationChange(false);
 
     this.formData.formType = this.filterType;
     if (this.formData.formType !== 'instructor') {
@@ -452,7 +640,7 @@ export class From implements OnInit {
     this.selectedFormId = null;
     this.formData.questions = [];
     this.addQuestion(); // สร้างข้อแรกเตรียมไว้
-    
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

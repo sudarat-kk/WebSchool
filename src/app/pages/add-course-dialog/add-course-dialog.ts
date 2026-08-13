@@ -2,13 +2,14 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms'; 
 import { CourseService } from '../../services/course.service';
+import { MatIconModule } from '@angular/material/icon';
 import Swal from 'sweetalert2';
 import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-add-course',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './add-course-dialog.html',
   styleUrl: './add-course-dialog.scss',
 })
@@ -192,5 +193,121 @@ export class AddCourse implements OnInit {
       label += ` - ${g.credits} หน่วยกิต`;
     }
     return label;
+  }
+
+  // ==========================================
+  // จัดการรุ่น (Edit / Delete)
+  // ==========================================
+  editBatch(batch: any) {
+    const startDate = batch.start_date ? batch.start_date.split('T')[0] : '';
+    const endDate = batch.end_date ? batch.end_date.split('T')[0] : '';
+
+    Swal.fire({
+      title: 'แก้ไขข้อมูลรุ่น',
+      html: `
+        <div style="display: flex; flex-direction: column; gap: 10px; text-align: left; margin-top: 10px;">
+          <label style="font-size: 14px; color: #555;">ชื่อรุ่น</label>
+          <input id="swal-batch-name" class="swal2-input" placeholder="ชื่อรุ่น" value="${batch.batch_name}" style="margin: 0; width: 100%; box-sizing: border-box;">
+          
+          <label style="font-size: 14px; color: #555; margin-top: 8px;">วันที่เริ่มต้น</label>
+          <input type="date" id="swal-start-date" class="swal2-input" value="${startDate}" style="margin: 0; width: 100%; box-sizing: border-box;">
+          
+          <label style="font-size: 14px; color: #555; margin-top: 8px;">วันที่สิ้นสุด</label>
+          <input type="date" id="swal-end-date" class="swal2-input" value="${endDate}" style="margin: 0; width: 100%; box-sizing: border-box;">
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'บันทึก',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#673ab7',
+      preConfirm: () => {
+        const name = (document.getElementById('swal-batch-name') as HTMLInputElement).value;
+        const start = (document.getElementById('swal-start-date') as HTMLInputElement).value;
+        const end = (document.getElementById('swal-end-date') as HTMLInputElement).value;
+        
+        if (!name.trim()) {
+          Swal.showValidationMessage('กรุณากรอกชื่อรุ่น');
+          return false;
+        }
+        return { batch_name: name, start_date: start, end_date: end };
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        this.courseService.updateBatch(batch.id, result.value).subscribe({
+          next: (res) => {
+            if (res.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'สำเร็จ!',
+                text: 'แก้ไขข้อมูลรุ่นเรียบร้อยแล้ว',
+                timer: 1500,
+                showConfirmButton: false
+              });
+              this.loadAllData();
+            } else {
+              Swal.fire('ข้อผิดพลาด', res.message, 'error');
+            }
+          },
+          error: (err) => {
+            console.error('Error updating batch:', err);
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
+          }
+        });
+      }
+    });
+  }
+
+  deleteBatch(batch: any) {
+    Swal.fire({
+      title: '⚠️ ลบรุ่นอย่างถาวร?',
+      html: `
+        <p style="color: #d32f2f; margin-bottom: 8px; text-align: left;">
+          การลบรุ่น "${batch.batch_name}" จะส่งผลให้ข้อมูลต่อไปนี้ถูก <b>ลบทิ้งอย่างถาวร</b>:
+        </p>
+        <ul style="color: #d32f2f; text-align: left; font-size: 14px; padding-left: 24px; margin-top: 0;">
+          <li>รายชื่อนักเรียนทั้งหมดในรุ่นนี้</li>
+          <li>คะแนนทั้งหมดของนักเรียนในรุ่นนี้</li>
+          <li>แบบฟอร์มประเมินที่ผูกกับรุ่นนี้</li>
+          <li>กลุ่มวิชาและรายวิชาทั้งหมดของรุ่นนี้</li>
+        </ul>
+        <p style="text-align: left; font-weight: bold; margin-top: 16px;">
+          คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลทั้งหมด?
+        </p>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ลบเลย!',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#d32f2f',
+      cancelButtonColor: '#9e9e9e',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.courseService.deleteBatch(batch.id).subscribe({
+          next: (res) => {
+            if (res.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบสำเร็จ!',
+                text: 'ลบรุ่นและข้อมูลที่เกี่ยวข้องเรียบร้อยแล้ว',
+                timer: 1500,
+                showConfirmButton: false
+              });
+              // Reset some fields if the deleted batch was selected
+              if (this.batchForm.course_id === batch.id) this.batchForm.course_id = '';
+              if (this.selectedCourseIdForGroup === batch.id) this.selectedCourseIdForGroup = '';
+              if (this.selectedBatchForSubject === batch.id) this.selectedBatchForSubject = '';
+              
+              this.loadAllData();
+            } else {
+              Swal.fire('ข้อผิดพลาด', res.message, 'error');
+            }
+          },
+          error: (err) => {
+            console.error('Error deleting batch:', err);
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
+          }
+        });
+      }
+    });
   }
 }

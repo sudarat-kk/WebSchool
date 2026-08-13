@@ -20,7 +20,7 @@
 .page-header {
   display: flex;
   align-items: center;
-  margin-bottom: 5rem;
+  margin-bottom: 2rem;
   
   .back-button {
     margin-right: 1rem;
@@ -280,4 +280,192 @@
 
 .alert-title:hover {
   text-decoration: underline;
+}
+
+/* Logout Button */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  background-color: transparent;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s;
+
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  &:hover {
+    background-color: #d32f2f;
+    color: white;
+  }
+}
+
+/* Guest View Styles */
+.guest-welcome-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
+}
+
+.welcome-banner {
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: white;
+  padding: 2.5rem 3rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(108, 92, 231, 0.2);
+  width: 100%;
+  max-width: 600px;
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    margin-top: 0;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+
+  .login-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: white;
+    color: #6c5ce7;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+/* Student Hub Styles */
+.hub-container {
+  padding: 0 1rem;
+}
+
+.hub-actions-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.action-card {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 700px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+  transition: all 0.3s;
+  gap: 20px;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: #e2e8f0;
+  }
+
+  &.score-action {
+    background: linear-gradient(135deg, #f8f6fc, #ffffff);
+    border-left: 5px solid #8b5cf6;
+  }
+
+  .action-icon-wrapper {
+    background-color: #ede9fe;
+    color: #7c3aed;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .action-details {
+    flex: 1;
+    text-align: left;
+
+    h3 {
+      font-size: 1.4rem;
+      margin: 0 0 0.5rem 0;
+      color: #2d3748;
+    }
+
+    p {
+      margin: 0;
+      color: #718096;
+      font-size: 1rem;
+    }
+  }
+
+  .arrow-icon {
+    color: #cbd5e0;
+    transition: color 0.3s;
+  }
+
+  &:hover .arrow-icon {
+    color: #7c3aed;
+  }
+}
+
+.hub-divider {
+  height: 1px;
+  background-color: #e2e8f0;
+  margin: 3rem 0;
+}
+
+.section-title-wrapper {
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin: 0;
+    font-weight: 600;
+
+    mat-icon {
+      color: #4a5568;
+    }
+  }
 }

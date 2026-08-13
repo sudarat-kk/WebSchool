@@ -69,90 +69,132 @@
       </button>
     </div>
 
-    <!-- 📌 แท็บ 1: กรอกทีละคน / แก้ไข -->
+    <!-- 📌 แท็บ 1: กรอกทีละคน / แก้ไข / เพิ่มหลายคน -->
     <form *ngIf="activeTab === 'single'" class="modal-form" (ngSubmit)="onSubmitSingle()">
-      <div class="form-row">
-        <div class="form-group short-input">
-          <label for="rank">ยศ</label>
-          <input
-            type="text"
-            id="rank"
-            name="rank"
-            class="form-control"
-            [(ngModel)]="studentForm.rank"
-          />
-        </div>
-        <div class="form-group">
-          <label for="firstName">ชื่อ</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            class="form-control"
-            [(ngModel)]="studentForm.firstName"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="lastName">นามสกุล</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            class="form-control"
-            [(ngModel)]="studentForm.lastName"
-            required
-          />
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="studentCode">รหัสประจำตัวนักเรียน</label>
-          <input
-            type="text"
-            id="studentCode"
-            name="studentCode"
-            class="form-control"
-            [(ngModel)]="studentForm.studentCode"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="password">รหัสผ่าน {{ isEditing ? '(เว้นว่างหากไม่เปลี่ยน)' : '' }}</label>
-          <div class="password-input-wrapper" style="position: relative;">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              id="password"
-              name="password"
-              class="form-control"
-              [(ngModel)]="studentForm.password"
-              style="padding-right: 40px;"
-            />
-            <button
-              type="button"
-              class="toggle-password-btn"
-              (click)="togglePasswordVisibility()"
-              style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; padding: 0; display: flex; align-items: center;"
-              title="{{ showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน' }}"
-            >
-              <mat-icon style="font-size: 20px; width: 20px; height: 20px;">
-                {{ showPassword ? 'visibility_off' : 'visibility' }}
-              </mat-icon>
+      
+      <div class="student-forms-container">
+        <div *ngFor="let form of studentForms; let i = index" class="student-card-row">
+          
+          <div class="card-row-header">
+            <h4>
+              <mat-icon>person_add</mat-icon> นักเรียนคนที่ {{ i + 1 }}
+            </h4>
+            <button *ngIf="!isEditing && studentForms.length > 1" type="button" class="btn-icon delete-row-btn" (click)="removeFormRow(i)" title="ลบรายการนี้">
+              <mat-icon>delete_outline</mat-icon>
             </button>
           </div>
-        </div>
-      </div>
 
-      <div class="form-group">
-        <label for="affiliation">สังกัด</label>
-        <input
-          type="text"
-          id="affiliation"
-          name="affiliation"
-          class="form-control"
-          [(ngModel)]="studentForm.affiliation"
-        />
+        <div class="form-row">
+          <div class="form-group short-input">
+            <label for="rank-{{i}}">ยศ</label>
+            <input
+              type="text"
+              id="rank-{{i}}"
+              name="rank-{{i}}"
+              class="form-control"
+              [(ngModel)]="form.rank"
+            />
+          </div>
+          <div class="form-group">
+            <label for="firstName-{{i}}">ชื่อ</label>
+            <input
+              type="text"
+              id="firstName-{{i}}"
+              name="firstName-{{i}}"
+              class="form-control"
+              [(ngModel)]="form.firstName"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="lastName-{{i}}">นามสกุล</label>
+            <input
+              type="text"
+              id="lastName-{{i}}"
+              name="lastName-{{i}}"
+              class="form-control"
+              [(ngModel)]="form.lastName"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="studentCode-{{i}}">รหัสประจำตัวนักเรียน</label>
+            <input
+              type="text"
+              id="studentCode-{{i}}"
+              name="studentCode-{{i}}"
+              class="form-control"
+              [(ngModel)]="form.studentCode"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="password-{{i}}">รหัสผ่าน {{ isEditing ? '(เว้นว่างหากไม่เปลี่ยน)' : '' }}</label>
+            <div class="password-input-wrapper" style="position: relative;">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password-{{i}}"
+                name="password-{{i}}"
+                class="form-control"
+                [(ngModel)]="form.password"
+                style="padding-right: 40px;"
+              />
+              <button
+                type="button"
+                class="toggle-password-btn"
+                (click)="togglePasswordVisibility()"
+                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; padding: 0; display: flex; align-items: center;"
+                title="{{ showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน' }}"
+              >
+                <mat-icon style="font-size: 20px; width: 20px; height: 20px;">
+                  {{ showPassword ? 'visibility_off' : 'visibility' }}
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="affiliation-{{i}}">สังกัด</label>
+          <input
+            type="text"
+            id="affiliation-{{i}}"
+            name="affiliation-{{i}}"
+            class="form-control"
+            [(ngModel)]="form.affiliation"
+          />
+        </div>
+      </div> <!-- ปิด student-card-row -->
+      </div> <!-- ปิด student-forms-container -->
+
+      <div *ngIf="!isEditing" class="bulk-actions-container">
+        <div class="action-buttons-row">
+          <button type="button" class="btn-add-row" (click)="addFormRow()">
+            <mat-icon>add</mat-icon> เพิ่มแถว
+          </button>
+          
+          <button type="button" class="btn-paste-excel" (click)="togglePasteArea()">
+            <mat-icon>content_paste</mat-icon> วางข้อมูลจาก Excel
+          </button>
+        </div>
+
+        <div *ngIf="showPasteArea" class="paste-area-box">
+          <label>วางข้อความรายชื่อนักเรียนที่คัดลอกมาจาก Excel หรือ ตาราง (ลำดับ | รหัสผ่าน | ยศ-ชื่อ-สกุล | สังกัด)</label>
+          <textarea
+            class="form-control textarea-code"
+            rows="5"
+            [(ngModel)]="pastedData"
+            name="pastedData"
+            placeholder="วางข้อมูลที่นี่..."
+          ></textarea>
+          <div class="paste-actions">
+            <button type="button" class="btn-gray" (click)="togglePasteArea()">ปิด</button>
+            <button type="button" class="btn-green" (click)="processPastedData()">นำเข้าข้อมูล</button>
+          </div>
+        </div>
       </div>
 
       <div class="form-actions center">
@@ -160,7 +202,7 @@
           {{ isEditing ? 'ยกเลิกการแก้ไข' : 'ยกเลิก' }}
         </button>
         <button type="submit" class="btn-purple btn-wide">
-          {{ isEditing ? 'อัปเดตข้อมูล' : 'ยืนยันการเพิ่มรายคน' }}
+          {{ isEditing ? 'อัปเดตข้อมูล' : 'บันทึกข้อมูลนักเรียน' }}
         </button>
       </div>
     </form>
