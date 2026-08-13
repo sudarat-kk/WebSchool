@@ -158,7 +158,25 @@ export class ScoreService {
     return this.http.post<any>(
       `${environment.apiUrl}/scores/special-bulk`,
       payload,
-      { headers: this.getAdminHeaders() }, // ✅ ปรับมาใช้ Admin Header
+      { headers: this.getAdminHeaders() },
+    );
+  }
+
+  // ==========================================
+  // Score Submissions (ตรวจสอบสถานะส่งคะแนน)
+  // ==========================================
+  getScoreSubmissions(batchId: number): Observable<any> {
+    return this.http.get<any>(
+      `${environment.apiUrl}/score-submissions?batch_id=${batchId}`,
+      { headers: this.getAdminHeaders() }
+    );
+  }
+
+  saveScoreSubmissions(payload: { batch_id: number; submissions: any[] }): Observable<any> {
+    return this.http.post<any>(
+      `${environment.apiUrl}/score-submissions/save`,
+      payload,
+      { headers: this.getAdminHeaders() }
     );
   }
 }

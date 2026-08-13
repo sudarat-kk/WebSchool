@@ -67,6 +67,10 @@ export class CourseService {
     return this.http.delete<any>(`${environment.apiUrl}/batches/${id}`);
   }
 
+  deleteCourse(id: number | string): Observable<any> {
+    return this.http.delete<any>(`${environment.apiUrl}/courses/${id}`);
+  }
+
   addSubjectGroup(data: any): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/subject-groups`, data);
   }
