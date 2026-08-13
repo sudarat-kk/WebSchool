@@ -18,11 +18,13 @@
         <div class="form-row">
           <div class="form-group">
             <label>ชื่อหลักสูตร</label>
-            <input type="text" [(ngModel)]="courseForm.course_name" name="course_name" placeholder="เช่น ชั้นนายพัน เหล่า ส." required>
+            <input type="text" [(ngModel)]="courseForm.course_name" name="course_name"
+              placeholder="เช่น ชั้นนายพัน เหล่า ส." required>
           </div>
           <div class="form-group short-input">
             <label>ปีหลักสูตร</label>
-            <input type="number" [(ngModel)]="courseForm.curriculum_year" name="curriculum_year" placeholder="เช่น 2569" required>
+            <input type="number" [(ngModel)]="courseForm.curriculum_year" name="curriculum_year" placeholder="เช่น 2569"
+              required>
           </div>
         </div>
         <div class="form-actions right">
@@ -42,7 +44,8 @@
           <div class="form-group">
             <label>เลือกหลักสูตร</label>
             <div class="select-wrapper">
-              <select [(ngModel)]="selectedCourseNameForBatch" name="selectedCourseNameForBatch" (change)="batchForm.course_id = ''" required>
+              <select [(ngModel)]="selectedCourseNameForBatch" name="selectedCourseNameForBatch"
+                (change)="batchForm.course_id = ''" required>
                 <option value="" disabled selected>-- เลือกหลักสูตร --</option>
                 <option *ngFor="let name of getUniqueCourseNames()" [value]="name">{{ name }}</option>
               </select>
@@ -51,9 +54,11 @@
           <div class="form-group">
             <label>เลือกปีการศึกษา</label>
             <div class="select-wrapper">
-              <select [(ngModel)]="batchForm.course_id" name="course_id" [disabled]="!selectedCourseNameForBatch" required>
+              <select [(ngModel)]="batchForm.course_id" name="course_id" [disabled]="!selectedCourseNameForBatch"
+                required>
                 <option value="" disabled selected>-- เลือกปีการศึกษา --</option>
-                <option *ngFor="let c of getCoursesByName(selectedCourseNameForBatch)" [value]="c.id">{{ c.curriculum_year }}</option>
+                <option *ngFor="let c of getCoursesByName(selectedCourseNameForBatch)" [value]="c.id">{{
+                  c.curriculum_year }}</option>
               </select>
             </div>
           </div>
@@ -61,7 +66,8 @@
         <div class="form-row">
           <div class="form-group">
             <label>ชื่อรุ่น</label>
-            <input type="text" [(ngModel)]="batchForm.batch_name" name="batch_name" placeholder="เช่น รุ่นที่ 63" required>
+            <input type="text" [(ngModel)]="batchForm.batch_name" name="batch_name" placeholder="เช่น รุ่นที่ 63"
+              required>
           </div>
           <div class="form-group">
             <label>วันที่เริ่มต้น</label>
@@ -73,9 +79,44 @@
           </div>
         </div>
         <div class="form-actions right">
+          <button type="button" class="btn-secondary" (click)="toggleBatchCard()">
+            <span class="material-icons">settings_suggest</span>
+            จัดการหลักสูตร
+          </button>
           <button type="submit" class="btn-submit">บันทึกรุ่น</button>
         </div>
       </form>
+    </div>
+
+    <div class="batch-management-card" [class.show]="isBatchCardOpen">
+      <div class="card-header">
+        <div class="title-group">
+          <span class="material-icons icon-purple">settings_suggest</span>
+          <div>
+            <h3>จัดการการแสดงผลรุ่นหลักสูตร</h3>
+            <p class="subtitle">เลือกเปิด-ปิดรุ่นที่ต้องการให้แสดงหน้าเว็บ (สูงสุด 3 รุ่น)</p>
+          </div>
+        </div>
+        <!-- แสดงจำนวนจาก Getter activeBatchCount -->
+        <span class="badge-counter">แสดงอยู่ {{ activeBatchCount }}/3 รุ่น</span>
+      </div>
+
+      <div class="batch-list">
+        <!-- ใช้ *ngFor วนลูปแสดงผลรายการรุ่น -->
+        <div class="batch-item" *ngFor="let batch of batchesData">
+          <div class="batch-info">
+            <span class="batch-name">{{ batch.name }}</span>
+            <span class="status-tag" [ngClass]="batch.status === 'active' ? 'status-active' : 'status-ended'">
+              {{ batch.status === 'active' ? 'กำลังเปิดรับ' : 'จบหลักสูตรแล้ว' }}
+            </span>
+          </div>
+
+          <label class="toggle-switch">
+            <input type="checkbox" [checked]="batch.isVisible" (change)="onToggleBatch(batch, $event)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
     </div>
 
     <!-- 3. ส่วนเพิ่มกลุ่มวิชา -->
@@ -85,7 +126,7 @@
         <h2>3. เพิ่มกลุ่มวิชา (Subject Group)</h2>
       </div>
       <form (ngSubmit)="onSubmitSubjectGroup()" class="custom-form">
-        
+
         <!-- คำอธิบายประเภทวิชา (Legend) -->
         <div class="info-box">
           <div class="info-header">
@@ -105,7 +146,8 @@
           <div class="form-group">
             <label>เลือกหลักสูตร</label>
             <div class="select-wrapper">
-              <select [(ngModel)]="selectedCourseNameForGroup" name="selectedCourseNameForGroup" (change)="selectedCourseIdForGroup = ''; groupForm.batch_id = ''">
+              <select [(ngModel)]="selectedCourseNameForGroup" name="selectedCourseNameForGroup"
+                (change)="selectedCourseIdForGroup = ''; groupForm.batch_id = ''">
                 <option value="" disabled selected>-- เลือกหลักสูตร --</option>
                 <option *ngFor="let name of getUniqueCourseNames()" [value]="name">{{ name }}</option>
               </select>
@@ -114,9 +156,11 @@
           <div class="form-group">
             <label>เลือกปีการศึกษา</label>
             <div class="select-wrapper">
-              <select [(ngModel)]="selectedCourseIdForGroup" name="selectedCourseIdForGroup" (change)="groupForm.batch_id = ''" [disabled]="!selectedCourseNameForGroup">
+              <select [(ngModel)]="selectedCourseIdForGroup" name="selectedCourseIdForGroup"
+                (change)="groupForm.batch_id = ''" [disabled]="!selectedCourseNameForGroup">
                 <option value="" disabled selected>-- เลือกปีการศึกษา --</option>
-                <option *ngFor="let c of getCoursesByName(selectedCourseNameForGroup)" [value]="c.id">{{ c.curriculum_year }}</option>
+                <option *ngFor="let c of getCoursesByName(selectedCourseNameForGroup)" [value]="c.id">{{
+                  c.curriculum_year }}</option>
               </select>
             </div>
           </div>
@@ -128,7 +172,8 @@
           <div class="select-wrapper">
             <select [(ngModel)]="groupForm.batch_id" name="batch_id" [disabled]="!selectedCourseIdForGroup" required>
               <option value="" disabled selected>-- เลือกรุ่น --</option>
-              <option *ngFor="let b of getBatchesForCourse(selectedCourseIdForGroup)" [value]="b.id">{{ b.batch_name }}</option>
+              <option *ngFor="let b of getBatchesForCourse(selectedCourseIdForGroup)" [value]="b.id">{{ b.batch_name }}
+              </option>
             </select>
           </div>
         </div>
@@ -140,7 +185,8 @@
           </div>
           <div class="form-group short-input">
             <label>หน่วยกิตรวม</label>
-            <input type="number" step="0.5" [(ngModel)]="groupForm.credits" name="credits" placeholder="เช่น 2.0" required>
+            <input type="number" step="0.5" [(ngModel)]="groupForm.credits" name="credits" placeholder="เช่น 2.0"
+              required>
           </div>
         </div>
         <div class="form-actions right">
@@ -156,7 +202,7 @@
         <h2>4. เพิ่มรายวิชา (Subject)</h2>
       </div>
       <form (ngSubmit)="onSubmitSubject()" class="custom-form">
-        
+
         <!-- คำอธิบายประเภทวิชา (Legend) -->
         <div class="info-box">
           <div class="info-header">
@@ -176,7 +222,8 @@
           <div class="form-group">
             <label>เลือกหลักสูตร</label>
             <div class="select-wrapper">
-              <select [(ngModel)]="selectedCourseNameForSubject" name="selectedCourseNameForSubject" (change)="selectedCourseIdForSubject = ''; selectedBatchForSubject = ''; subjectForm.group_id = ''">
+              <select [(ngModel)]="selectedCourseNameForSubject" name="selectedCourseNameForSubject"
+                (change)="selectedCourseIdForSubject = ''; selectedBatchForSubject = ''; subjectForm.group_id = ''">
                 <option value="" disabled selected>-- เลือกหลักสูตร --</option>
                 <option *ngFor="let name of getUniqueCourseNames()" [value]="name">{{ name }}</option>
               </select>
@@ -185,9 +232,12 @@
           <div class="form-group">
             <label>เลือกปีการศึกษา</label>
             <div class="select-wrapper">
-              <select [(ngModel)]="selectedCourseIdForSubject" name="selectedCourseIdForSubject" (change)="selectedBatchForSubject = ''; subjectForm.group_id = ''" [disabled]="!selectedCourseNameForSubject">
+              <select [(ngModel)]="selectedCourseIdForSubject" name="selectedCourseIdForSubject"
+                (change)="selectedBatchForSubject = ''; subjectForm.group_id = ''"
+                [disabled]="!selectedCourseNameForSubject">
                 <option value="" disabled selected>-- เลือกปีการศึกษา --</option>
-                <option *ngFor="let c of getCoursesByName(selectedCourseNameForSubject)" [value]="c.id">{{ c.curriculum_year }}</option>
+                <option *ngFor="let c of getCoursesByName(selectedCourseNameForSubject)" [value]="c.id">{{
+                  c.curriculum_year }}</option>
               </select>
             </div>
           </div>
@@ -197,9 +247,11 @@
         <div class="form-group">
           <label>เลือกรุ่น</label>
           <div class="select-wrapper">
-            <select [(ngModel)]="selectedBatchForSubject" name="selectedBatchForSubject" (change)="subjectForm.group_id = ''" [disabled]="!selectedCourseIdForSubject">
+            <select [(ngModel)]="selectedBatchForSubject" name="selectedBatchForSubject"
+              (change)="subjectForm.group_id = ''" [disabled]="!selectedCourseIdForSubject">
               <option value="" disabled selected>-- เลือกรุ่น --</option>
-              <option *ngFor="let b of getBatchesForCourse(selectedCourseIdForSubject)" [value]="b.id">{{ b.batch_name }}</option>
+              <option *ngFor="let b of getBatchesForCourse(selectedCourseIdForSubject)" [value]="b.id">{{ b.batch_name
+                }}</option>
             </select>
           </div>
         </div>
@@ -210,7 +262,8 @@
           <div class="select-wrapper">
             <select [(ngModel)]="subjectForm.group_id" name="group_id" [disabled]="!selectedBatchForSubject" required>
               <option value="" disabled selected>-- เลือกกลุ่มวิชา --</option>
-              <option *ngFor="let g of getGroupsForBatch(selectedBatchForSubject)" [value]="g.id">{{ g.group_name }}</option>
+              <option *ngFor="let g of getGroupsForBatch(selectedBatchForSubject)" [value]="g.id">{{ g.group_name }}
+              </option>
             </select>
           </div>
         </div>
@@ -220,13 +273,16 @@
           <label>รายชื่อวิชาในกลุ่มนี้ (เพิ่มได้หลายวิชา)</label>
           <div class="dynamic-row" *ngFor="let subj of subjectsList; let i = index; let isLast = last">
             <div class="form-group mb-0">
-              <input type="text" [(ngModel)]="subj.subject_name" name="subject_name_{{i}}" placeholder="เช่น ฝ่ายอำนวยการ" required>
+              <input type="text" [(ngModel)]="subj.subject_name" name="subject_name_{{i}}"
+                placeholder="เช่น ฝ่ายอำนวยการ" required>
             </div>
-            
-            <button type="button" class="btn-icon-action btn-add" (click)="addSubjectField()" *ngIf="isLast" title="เพิ่มรายวิชา">
+
+            <button type="button" class="btn-icon-action btn-add" (click)="addSubjectField()" *ngIf="isLast"
+              title="เพิ่มรายวิชา">
               <span class="material-icons">add_circle</span>
             </button>
-            <button type="button" class="btn-icon-action btn-remove" (click)="removeSubjectField(i)" *ngIf="subjectsList.length > 1" title="ลบรายวิชานี้">
+            <button type="button" class="btn-icon-action btn-remove" (click)="removeSubjectField(i)"
+              *ngIf="subjectsList.length > 1" title="ลบรายวิชานี้">
               <span class="material-icons">remove_circle</span>
             </button>
           </div>

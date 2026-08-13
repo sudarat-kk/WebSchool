@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -37,6 +37,7 @@ export class Addstudent implements OnInit {
     private location: Location,
     private courseService: CourseService,
     private studentService: StudentService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   activeTab: 'single' | 'excel' | 'file' = 'single';
@@ -91,6 +92,7 @@ export class Addstudent implements OnInit {
   fetchStudents() {
     if (!this.selectedBatch) {
       this.students = [];
+      this.cdr.detectChanges();
       return;
     }
     this.studentService.getStudents(this.selectedBatch).subscribe({
@@ -106,6 +108,7 @@ export class Addstudent implements OnInit {
           affiliation: s.affiliation || '',
           showPassword: false // ค่าเริ่มต้นให้ซ่อนรหัสผ่านในตาราง
         }));
+        this.cdr.detectChanges();
       },
       error: (err) => console.error('Failed to load students', err),
     });
@@ -164,6 +167,7 @@ export class Addstudent implements OnInit {
             if (this.editingId === id) {
               this.resetForm();
             }
+            this.cdr.detectChanges();
           },
           error: (err) => {
             console.error('Delete failed', err);
@@ -205,6 +209,7 @@ export class Addstudent implements OnInit {
           Swal.fire('สำเร็จ', 'อัปเดตข้อมูลนักเรียนสำเร็จ', 'success');
           this.resetForm();
           this.fetchStudents();
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Update failed', err);
@@ -217,6 +222,7 @@ export class Addstudent implements OnInit {
           Swal.fire('สำเร็จ', 'เพิ่มข้อมูลนักเรียนสำเร็จ', 'success');
           this.resetForm();
           this.fetchStudents();
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Add failed', err);
@@ -250,6 +256,7 @@ export class Addstudent implements OnInit {
         this.selectedFile = null;
         this.selectedFileName = '';
         this.fetchStudents();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Upload failed', err);
@@ -258,3 +265,5 @@ export class Addstudent implements OnInit {
     });
   }
 }
+
+
