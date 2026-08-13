@@ -1,144 +1,241 @@
+.login-page {
+  min-height: 100vh;
+  background: #f8f6fc; /* Very light purple background */
+  font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header {
+  padding: 16px 24px;
+}
+
+.back-button {
+  background: white;
+  border: 1px solid #e3d9f0;
+  color: #66537a;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f7f4fc;
+    color: #4c1d95;
+  }
+}
+
 .page-content {
-  text-align: center;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 20px;
 }
 
+.login-card {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(91, 33, 182, 0.08);
+  border: 1px solid #f0e6fa;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f4ebfc 0%, #ffffff 100%);
+  padding: 32px 32px 24px;
+  text-align: center;
+  border-bottom: 1px solid #f0e6fa;
+}
+
+.school-logo {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 16px;
+}
+
 .main-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333333;
-  margin-bottom: 50px; 
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #374151;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+}
+
+.course-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f7f4fc;
+  border: 1px solid #d9c2f0;
+  padding: 8px 20px;
+  border-radius: 24px;
+}
+
+.badge-label {
+  color: #8262a6;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.badge-value {
+  color: #56288b;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.login-body {
+  padding: 32px;
 }
 
 .sub-title {
-  font-size: 20px; 
-  color: #333333; 
-  margin-bottom: 32px; 
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  color: #6b7280;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: 0 0 24px 0;
 }
 
 .title-icon {
-  font-size: 24px; 
-  width: 24px;
-  height: 24px;
-  color: #333333;       
+  color: #8262a6;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
 }
 
-/* ส่วนจัดแต่งสำหรับกล่องกรอกข้อมูล */
-.login-container {
+.login-form {
   display: flex;
-  flex-direction: column; 
-  align-items: center;    
-  gap: 20px; 
-  width: 100%;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.password-field {
+.custom-field {
   width: 100%;
-  max-width: 420px;       
-  font-size: 18px; 
 
-  ::v-deep .mat-icon {
-    font-size: 24px; 
-    width: 24px;
-    height: 24px;
+  ::v-deep .mat-mdc-text-field-wrapper {
+    background-color: #faf8fc;
   }
-}
-
-/* ส่วนเพิ่มข้อความสองฝั่ง (ลงมาจากช่องกรอกรหัสผ่าน) */
-.login-helpers {
-  display: flex;
-  justify-content: space-between; 
-  width: 100%;
-  max-width: 420px;               
-  margin-top: -8px;               
-  padding: 0 4px;                 
-  font-size: 15px;                
-  color: #666666;                 
   
-  span {
-    cursor: pointer;              
-    &:hover {
-      color: #1976d2;             
-      text-decoration: underline; 
-    }
+  ::v-deep .mdc-notched-outline__leading,
+  ::v-deep .mdc-notched-outline__notch,
+  ::v-deep .mdc-notched-outline__trailing {
+    border-color: #e3d9f0 !important;
   }
 }
 
-/* จัดตำแหน่งปุ่มค้นหา */
-.action-container {
-  margin-top: 24px;
-  margin-bottom: 40px; 
-  display: flex;
-  justify-content: center;
-  width: 100%;
+.field-icon {
+  color: #a894c2;
 }
 
-.search-btn {
-  background-color: #e0e0e0; 
-  color: #000000;            
-  font-size: 20px;           
-  font-weight: 500;
-  padding: 8px 32px;         
-  border-radius: 8px;        
-  min-width: 140px;          
-  height: auto;
-}
+.login-btn {
+  background: linear-gradient(135deg, #7e22ce, #5b21b6) !important;
+  color: white !important;
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 12px 0;
+  border-radius: 12px;
+  height: 50px;
+  margin-top: 12px;
+  box-shadow: 0 4px 12px rgba(126, 34, 206, 0.2);
+  transition: all 0.2s;
 
-/* ส่วนแจ้งปัญหาด้านล่างสุด (คุมพฤติกรรมแยกฝั่งซ้าย-ขวา) */
-.support-footer {
-  display: flex;
-  justify-content: space-between; /* ดันกลุ่มซ้าย และกลุ่มขวา แยกออกจากกันสุดขอบ */
-  align-items: center;
-  width: 100%;
-  max-width: 420px;               /* ความกว้างเท่ากับช่องกรอกด้านบน */
-  margin: 0 auto;                 /* จัดให้กล่องทั้งหมดอยู่ตรงกลางหน้าจอ */
-  padding: 16px 8px;
-}
-
-/* จัดสไตล์ฝั่งซ้าย */
-.support-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;                      
-  font-size: 18px;               
-  color: #000000;
-  font-weight: 500;
-
-  .warning-icon {
-    color: #fbc02d;              /* ไอคอนสามเหลี่ยมสีเหลือง */
-    font-size: 28px;
-    width: 28px;
-    height: 28px;
+  &:not([disabled]):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(126, 34, 206, 0.3);
   }
-}
 
-/* จัดสไตล์ฝั่งขวา (ปุ่มแดง + เบอร์โทร) */
-.support-right-inline {
-  display: flex;
-  align-items: center;
-  gap: 12px; /* ระยะห่างระหว่างปุ่มวงกลมสีแดง กับ ตัวเลขเบอร์โทรด้านหลัง */
-}
+  &[disabled] {
+    background: #e3d9f0 !important;
+    color: #a894c2 !important;
+    box-shadow: none;
+  }
 
-/* ปุ่มโทรศัพท์วงกลมสีแดง */
-.phone-btn {
-  background-color: #db4437 !important; /* สีแดงส้มตามรูป (ใส่ !important กัน Material ครอบงำ) */
-  color: #ffffff !important;            /* ไอคอนโทรศัพท์สีขาว */
-  
-  .mat-icon {
+  .btn-icon {
+    margin-left: 8px;
     font-size: 20px;
     width: 20px;
     height: 20px;
   }
 }
 
-/* ตัวหนังสือเบอร์โทรศัพท์ปกติที่อยู่ขวาสุด */
-.phone-number-text {
-  font-size: 18px;
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #fca5a5;
+  font-size: 0.9rem;
+  margin-top: -8px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.card-footer {
+  background: #fbf9ff;
+  border-top: 1px solid #f0e6fa;
+  padding: 20px 32px;
+}
+
+.support-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #66537a;
+  font-size: 0.95rem;
   font-weight: 500;
-  color: #000000;      /* ตัวหนังสือสีดำปกติ */
-  white-space: nowrap; /* ล็อกไม่ให้ตัวเลขเบอร์โทรตกบรรทัด */
+}
+
+.support-icon {
+  color: #8262a6;
+}
+
+.phone-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #d946ef; /* Magenta/purple pop color */
+  text-decoration: none;
+  font-weight: 700;
+  background: #fdf4ff;
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 1px solid #fae8ff;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #fae8ff;
+    color: #c026d3;
+  }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

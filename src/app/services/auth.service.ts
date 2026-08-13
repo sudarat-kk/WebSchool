@@ -9,9 +9,13 @@ import { environment } from '../../environments/environment';
 export interface StudentData {
   student_id: number;
   batch_id: number;
+  student_code?: string;
   first_name: string;
   last_name: string;
   rank_name: string;
+  course_name?: string;
+  batch_name?: string;
+  status?: string;
 }
 
 export interface StudentLoginRequest {

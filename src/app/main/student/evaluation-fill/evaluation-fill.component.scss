@@ -1,0 +1,203 @@
+.evaluation-fill-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: 40px;
+
+  .page-header {
+    background: linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+    .back-button {
+      color: white;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .course-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 500;
+    }
+  }
+
+  .content-container {
+    max-width: 800px;
+    margin: 32px auto;
+    padding: 0 16px;
+  }
+
+  .loading-state, .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    color: #666;
+    
+    p { margin-top: 12px; font-size: 16px; }
+  }
+
+  .form-header-card {
+    background: white;
+    padding: 32px 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+    border-top: 8px solid #673ab7; /* สีม่วงแบบ Google Form */
+
+    .form-main-title {
+      margin: 0 0 12px 0;
+      font-size: 28px;
+      color: #202124;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+    
+    .subtitle {
+      color: #202124;
+      font-size: 14px;
+      margin: 0 0 16px 0;
+    }
+
+    .divider {
+      border: 0;
+      height: 1px;
+      background: #dadce0;
+      margin: 20px 0;
+    }
+
+    .instructions {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #3c4043;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      border-left: 4px solid #673ab7;
+    }
+
+    .instructor-input-group {
+      margin-top: 24px;
+      background: #fff;
+      label {
+        display: block;
+        margin-bottom: 12px;
+        font-weight: 500;
+        color: #202124;
+        font-size: 16px;
+      }
+      .custom-input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+        outline: none;
+        &:focus {
+          border-color: #8142ff;
+          box-shadow: 0 0 0 2px rgba(129, 66, 255, 0.2);
+        }
+      }
+    }
+  }
+
+  .question-card {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 16px;
+
+    .question-text {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: #333;
+      
+      .q-num {
+        color: #8142ff;
+        margin-right: 4px;
+      }
+    }
+    
+    .required {
+      color: #e53935;
+      margin-left: 4px;
+    }
+
+    .choices-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .radio-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+
+        &:hover {
+          background: #f8f9fa;
+        }
+
+        input[type="radio"] {
+          width: 18px;
+          height: 18px;
+          accent-color: #8142ff;
+        }
+        
+        .radio-text {
+          font-size: 15px;
+          color: #444;
+        }
+      }
+    }
+
+    .text-group {
+      .custom-textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+        resize: vertical;
+        outline: none;
+        &:focus {
+          border-color: #8142ff;
+          box-shadow: 0 0 0 2px rgba(129, 66, 255, 0.2);
+        }
+      }
+    }
+  }
+
+  .submit-action {
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
+
+    .btn-submit {
+      background: #8142ff;
+      color: white;
+      padding: 8px 32px;
+      font-size: 16px;
+      border-radius: 24px;
+      height: 48px;
+      
+      &:hover {
+        background: #6a1b9a;
+      }
+    }
+  }
+}

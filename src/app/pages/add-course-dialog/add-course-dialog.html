@@ -262,8 +262,12 @@
           <div class="select-wrapper">
             <select [(ngModel)]="subjectForm.group_id" name="group_id" [disabled]="!selectedBatchForSubject" required>
               <option value="" disabled selected>-- เลือกกลุ่มวิชา --</option>
+<<<<<<< HEAD
               <option *ngFor="let g of getGroupsForBatch(selectedBatchForSubject)" [value]="g.id">{{ g.group_name }}
               </option>
+=======
+              <option *ngFor="let g of getGroupsForBatch(selectedBatchForSubject)" [value]="g.id">{{ getGroupLabel(g) }}</option>
+>>>>>>> 9993060f53613f3dfbc77eaf9684a8e47fd112bb
             </select>
           </div>
         </div>

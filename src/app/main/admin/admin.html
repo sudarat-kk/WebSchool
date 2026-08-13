@@ -1,10 +1,18 @@
 <div class="admin-page">
-  <div class="page-header">
-    <!-- ปุ่มย้อนกลับไปหน้าคุณครู -->
-    <button mat-icon-button class="back-button" routerLink="/teacher">
-      <mat-icon>chevron_left</mat-icon>
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <!-- ปุ่มย้อนกลับไปหน้าคุณครู -->
+      <button mat-icon-button class="back-button" routerLink="/teacher">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <h1 class="course-title" style="margin: 0;">ส่วนจัดการระบบ (สำหรับผู้ดูแลระบบ)</h1>
+    </div>
+
+    <!-- ปุ่มออกจากระบบ -->
+    <button class="btn-logout" (click)="onLogout()" style="background-color: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; padding: 6px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 14px; transition: all 0.2s;">
+      <mat-icon style="font-size: 18px; width: 18px; height: 18px;">logout</mat-icon>
+      ออกจากระบบ
     </button>
-    <h1 class="course-title">ส่วนจัดการระบบ (สำหรับผู้ดูแลระบบ)</h1>
   </div>
 
   <div class="content-container">
