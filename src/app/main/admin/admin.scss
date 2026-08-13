@@ -108,6 +108,12 @@
       color: #00897b;
     }
   }
+
+  &.score-submission-card {
+    .card-details .card-title {
+      color: #D81B60 !important;
+    }
+  }
 }
 
 /* ส่วนของปุ่มกด (UI/UX Redesign) */
@@ -121,8 +127,8 @@
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: #ffffff;
-  background-color: #1976d2;
+  color: #ffffff !important;
+  background-color: #1976d2 !important;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -135,7 +141,7 @@
 
   /* 🖱️ Effect เวลาเอาเมาส์ชี้ (Hover) */
   &:hover {
-    background-color: #1565c0;
+    background-color: #1565c0 !important;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(25, 118, 210, 0.35);
 
@@ -152,11 +158,11 @@
 
   /* 🟣 ปุ่มธีมม่วง */
   &.btn-purple {
-    background-color: #673ab7;
+    background-color: #673ab7 !important;
     box-shadow: 0 4px 12px rgba(103, 58, 183, 0.25);
 
     &:hover {
-      background-color: #512da8;
+      background-color: #512da8 !important;
       box-shadow: 0 6px 16px rgba(103, 58, 183, 0.35);
     }
 
@@ -167,16 +173,32 @@
 
   /* 🟢 ปุ่มธีมเขียว Teal */
   &.btn-teal {
-    background-color: #00897b;
+    background-color: #00897b !important;
     box-shadow: 0 4px 12px rgba(0, 137, 123, 0.25);
 
     &:hover {
-      background-color: #00695c;
+      background-color: #00695c !important;
       box-shadow: 0 6px 16px rgba(0, 137, 123, 0.35);
     }
 
     &:active {
       box-shadow: 0 2px 6px rgba(0, 137, 123, 0.2);
+    }
+  }
+
+  /* 🌹 ปุ่มธีมกุหลาบ/ชมพูบานเย็น Rose */
+  &.btn-rose {
+    background-color: #D81B60 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(216, 27, 96, 0.25);
+
+    &:hover {
+      background-color: #C2185B !important;
+      box-shadow: 0 6px 16px rgba(216, 27, 96, 0.35);
+    }
+
+    &:active {
+      box-shadow: 0 2px 6px rgba(216, 27, 96, 0.2);
     }
   }
 

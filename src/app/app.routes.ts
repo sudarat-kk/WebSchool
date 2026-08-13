@@ -63,9 +63,10 @@ export const routes: Routes = [
       { path: 'classoverview', component: ClassOverview },
       { path: 'addstudent', component: Addstudent },
       { path: 'addcourse', component: AddCourse },
+       {path:'score-submission',component: ScoreSubmission},
+
     ],
   },
-
   { path: 'register', component: Register },
 
   { path: 'score-submission', component: ScoreSubmission },
