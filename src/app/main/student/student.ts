@@ -3,9 +3,12 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router'; // 👈 นำเข้า Router
+import { ScoreService } from '../../services/score.service';
 import { SubjectService } from '../../services/subject.service';
 import { GeneralEvaluationService } from '../../services/general-evaluation.service';
+import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import Swal from 'sweetalert2';
 
 // สร้าง Interface สำหรับ Card เพื่อให้ผูกข้อมูลกับ HTML ได้ง่ายขึ้น
 interface CourseCard {
@@ -28,6 +31,7 @@ export class Student implements OnInit, OnDestroy {
   currentBatchId: number | null = null;
   currentCourseName: string = '';
   currentBatchName: string = '';
+  isLoggedIn: boolean = false;
   private evaluationSub: Subscription | null = null;
 
   // เก็บข้อมูลรายวิชาทั้งหมดที่ดึงมาจาก API
@@ -39,6 +43,8 @@ export class Student implements OnInit, OnDestroy {
   constructor(
     private subjectService: SubjectService,
     private generalEvaluationService: GeneralEvaluationService,
+    private scoreService: ScoreService,
+    private authService: AuthService,
     private route: ActivatedRoute, 
     private router: Router, // 👈 เพิ่ม Router
     private cdr: ChangeDetectorRef,
@@ -51,6 +57,25 @@ export class Student implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.isLoggedIn = this.authService.isLoggedIn();
+
+    if (this.isLoggedIn) {
+      const studentData = this.authService.getStudentData();
+      if (studentData) {
+        this.currentBatchId = studentData.batch_id;
+        this.currentCourseName = studentData.course_name || '';
+        this.currentBatchName = studentData.batch_name || '';
+        
+        if (this.currentCourseName && this.currentBatchName) {
+           this.pageTitle = `${this.currentCourseName} ${this.currentBatchName}`;
+        }
+        
+        if (this.currentBatchId) {
+          this.fetchSubjects(this.currentBatchId);
+        }
+      }
+    }
+
     // 👈 ใช้ subscribe เพื่อดักจับการเปลี่ยนแปลงของ URL Parameters
     this.route.queryParams.subscribe((params) => {
       const batchId = params['batchId'];
@@ -58,21 +83,33 @@ export class Student implements OnInit, OnDestroy {
       const courseName = params['courseName'];
       const batchName = params['batchName'];
 
-      // อัปเดตชื่อหัวข้อหลักสูตรตามที่ส่งมาจาก Header
-      if (title) {
-        this.pageTitle = title;
-      }
-      if (courseName) {
-        this.currentCourseName = courseName;
-      }
-      if (batchName) {
-        this.currentBatchName = batchName;
+      if (this.isLoggedIn && batchId) {
+        const studentData = this.authService.getStudentData();
+        if (studentData && studentData.batch_id !== Number(batchId)) {
+          // หากเปลี่ยนรุ่นใน Header ให้ทำการ Logout ออกอัตโนมัติ
+          this.authService.logout();
+          this.isLoggedIn = false;
+          this.allCourses = [];
+          this.filteredCourses = [];
+          this.selectedAssessment = '';
+        }
       }
 
-      // ถ้ามี batchId ส่งมา ให้เรียก API ดึงข้อมูลวิชา
-      if (batchId) {
-        this.currentBatchId = Number(batchId);
-        this.fetchSubjects(this.currentBatchId);
+      if (!this.isLoggedIn) {
+        if (title) this.pageTitle = title;
+        if (courseName) this.currentCourseName = courseName;
+        if (batchName) this.currentBatchName = batchName;
+        if (batchId) this.currentBatchId = Number(batchId);
+      } else {
+        const studentData = this.authService.getStudentData();
+        if (studentData) {
+          this.currentBatchId = studentData.batch_id;
+          this.currentCourseName = studentData.course_name || '';
+          this.currentBatchName = studentData.batch_name || '';
+          if (this.currentCourseName && this.currentBatchName) {
+            this.pageTitle = `${this.currentCourseName} ${this.currentBatchName}`;
+          }
+        }
       }
     });
   }
@@ -83,18 +120,18 @@ export class Student implements OnInit, OnDestroy {
     this.filteredCourses = [];
     this.selectedAssessment = '';
 
-    this.subjectService.getSubjectsByBatch(batchId).subscribe({
+    const studentData = this.authService.getStudentData();
+    if (!studentData) return;
+
+    this.scoreService.getStudentScores(studentData.student_id, batchId).subscribe({
       next: (res) => {
-        if (res.success && res.data) {
-          // ใช้ flatMap เพื่อดึง subjects ออกมาจากทุกๆ group มารวมเป็น Array เดียว
-          this.allCourses = res.data.flatMap((group: any) =>
-            group.subjects.map((subject: any) => ({
-              id: subject.subject_id || subject.id || 0,
-              text: subject.subject_name || subject.name || 'ไม่มีชื่อวิชา',
-              status: 'pending', // กำหนดสถานะเริ่มต้น (ถ้า API มีสถานะส่งมาด้วย ให้เปลี่ยนตรงนี้)
-              formUrl: subject.form_url || '',
-            })),
-          );
+        if (res.subject_details) {
+          this.allCourses = res.subject_details.map((subject: any) => ({
+            id: subject.subject_id || 0,
+            text: subject.subject_name || 'ไม่มีชื่อวิชา',
+            status: subject.is_evaluated ? 'green' : 'red', // green = ประเมินแล้ว, red = ยังไม่ประเมิน
+            formUrl: '',
+          }));
         }
       },
       error: (err) => {
@@ -173,6 +210,17 @@ export class Student implements OnInit, OnDestroy {
 
   // ทำงานเมื่อกดคลิกที่ Card รายวิชา
   openForm(course: CourseCard): void {
+    if (course.status === 'green') {
+      Swal.fire({
+        icon: 'info',
+        title: 'แจ้งเตือน',
+        text: 'คุณได้ทำแบบประเมินนี้ไปแล้ว',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#3085d6'
+      });
+      return;
+    }
+
     // กำหนดประเภทการประเมินจาก selectedAssessment
     let typeStr = 'instructor';
     if (this.selectedAssessment === '2') typeStr = 'director';
@@ -186,6 +234,34 @@ export class Student implements OnInit, OnDestroy {
         type: typeStr,
         courseTitle: course.text,
         batchName: this.currentBatchName // 👈 ส่งชื่อรุ่นที่ถูกต้องไปด้วย
+      }
+    });
+  }
+
+  goToScore(): void {
+    this.router.navigate(['/student/score']);
+  }
+
+  logout(): void {
+    const batchId = this.currentBatchId || '';
+    const courseName = this.currentCourseName || '';
+    const batchName = this.currentBatchName || '';
+    const title = (courseName && batchName) ? `${courseName} ${batchName}` : '';
+
+    this.authService.logout();
+    this.isLoggedIn = false;
+    
+    // เคลียร์ข้อมูลการ์ด
+    this.filteredCourses = [];
+    this.selectedAssessment = '';
+
+    // รีเฟรชหน้าตัวเองพร้อมส่งพารามิเตอร์เดิมไป
+    this.router.navigate(['/student'], {
+      queryParams: {
+        batchId: batchId,
+        title: title,
+        courseName: courseName,
+        batchName: batchName
       }
     });
   }

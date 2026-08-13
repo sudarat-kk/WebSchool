@@ -76,6 +76,45 @@
           <button type="submit" class="btn-submit">บันทึกรุ่น</button>
         </div>
       </form>
+
+      <!-- ส่วนจัดการรุ่นที่มีอยู่แล้ว (Manage Existing Batches) -->
+      <div class="existing-batches" *ngIf="selectedCourseNameForBatch" style="margin-top: 24px; padding-top: 16px; border-top: 1px dashed #ccc;">
+        <h3 style="font-size: 14px; color: #673ab7; margin-bottom: 12px; font-weight: 500;">
+          รุ่นที่มีอยู่แล้วในหลักสูตร "{{ selectedCourseNameForBatch }}"
+        </h3>
+        
+        <div *ngIf="getCoursesByName(selectedCourseNameForBatch).length === 0" style="color: #888; font-size: 13px;">
+          ยังไม่มีรุ่นในหลักสูตรนี้
+        </div>
+        
+        <table *ngIf="getCoursesByName(selectedCourseNameForBatch).length > 0" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="background-color: #f3e8ff; color: #4c1d95; text-align: left;">
+              <th style="padding: 8px; border: 1px solid #ddd;">ปีการศึกษา</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">ชื่อรุ่น</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">วันที่เริ่ม-สิ้นสุด</th>
+              <th style="padding: 8px; border: 1px solid #ddd; text-align: center; width: 100px;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let batch of getCoursesByName(selectedCourseNameForBatch)">
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ batch.curriculum_year }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">{{ batch.batch_name }}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">
+                {{ batch.start_date ? (batch.start_date | date:'dd/MM/yyyy') : '-' }} - {{ batch.end_date ? (batch.end_date | date:'dd/MM/yyyy') : '-' }}
+              </td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                <button type="button" mat-icon-button (click)="editBatch(batch)" style="color: #ff9800; transform: scale(0.8);" title="แก้ไขรุ่น">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button type="button" mat-icon-button (click)="deleteBatch(batch)" style="color: #f44336; transform: scale(0.8);" title="ลบรุ่น">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- 3. ส่วนเพิ่มกลุ่มวิชา -->

@@ -69,11 +69,16 @@
             <tr *ngFor="let subject of subjectDetails">
               <td class="col-subject">{{ subject.subject_name }}</td>
               <td class="col-score text-center">
-                <ng-container *ngIf="subject.is_evaluated !== false; else notEvaluated">
+                <ng-container *ngIf="subject.is_evaluated; else notEvaluated">
                   {{ subject.raw_score }}
                 </ng-container>
                 <ng-template #notEvaluated>
-                  <span class="text-muted" style="font-size: 0.9em; color: #ff9800;">ยังไม่ประเมินผู้สอน</span>
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span class="text-muted" style="font-size: 0.9em; color: #ff9800;">ยังไม่ประเมินผู้สอน</span>
+                    <button class="evaluate-btn" (click)="goToEvaluation(subject.subject_id)">
+                      ประเมินเลย
+                    </button>
+                  </div>
                 </ng-template>
               </td>
             </tr>

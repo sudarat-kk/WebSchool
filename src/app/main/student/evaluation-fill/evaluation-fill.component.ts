@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { GeneralEvaluationService } from '../../../services/general-evaluation.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-evaluation-fill',
@@ -47,7 +48,7 @@ export class EvaluationFillComponent implements OnInit {
         this.fetchQuestions();
       } else {
         this.isLoading = false;
-        alert('ข้อมูลไม่ครบถ้วน');
+        Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ข้อมูลไม่ครบถ้วน', confirmButtonText: 'ตกลง' });
       }
     });
   }
@@ -85,7 +86,7 @@ export class EvaluationFillComponent implements OnInit {
         },
         error: (err: any) => {
           console.error('3. API ตอบกลับแบบ Error:', err);
-          alert('ไม่พบข้อมูลแบบประเมินในระบบ (อาจยังไม่ได้สร้างลิงก์สำหรับรุ่นนี้)');
+          Swal.fire({ icon: 'warning', title: 'ไม่พบข้อมูล', text: 'ไม่พบข้อมูลแบบประเมินในระบบ (อาจยังไม่ได้สร้างลิงก์สำหรับรุ่นนี้)', confirmButtonText: 'ตกลง' });
           this.isLoading = false;
           this.cdr.detectChanges(); // 👈 บังคับรีเฟรชหน้าจอทันที
         },
@@ -96,12 +97,12 @@ export class EvaluationFillComponent implements OnInit {
     // Validate ว่าตอบครบทุกข้อที่เป็น choice หรือไม่
     const unanswered = this.questions.find((q) => q.question_type === 'choice' && !q.answer_score);
     if (unanswered) {
-      alert('กรุณาตอบคำถามแบบตัวเลือกให้ครบทุกข้อครับ');
+      Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาตอบคำถามแบบตัวเลือกให้ครบทุกข้อครับ', confirmButtonText: 'ตกลง' });
       return;
     }
 
     if (!this.instructorName && this.type === 'instructor') {
-      alert('กรุณาระบุชื่ออาจารย์ผู้สอนครับ');
+      Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาระบุชื่ออาจารย์ผู้สอนครับ', confirmButtonText: 'ตกลง' });
       return;
     }
 
@@ -111,7 +112,11 @@ export class EvaluationFillComponent implements OnInit {
       comment: q.question_type === 'text' ? q.answer_comment : null,
     }));
 
+    const studentDataStr = localStorage.getItem('student_data');
+    const studentId = studentDataStr ? JSON.parse(studentDataStr).student_id : null;
+
     const payload = {
+      studentId: studentId,
       formId: this.formDetails.form_id,
       subjectId: this.subjectId,
       instructorName: this.instructorName,
@@ -121,13 +126,19 @@ export class EvaluationFillComponent implements OnInit {
     this.generalEvaluationService.submitEvaluationAnswer(payload).subscribe({
       next: (res: any) => {
         if (res.success) {
-          alert('ส่งแบบประเมินเรียบร้อยแล้ว ขอบคุณครับ!');
-          this.location.back(); // กลับไปหน้าเดิม
+          Swal.fire({
+            icon: 'success',
+            title: 'สำเร็จ!',
+            text: 'ส่งแบบประเมินเรียบร้อยแล้ว ขอบคุณครับ!',
+            confirmButtonText: 'ตกลง'
+          }).then(() => {
+            this.location.back();
+          });
         }
       },
       error: (err: any) => {
         console.error('Submit error', err);
-        alert('เกิดข้อผิดพลาดในการส่งข้อมูล');
+        Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'เกิดข้อผิดพลาดในการส่งข้อมูล', confirmButtonText: 'ตกลง' });
       },
     });
   }

@@ -34,8 +34,16 @@ export class GeneralEvaluationService {
     return this.http.put<any>(`${environment.apiUrl}/evaluation/${id}`, payload);
   }
 
+  deleteGeneralEvaluation(id: number | string): Observable<any> {
+    return this.http.delete<any>(`${environment.apiUrl}/evaluation/${id}`);
+  }
+
   getAllForms(): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/evaluation-forms`);
+  }
+
+  getFormById(id: number | string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/evaluation/${id}`);
   }
 
   getEvaluationQuestions(batchId: number, type: string, subjectId?: string | number): Observable<any> {

@@ -59,6 +59,14 @@ export class CourseService {
     return this.http.post<any>(`${environment.apiUrl}/batches`, data);
   }
 
+  updateBatch(id: number | string, data: any): Observable<any> {
+    return this.http.put<any>(`${environment.apiUrl}/batches/${id}`, data);
+  }
+
+  deleteBatch(id: number | string): Observable<any> {
+    return this.http.delete<any>(`${environment.apiUrl}/batches/${id}`);
+  }
+
   addSubjectGroup(data: any): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/subject-groups`, data);
   }

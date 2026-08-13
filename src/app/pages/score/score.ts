@@ -72,7 +72,17 @@ export class Score implements OnInit {
       });
   }
 
-
+  goToEvaluation(subjectId: number) {
+    this.router.navigate(['/student/fill-form'], { 
+      queryParams: { 
+        subjectId: subjectId,
+        batchId: this.studentData?.batch_id,
+        batchName: this.studentData?.batch_name,
+        courseTitle: this.studentData?.course_name,
+        type: 'instructor' 
+      } 
+    });
+  }
 
   onLogout(): void {
     const batchId = this.studentData?.batch_id || '';
