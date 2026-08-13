@@ -21,6 +21,7 @@ import { FollowUpComponent } from './pages/follow-up/follow-up';
 import { Committee } from './main/committee/committee';
 
 import { AddCourse } from './pages/add-course-dialog/add-course-dialog';
+import { FormView } from './pages/form-view/form-view';
 
 import { EvaluationFillComponent } from './main/student/evaluation-fill/evaluation-fill.component';
 
@@ -63,12 +64,19 @@ export const routes: Routes = [
       { path: 'classoverview', component: ClassOverview },
       { path: 'addstudent', component: Addstudent },
       { path: 'addcourse', component: AddCourse },
-       {path:'score-submission',component: ScoreSubmission},
+      {path:'score-submission',component: ScoreSubmission},
+      {path:'form-view',component: FormView},
 
     ],
   },
   { path: 'register', component: Register },
 
+  {path:'register',component: Register},
+
+
+
+  // ส่วนของคะแนน (ทั่วไป)
+  { path: 'score', component: Score },
   { path: 'score-submission', component: ScoreSubmission },
 
   // หน้าใหม่ที่เพิ่มเข้ามา

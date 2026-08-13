@@ -1,0 +1,133 @@
+// 🎨 Palette สีม่วงพาสเทล (ปรับแต่งใหม่)
+$primary-color: #8b5cf6;      // สีม่วงพาสเทลหลัก (สำหรับปุ่ม)
+$primary-hover: #7c3aed;      // สีม่วงเข้มขึ้นเล็กน้อยเวลาชี้ปุ่ม
+$text-main: #2e1065;          // สีตัวหนังสือหลัก (ม่วงเข้มอ่านง่าย)
+$text-muted: #6b21a8;         // สีตัวหนังสือน้อยสำคัญ (ม่วงโทนกลาง)
+$bg-main: #f3e8ff;            // พื้นหลังหลัก (สีม่วงพาสเทลอ่อนนุ่ม)
+$card-bg: #ffffff;            // การ์ดสีขาวตัดกับพื้นหลัง
+$border-color: #e9d5ff;        // เส้นขอบสีม่วงพาสเทลจางๆ
+
+// สีตารางพาสเทล
+$th-bg: #e9d5ff;               // พื้นหลังหัวข้อตาราง (ม่วงพาสเทลเข้มขึ้นมาอีกระดับ)
+$th-text: #581c87;             // สีข้อความหัวข้อตาราง (ม่วงเข้มคมชัด)
+$tr-hover: #fae8ff;            // สีตอนเอาเมาส์ชี้แถวตาราง
+
+.page-container {
+  padding: 2rem;
+  background-color: $bg-main;
+  min-height: 100vh;
+  font-family: 'Prompt', 'Kanit', sans-serif;
+}
+
+.card {
+  background-color: $card-bg;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px -3px rgba(139, 92, 246, 0.15); // เงาสีม่วงจางๆ
+  border: 1px solid $border-color;
+  overflow: hidden;
+
+  .card-header {
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid $border-color;
+
+    .header-title {
+      h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: $text-main;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.875rem;
+        color: $text-muted;
+      }
+    }
+
+    .btn-primary {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      border: none;
+      background-color: $primary-color;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: $primary-hover;
+      }
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem 2rem;
+  }
+}
+
+// Table Style
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 1200px;
+
+  th, td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid $border-color;
+    vertical-align: middle;
+    word-wrap: break-word;
+    text-align: center;
+  }
+
+  th {
+    background-color: $th-bg;   // 👈 พื้นหลังหัวข้อตารางสีม่วงพาสเทลเข้ม
+    color: $th-text;             // 👈 ข้อความหัวข้อสีม่วงเข้ม
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: $tr-hover; // 👈 ไฮไลท์แถวเวลาชี้ด้วยสีม่วงพาสเทลจางๆ
+    }
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .font-weight-medium {
+    font-weight: 500;
+    color: $text-main;
+    white-space: nowrap;
+  }
+
+  .col-date {
+    white-space: nowrap;
+    color: $text-muted;
+  }
+
+  .col-long-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .no-data {
+    padding: 2.5rem;
+    color: $text-muted;
+  }
+}

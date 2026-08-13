@@ -113,15 +113,28 @@ export class ScoreManagement implements OnInit {
   }
 
   loadSubjects(batchId: number) {
+    // 1. ล้างข้อมูลวิชาเก่า และล้างค่าวิชาที่เคยเลือกไว้ เพื่อป้องกันข้อมูลตกค้าง
+    this.subjects = [];
+    this.selectedSubjectId = null;
+
     this.dropdownService.getSubjects(batchId).subscribe({
       next: (res) => {
+
+        // 2. กำหนดค่าข้อมูลตรงๆ ไม่ต้องใช้ setTimeout ครอบ
         if (res && res.data) {
           this.subjects = res.data;
         } else {
           this.subjects = [];
         }
+
+        // 3. บังคับอัปเดต UI ทันที (แก้ปัญหาต้องคลิกก่อนข้อมูลถึงจะแสดง)
+        this.cdr.detectChanges();
       },
-      error: (err) => console.error('Failed to load subjects', err),
+      error: (err) => {
+        console.error('Failed to load subjects', err);
+        this.subjects = [];
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -245,6 +258,15 @@ export class ScoreManagement implements OnInit {
   }
 
   onSubjectChange() {
+      this.studentList = [];
+      this.isSaved = false;
+      this.saveError = '';
+      this.updateStats();
+
+      if (this.selectedBatch && this.selectedSubjectId) {
+        this.loadStudents(this.selectedBatch, this.selectedSubjectId);
+      }
+      this.cdr.detectChanges();
     this.studentList = [];
     this.isSaved = false;
     this.saveError = '';

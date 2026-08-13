@@ -6,6 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import Swal from 'sweetalert2';
 import { lastValueFrom } from 'rxjs';
 
+interface CourseBatch {
+  id: number;
+  name: string;
+  status: 'active' | 'ended';
+  isVisible: boolean;
+}
+
 @Component({
   selector: 'app-add-course',
   standalone: true,
@@ -175,6 +182,44 @@ export class AddCourse implements OnInit {
       Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถเพิ่มรายวิชาได้บางส่วน', 'error');
       console.error(err);
     }
+  }
+
+  // ตัวแปรควบคุมการเปิด-ปิดการ์ด (Accordion)
+  isBatchCardOpen: boolean = false;
+
+  // 2. ข้อมูลรุ่นหลักสูตร (เป็น Property ของ Class)
+  batchesData: CourseBatch[] = [
+    { id: 12, name: 'รุ่นที่ 12 (เปิดรับสมัคร)', status: 'active', isVisible: true },
+    { id: 11, name: 'รุ่นที่ 11', status: 'ended', isVisible: true },
+    { id: 10, name: 'รุ่นที่ 10', status: 'ended', isVisible: true },
+    { id: 9, name: 'รุ่นที่ 09', status: 'ended', isVisible: false }
+  ];
+
+
+  // ฟังก์ชันสลับการ เปิด/ปิด การ์ด
+  toggleBatchCard(): void {
+    this.isBatchCardOpen = !this.isBatchCardOpen;
+  }
+
+  // คำนวณจำนวนรุ่นที่เปิดใช้งานอยู่
+  get activeBatchCount(): number {
+    return this.batchesData.filter(b => b.isVisible).length;
+  }
+
+  // ฟังก์ชันเช็กสวิตช์ Toggle (ล็อกไม่ให้เปิดเกิน 3 รุ่น)
+  onToggleBatch(batch: CourseBatch, event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    // ถ้ากำลังจะ "เปิด" สวิตช์เพิ่ม และตอนนี้เปิดครบ 3 รุ่นแล้ว
+    if (input.checked && this.activeBatchCount >= 3) {
+      alert('⚠️ สามารถแสดงผลหน้าเว็บได้สูงสุดเพียง 3 รุ่นเท่านั้น');
+      // ย้อนกลับค่าเดิมทันที
+      input.checked = false;
+      batch.isVisible = false;
+      return;
+    }
+
+    batch.isVisible = input.checked;
   }
 
   getGroupLabel(g: any): string {

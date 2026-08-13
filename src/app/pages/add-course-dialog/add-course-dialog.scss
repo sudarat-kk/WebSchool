@@ -6,6 +6,12 @@ $input-bg: #f0f0f0;
 $text-dark: #1a1a1a;
 $card-bg: #ffffff;
 
+// Blue Pastel Theme (สำหรับปุ่มจัดการรุ่น)
+$blue-pastel-bg: #e8f1ff;       
+$blue-pastel-border: #b3d1ff;  
+$blue-pastel-text: #2b6cb0;     
+$blue-pastel-hover: #d0e3ff;
+
 .page-container {
   width: 100%;
   min-height: 100vh;
@@ -54,6 +60,9 @@ $card-bg: #ffffff;
   gap: 32px;
 }
 
+/* ==========================================================================
+   📦 การ์ดเดิมของคุณ (Form Section) - คืนค่าเดิมให้อยู่ครบถ้วน
+   ========================================================================== */
 .form-section {
   background-color: $card-bg;
   border-radius: 16px;
@@ -160,14 +169,20 @@ $card-bg: #ffffff;
   }
 }
 
+/* ==========================================================================
+   🔘 ส่วนปุ่มกด (Form Actions) - ปุ่มบันทึกรุ่น + ปุ่มจัดการรุ่นสีฟ้าพาสเทล
+   ========================================================================== */
 .form-actions {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  margin-top: 16px;
+  gap: 12px;             
+  margin-top: 20px;
 
   &.right { justify-content: flex-end; }
   &.center { justify-content: center; }
 
+  /* 1. ปุ่มหลัก (ปุ่มบันทึกรุ่น - สีม่วง) */
   .btn-submit {
     background-color: $purple-primary;
     color: #ffffff;
@@ -183,11 +198,191 @@ $card-bg: #ffffff;
     &:hover { 
       background-color: $purple-hover; 
       transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(141, 112, 238, 0.25);
+    }
+  }
+
+  /* 2. ปุ่มจัดการรุ่นหลักสูตร (สีน้ำเงินพาสเทล) */
+  .btn-secondary {
+    background-color: $blue-pastel-bg;
+    color: $blue-pastel-text;
+    border: 1px solid $blue-pastel-border;
+    height: 44px;
+    padding: 0 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: $blue-pastel-hover;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(43, 108, 176, 0.15);
     }
   }
 }
 
-/* Dynamic list styling for multiple subjects */
+/* ==========================================================================
+   ⚙️ การ์ดใหม่สำหรับสวิตช์เปิด-ปิดรุ่น (Batch Management Card)
+   ========================================================================== */
+.batch-management-card {
+  display: none; /* ซ่อนไว้รอเปิดจากการกดปุ่ม */
+  margin-top: 20px;
+  background-color: $card-bg;
+  border: 1px solid $blue-pastel-border;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  animation: slideDown 0.3s ease-out forwards;
+
+  &.show {
+    display: block;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: $text-dark;
+      }
+
+      .subtitle {
+        margin: 4px 0 0 0;
+        font-size: 0.85rem;
+        color: #777;
+      }
+    }
+
+    .badge-counter {
+      background-color: $blue-pastel-bg;
+      color: $blue-pastel-text;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  }
+
+  .batch-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .batch-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #f9fbfd;
+    border: 1px solid #eef2f7;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $blue-pastel-border;
+      background-color: #ffffff;
+    }
+
+    .batch-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .batch-name {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .status-tag {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 12px;
+
+        &.status-active {
+          background-color: #e6f4ea;
+          color: #137333;
+        }
+
+        &.status-ended {
+          background-color: #f1f3f4;
+          color: #5f6368;
+        }
+      }
+    }
+  }
+}
+
+/* สวิตช์ Toggle */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 22px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+
+    &:checked + .slider {
+      background-color: $purple-primary;
+    }
+
+    &:checked + .slider:before {
+      transform: translateX(22px);
+    }
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .3s;
+    border-radius: 22px;
+
+    &:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   ส่วนประกอบอื่นๆ (Dynamic List & Info Box)
+   ========================================================================== */
 .dynamic-list-container {
   display: flex;
   flex-direction: column;
@@ -230,16 +425,10 @@ $card-bg: #ffffff;
     transform: scale(1.1);
   }
 
-  &.btn-add {
-    color: #28a745;
-  }
-
-  &.btn-remove {
-    color: #dc3545;
-  }
+  &.btn-add { color: #28a745; }
+  &.btn-remove { color: #dc3545; }
 }
 
-/* Info Box for Legends */
 .info-box {
   background-color: #f4f6f8;
   border: 1px solid #e1e4e8;
@@ -254,14 +443,8 @@ $card-bg: #ffffff;
     color: #0366d6;
     margin-bottom: 12px;
 
-    span.material-icons {
-      font-size: 20px;
-    }
-    
-    strong {
-      font-size: 1.05rem;
-      color: #24292e;
-    }
+    span.material-icons { font-size: 20px; }
+    strong { font-size: 1.05rem; color: #24292e; }
   }
 
   .info-badges {
@@ -277,10 +460,7 @@ $card-bg: #ffffff;
       font-size: 0.95rem;
       border: 1px solid rgba(0,0,0,0.1);
 
-      strong {
-        margin-right: 6px;
-        font-weight: 700;
-      }
+      strong { margin-right: 6px; font-weight: 700; }
 
       &.badge-yellow {
         background-color: #fffde7;
@@ -306,6 +486,177 @@ $card-bg: #ffffff;
         border-color: #e0e0e0;
         strong { color: #424242; }
       }
+    }
+  }
+}
+
+
+.batch-management-card {
+  /* เริ่มต้นซ่อนไว้ด้วยการบีบความสูงเป็น 0 */
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 32px;
+  margin-top: -12px;
+  margin-bottom: -12px;
+  border: 1px solid transparent;
+  
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(141, 112, 238, 0.08);
+
+  /* กำหนดความลื่นไหลเวลาพับ/คลี่ */
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* เมื่อมี Class .show การ์ดจะขยายความสูงออกมา */
+  &.show {
+    max-height: 600px; /* กำหนดเผื่อความสูงการ์ด */
+    opacity: 1;
+    padding: 24px 32px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border-color: rgba(141, 112, 238, 0.2);
+    border-left: 6px solid #8d70ee;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .icon-purple {
+        color: #8d70ee;
+        font-size: 28px;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a1a1a;
+      }
+
+      .subtitle {
+        margin: 2px 0 0 0;
+        font-size: 0.85rem;
+        color: #666;
+      }
+    }
+
+    .badge-counter {
+      background-color: #e8f1ff;
+      color: #2b6cb0;
+      border: 1px solid #b3d1ff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+  }
+
+  .batch-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .batch-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background-color: #fcfbfe;
+    border: 1px solid #f0eafc;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #ffffff;
+      border-color: rgba(141, 112, 238, 0.4);
+      transform: translateX(2px);
+    }
+
+    .batch-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .batch-name {
+        font-size: 0.98rem;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .status-tag {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 12px;
+
+        &.status-active {
+          background-color: #e6f4ea;
+          color: #137333;
+          border: 1px solid #ceebd6;
+        }
+
+        &.status-ended {
+          background-color: #f1f3f4;
+          color: #5f6368;
+          border: 1px solid #e0e0e0;
+        }
+      }
+    }
+  }
+}
+
+/* --- สวิตช์ Toggle --- */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+
+    &:checked + .slider {
+      background-color: #8d70ee;
+    }
+
+    &:checked + .slider:before {
+      transform: translateX(22px);
+    }
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #d1d1d1;
+    transition: 0.25s ease;
+    border-radius: 24px;
+
+    &:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.25s ease;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
   }
 }
