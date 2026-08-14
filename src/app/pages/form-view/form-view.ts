@@ -1,64 +1,197 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-
-interface FormDataItem {
- id: number;
-  submittedAt: string; // วันที่ส่ง
-  name: string;        // ชื่อ-นามสกุล
-  email: string;       // อีเมล
-  q1: string;          // คำถาม 1 (เช่น แผนก/ฝ่าย)
-  q2: string;          // คำถาม 2 (เช่น ประเภทเรื่อง)
-  q3: string;          // คำถาม 3 (เช่น หัวข้อเรื่อง)
-  q4: string;          // คำถาม 4 (เช่น รายละเอียด)
-  q5: string;
-}
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { GeneralEvaluationService } from '../../services/general-evaluation.service';
+import { CourseService } from '../../services/course.service';
 
 @Component({
   selector: 'app-form-view',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './form-view.html',
   styleUrl: './form-view.scss',
 })
-export class FormView {
-  formDataList: FormDataItem[] = [
-    {
-      id: 1,
-      submittedAt: '11/08/2026 09:30',
-      name: 'สมชาย ใจดี',
-      email: 'somchai@example.com',
-      q1: 'เทคโนโลยีสารสนเทศ (IT)',
-      q2: 'แจ้งปัญหาเทคนิค',
-      q3: 'เข้าใช้งานระบบไม่ได้',
-      q4: 'พยายามล็อกอินแล้วขึ้นข้อความระบบขัดข้อง Error 500',
-      q5: 'ด่วนมาก'
-    },
-    {
-      id: 2,
-      submittedAt: '11/08/2026 10:15',
-      name: 'นภา สดใส',
-      email: 'napha@example.com',
-      q1: 'การตลาด (Marketing)',
-      q2: 'สอบถามข้อมูล',
-      q3: 'ขอใบเสนอราคาแพ็กเกจ',
-      q4: 'ต้องการรายละเอียดราคาแพ็กเกจสำหรับองค์กรขนาดใหญ่',
-      q5: 'ปกติ'
-    },
-    {
-      id: 3,
-      submittedAt: '11/08/2026 11:00',
-      name: 'วิชัย มั่นคง',
-      email: 'wichai@example.com',
-      q1: 'ทรัพยากรบุคคล (HR)',
-      q2: 'ข้อเสนอแนะ',
-      q3: 'ขอเพิ่มฟังก์ชันการลา',
-      q4: 'อยากให้เพิ่มตัวเลือกสิทธิ์การลาครึ่งวันในแบบฟอร์ม',
-      q5: 'ปานกลาง'
-    }
+export class FormView implements OnInit {
+  courseGroups: any[] = [];
+  batches: any[] = [];
+  allForms: any[] = [];
+  filteredForms: any[] = [];
+
+  formTypes = [
+    { value: 'instructor', label: 'ประเมินอาจารย์ผู้สอน' },
+    { value: 'director', label: 'แบบประเมินอาจารย์กำกับหลักสูตร' },
+    { value: 'course', label: 'แบบประเมินหลักสูตร' },
+    { value: 'committee', label: 'แบบประเมินสำหรับคณะกำกับหลักสูตร' },
+    { value: 'followup', label: 'แบบประเมินติดตามผู้สำเร็จการศึกษา' },
   ];
+  availableSubjects: any[] = [];
+
+  selectedCourse: string = '';
+  selectedBatch: string | number = '';
+  selectedFormType: string = '';
+  selectedSubject: string | number = '';
+  selectedFormId: string | number = '';
+
+  questions: any[] = [];
+  submissions: any[] = [];
+  isLoading = false;
+
+  constructor(
+    private evalService: GeneralEvaluationService,
+    private courseService: CourseService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.loadCourses();
+    this.loadForms();
+  }
+
+  loadCourses(): void {
+    this.courseService.getCourses().subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.courseGroups = res.data;
+        }
+      },
+      error: (err: any) => console.error('Error loading courses:', err)
+    });
+  }
+
+  loadForms(): void {
+    this.evalService.getAllForms().subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.allForms = res.data;
+          this.filterForms();
+        }
+      },
+      error: (err: any) => console.error('Error loading forms:', err)
+    });
+  }
+
+  onCourseChange(): void {
+    this.selectedBatch = '';
+    this.selectedFormType = '';
+    this.selectedSubject = '';
+    this.selectedFormId = '';
+    this.batches = [];
+    this.availableSubjects = [];
+    
+    if (this.selectedCourse) {
+      const selectedGroup = this.courseGroups.find(
+        (g) => g.course_name === this.selectedCourse
+      );
+      if (selectedGroup && selectedGroup.batches) {
+        this.batches = selectedGroup.batches;
+      }
+    }
+    this.filterForms();
+  }
+
+  onBatchChange(): void {
+    this.selectedFormType = '';
+    this.selectedSubject = '';
+    this.selectedFormId = '';
+    this.availableSubjects = [];
+    this.filterForms();
+  }
+
+  onFormTypeChange(): void {
+    this.selectedSubject = '';
+    this.selectedFormId = '';
+    
+    if (this.selectedFormType === 'instructor' && this.selectedBatch) {
+      this.courseService.getSubjectsByBatch(this.selectedBatch).subscribe({
+        next: (res: any) => {
+          if (res.success && res.data.length > 0) {
+            let allSubjects: any[] = [];
+            res.data.forEach((group: any) => {
+              if (group.subjects && group.subjects.length > 0) {
+                allSubjects = allSubjects.concat(group.subjects);
+              }
+            });
+            // กรองวิชาที่ซ้ำกันออกที่ฝั่งหน้าเว็บ (Frontend) เพื่อแก้ปัญหาวิชาซ้ำ
+            this.availableSubjects = allSubjects.filter(
+              (subject, index, self) =>
+                index === self.findIndex((t) => t.subject_id === subject.subject_id)
+            );
+          } else {
+            this.availableSubjects = [];
+          }
+        },
+        error: (err: any) => {
+          console.error('Error loading subjects:', err);
+          this.availableSubjects = [];
+        }
+      });
+    } else {
+      this.availableSubjects = [];
+    }
+    this.filterForms();
+  }
+
+  onSubjectChange(): void {
+    this.selectedFormId = '';
+    this.filterForms();
+  }
+
+  filterForms(): void {
+    this.filteredForms = this.allForms;
+
+    if (this.selectedBatch) {
+      this.filteredForms = this.filteredForms.filter(f => f.batch_id == this.selectedBatch);
+    }
+    
+    if (this.selectedFormType) {
+      this.filteredForms = this.filteredForms.filter(f => f.evaluation_type === this.selectedFormType);
+    }
+
+    if (this.selectedFormType === 'instructor' && this.selectedSubject) {
+      this.filteredForms = this.filteredForms.filter(f => f.subject_id == this.selectedSubject);
+    }
+
+    if (this.filteredForms.length === 1) {
+      const form = this.filteredForms[0];
+      this.selectedFormId = form.id;
+      // ทำให้ช่อง dropdown "รายวิชา" อัปเดตตามฟอร์มที่ถูกเลือกอัตโนมัติด้วย (ถ้าฟอร์มนั้นผูกกับรายวิชา)
+      if (form.subject_id) {
+        this.selectedSubject = form.subject_id;
+      }
+      // โหลดข้อมูลอัตโนมัติเมื่อเจอแบบฟอร์ม
+      this.onSearch();
+    } else {
+      this.selectedFormId = '';
+      this.submissions = [];
+      this.questions = [];
+    }
+  }
+
+  onSearch(): void {
+    if (!this.selectedFormId) return;
+    this.isLoading = true;
+    this.cdr.detectChanges(); // บังคับให้ UI โชว์คำว่ากำลังโหลดทันที
+
+    this.evalService.getFormSubmissions(this.selectedFormId).subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.questions = res.data.questions;
+          this.submissions = res.data.submissions;
+        }
+        this.isLoading = false;
+        this.cdr.detectChanges(); // บังคับให้ Angular วาดตารางข้อมูลทันที!
+      },
+      error: (err: any) => {
+        console.error('Error fetching submissions:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   onExport(): void {
-    console.log('Exporting data...', this.formDataList);
+    if (this.submissions.length === 0) return;
+    console.log('Exporting data...', this.submissions);
+    alert('ระบบกำลังพัฒนาส่วน Export');
   }
 }
-

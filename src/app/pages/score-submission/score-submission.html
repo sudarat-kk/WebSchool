@@ -69,6 +69,20 @@
         </div>
     </section>
 
+    <!-- Legend Section -->
+    <div class="legend-box screen-only" style="margin: 0 24px 16px 24px; padding: 16px; background: #f8fafc; border-radius: 8px; display: flex; align-items: center; gap: 12px; border: 1px solid #e2e8f0;">
+        <i class="material-icons" style="color: #3b82f6; font-size: 20px;">info</i>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-weight: 600; color: #1e293b;">คำแนะนำ: ความหมายของตัวย่อกลุ่มวิชา (เทียบตามแถบสี)</span>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <span style="padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; background: #fef08a; color: #b45309; border: 1px solid #fde047;">M (Main) = วิชาหลัก</span>
+                <span style="padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; background: #fecdd3; color: #be123c; border: 1px solid #fda4af;">MN (Minor) = วิชารอง</span>
+                <span style="padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; background: #bfdbfe; color: #1d4ed8; border: 1px solid #93c5fd;">S (Supporting) = วิชาประกอบ</span>
+                <span style="padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb;">P (Practical) = ภาคปฏิบัติ</span>
+            </div>
+        </div>
+    </div>
+
     <!-- ส่วนตาราง -->
     <main class="table-section">
         <table class="data-table">
@@ -89,7 +103,7 @@
                     </td>
                 </tr>
 
-                <tr *ngFor="let item of gradeItems; let i = index">
+                <tr *ngFor="let item of gradeItems; let i = index" [ngClass]="getRowClass(item)">
                     <td class="col-check">
                         <div class="screen-only">
                             <input type="checkbox" [(ngModel)]="item.checked" (change)="onItemCheckChange(item)" [id]="'check-' + i" [name]="'check-' + i">
@@ -144,20 +158,20 @@
             <tr>
                 <th class="col-index">ลำดับ</th>
                 <th class="col-subj">วิชา / กิจกรรม</th>
-                <th class="col-datetime">วันที่ส่งคะแนน</th>
-                <th class="col-datetime">เวลาที่ส่ง</th>
+                <th class="col-credit" style="width: 80px; text-align: center;">หน่วยกิต</th>
                 <th class="col-check-status">ส่งคะแนน</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let item of gradeItems; let i = index">
-                <td class="text-center">{{ i + 1 }}</td>
+                <td class="text-center" [ngClass]="getPrintIndexClass(item)">{{ i + 1 }}</td>
                 <td>{{ item.subjectName }}</td>
-                <td class="text-center">{{ item.submitDate || '-' }}</td>
-                <td class="text-center">{{ item.submitTime || '-' }}</td>
+                <td *ngIf="item.isFirstInGroup" [attr.rowspan]="item.rowspan" class="text-center" style="vertical-align: middle;">
+                    {{ item.credits }}
+                </td>
                 <td class="text-center">
                     <div class="print-box-check">
-                        {{ item.checked ? '✓' : '' }}
+                        {{ item.checked ? '☑' : '☐' }}
                     </div>
                 </td>
             </tr>
@@ -168,16 +182,43 @@
         <table class="print-summary-table">
             <thead>
                 <tr>
-                    <th colspan="3" class="summary-main-header">สรุปจำนวนวิชาทั้งหมด</th>
+                    <th colspan="3" class="summary-main-header" style="text-align: right; padding-right: 12px;">จำนวนหน่วยกิตทั้งหมด</th>
+                    <th class="summary-main-header" style="text-align: center;">{{ groupSummary.totalCredits | number:'1.1-1' }}</th>
                 </tr>
                 <tr>
+                    <th style="width: 100px;"></th>
                     <th>วิชาเรียนทั้งหมด</th>
-                    <th>ส่งคะแนนแล้ว</th>
+                    <th>ปัจจุบันส่งคะแนนแล้ว</th>
                     <th>ขาดส่ง</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
+                    <td class="text-center cat-label-m">วิชาหลัก</td>
+                    <td class="text-center">{{ groupSummary.main.total }}</td>
+                    <td class="text-center">{{ groupSummary.main.verified }}</td>
+                    <td class="text-center">{{ groupSummary.main.pending }}</td>
+                </tr>
+                <tr>
+                    <td class="text-center cat-label-mn">วิชารอง</td>
+                    <td class="text-center">{{ groupSummary.minor.total }}</td>
+                    <td class="text-center">{{ groupSummary.minor.verified }}</td>
+                    <td class="text-center">{{ groupSummary.minor.pending }}</td>
+                </tr>
+                <tr>
+                    <td class="text-center cat-label-s">ประกอบ</td>
+                    <td class="text-center">{{ groupSummary.supporting.total }}</td>
+                    <td class="text-center">{{ groupSummary.supporting.verified }}</td>
+                    <td class="text-center">{{ groupSummary.supporting.pending }}</td>
+                </tr>
+                <tr>
+                    <td class="text-center cat-label-p">ภาคปฏิบัติ</td>
+                    <td class="text-center">{{ groupSummary.practical.total }}</td>
+                    <td class="text-center">{{ groupSummary.practical.verified }}</td>
+                    <td class="text-center">{{ groupSummary.practical.pending }}</td>
+                </tr>
+                <tr style="font-weight: bold;">
+                    <td class="text-center" style="font-weight: bold;">รวม</td>
                     <td class="text-center">{{ summaryData.totalSubjects }}</td>
                     <td class="text-center">{{ summaryData.verifiedSubjects }}</td>
                     <td class="text-center">{{ summaryData.pendingVerifications }}</td>

@@ -16,7 +16,7 @@ $tr-hover: #fae8ff;            // สีตอนเอาเมาส์ชี�
   padding: 2rem;
   background-color: $bg-main;
   min-height: 100vh;
-  font-family: 'Prompt', 'Kanit', sans-serif;
+  font-family: 'Sarabun', sans-serif;
 }
 
 .card {
@@ -79,22 +79,23 @@ $tr-hover: #fae8ff;            // สีตอนเอาเมาส์ชี�
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
   min-width: 1200px;
 
   th, td {
     padding: 0.875rem 1rem;
     border-bottom: 1px solid $border-color;
     vertical-align: middle;
-    word-wrap: break-word;
     text-align: center;
   }
 
   th {
-    background-color: $th-bg;   // 👈 พื้นหลังหัวข้อตารางสีม่วงพาสเทลเข้ม
-    color: $th-text;             // 👈 ข้อความหัวข้อสีม่วงเข้ม
+    background-color: $th-bg;
+    color: $th-text;
     font-weight: 600;
-    white-space: nowrap;
+    /* ยอมให้ข้อความยาวๆ ตัดบรรทัดได้ (ป้องการตัวหนังสือซ้อนทับกัน) */
+    white-space: normal;
+    min-width: 150px;
+    line-height: 1.4;
   }
 
   tbody tr {

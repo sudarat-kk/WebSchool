@@ -1,56 +1,272 @@
 <div class="page-container">
-    <!-- Card Container -->
-    <div class="card">
-
-        <!-- Card Header -->
-        <div class="card-header">
-            <div class="header-title">
-                <h2>แสดงข้อมูลแบบฟอร์ม</h2>
-                <p>รายการข้อมูลที่มีการส่งเข้าระบบทั้งหมด</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-primary" (click)="onExport()">
-                    <i class="icon">📥</i> ส่งออกข้อมูล
-                </button>
-            </div>
-        </div>
-
-        <!-- Card Body / Table Wrapper -->
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ลำดับ</th>
-                            <th>วันที่ส่ง</th>
-                            <th>ยศ-ชื่อ-นามสกุล</th>
-                            <th>อีเมล</th>
-                            <th>คำถาม1</th>
-                            <th>คำถาม2</th>
-                            <th>คำถาม3</th>
-                            <th>คำถาม4</th>
-                            <th>คำถาม5</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let item of formDataList; let i = index">
-                            <td>{{ i + 1 }}</td>
-                            <td>{{ item.submittedAt }}</td>
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.email }}</td> <!-- 👈 มั่นใจว่าช่องอีเมลอยู่ช่องที่ 4 ตรงนี้ -->
-                            <td>{{ item.q1 }}</td> <!-- 👈 คำถาม 1 อยู่ช่องที่ 5 -->
-                            <td>{{ item.q2 }}</td>
-                            <td>{{ item.q3 }}</td>
-                            <td class="col-long-text" [title]="item.q4">{{ item.q4 }}</td>
-                            <td>{{ item.q5 }}</td>
-                        </tr>
-                        <tr *ngIf="formDataList.length === 0">
-                            <td colspan="9" class="text-center no-data">ไม่พบข้อมูลแบบฟอร์ม</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+  <!-- Card Container -->
+  <div class="card">
+    <!-- Card Header -->
+    <div class="card-header">
+      <div class="header-title">
+        <h2>แสดงข้อมูลแบบฟอร์ม</h2>
+        <p>รายการข้อมูลที่มีการส่งเข้าระบบทั้งหมด</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" (click)="onExport()" [disabled]="submissions.length === 0">
+          <i class="icon">📥</i> ส่งออกข้อมูล
+        </button>
+      </div>
     </div>
+
+    <!-- Filter Section -->
+    <div
+      class="filter-section"
+      style="
+        padding: 1.5rem 2rem 0 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-end;
+      "
+    >
+      <div class="form-group" style="flex: 1; min-width: 150px">
+        <label
+          style="
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+          "
+          >หลักสูตร</label
+        >
+        <select
+          class="custom-select"
+          [(ngModel)]="selectedCourse"
+          (change)="onCourseChange()"
+          style="
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            outline: none;
+          "
+        >
+          <option value="">— เลือกหลักสูตร —</option>
+          <option *ngFor="let course of courseGroups" [value]="course.course_name">
+            {{ course.course_name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" style="flex: 1; min-width: 150px">
+        <label
+          style="
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+          "
+          >รุ่น</label
+        >
+        <select
+          class="custom-select"
+          [(ngModel)]="selectedBatch"
+          (change)="onBatchChange()"
+          [disabled]="!selectedCourse"
+          style="
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            outline: none;
+          "
+        >
+          <option value="">— เลือกรุ่น —</option>
+          <option *ngFor="let batch of batches" [value]="batch.batch_id">
+            {{ batch.batch_name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" style="flex: 1.5; min-width: 200px">
+        <label
+          style="
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+          "
+          >ประเภทแบบฟอร์ม</label
+        >
+        <select
+          class="custom-select"
+          [(ngModel)]="selectedFormType"
+          (change)="onFormTypeChange()"
+          [disabled]="!selectedBatch"
+          style="
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            outline: none;
+          "
+        >
+          <option value="">— เลือกประเภท —</option>
+          <option *ngFor="let type of formTypes" [value]="type.value">
+            {{ type.label }}
+          </option>
+        </select>
+      </div>
+
+      <div
+        class="form-group"
+        style="flex: 1.5; min-width: 200px"
+        *ngIf="selectedFormType === 'instructor'"
+      >
+        <label
+          style="
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+          "
+          >รายวิชา</label
+        >
+        <select
+          class="custom-select"
+          [(ngModel)]="selectedSubject"
+          (change)="onSubjectChange()"
+          style="
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            outline: none;
+          "
+        >
+          <option value="">— เลือกรายวิชา —</option>
+          <option *ngFor="let subject of availableSubjects" [value]="subject.subject_id">
+            {{ subject.subject_name }}
+          </option>
+        </select>
+      </div>
+
+      <div
+        class="form-group"
+        style="flex: 1.5; min-width: 200px"
+        *ngIf="selectedFormType"
+      >
+        <label
+          style="
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+          "
+          >แบบประเมินที่พบ</label
+        >
+        <select
+          class="custom-select"
+          [(ngModel)]="selectedFormId"
+          (change)="onSearch()"
+          [disabled]="filteredForms.length === 0"
+          style="
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            outline: none;
+          "
+          [style.backgroundColor]="filteredForms.length === 0 ? '#f3f4f6' : 'white'"
+        >
+          <option value="">
+            {{ filteredForms.length === 0 ? '— ไม่พบแบบประเมินสำหรับวิชานี้ —' : '— เลือกแบบประเมิน —' }}
+          </option>
+          <option *ngFor="let form of filteredForms" [value]="form.id">
+            {{ form.form_name }}
+          </option>
+        </select>
+      </div>
+
+      <button
+        (click)="onSearch()"
+        [disabled]="!selectedFormId || isLoading"
+        style="
+          padding: 0.5rem 1rem;
+          height: 35px;
+          border: 1px solid #e5e7eb;
+          border-radius: 4px;
+          background-color: #f9fafb;
+          color: #6b7280;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        "
+      >
+        <i class="icon" style="font-size: 14px">🔍</i> ค้นหา
+      </button>
+    </div>
+
+    <div style="border-bottom: 1px solid #e9d5ff; margin-top: 1.5rem"></div>
+
+    <!-- Card Body / Table Wrapper -->
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center" style="padding: 2.5rem; color: #6b21a8">
+        กำลังโหลดข้อมูล...
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading && submissions.length > 0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="min-width: 60px">ลำดับ</th>
+              <th style="min-width: 140px">ประทับเวลา</th>
+              <th style="min-width: 120px">รหัสนักเรียน</th>
+              <th style="min-width: 180px">ผู้ตอบแบบประเมิน</th>
+              <th style="min-width: 180px">ครู-อาจารย์ผู้สอน</th>
+              <!-- Dynamic Questions Header -->
+              <th *ngFor="let q of questions" style="min-width: 250px">
+                {{ q.order_num }}. {{ q.question_text }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let sub of submissions; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td class="col-date">{{ sub.submittedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td class="font-weight-medium">{{ sub.studentCode }}</td>
+              <td>{{ sub.name || '-' }}</td>
+              <td>{{ sub.instructorName || '-' }}</td>
+              <!-- Dynamic Questions Answers -->
+              <td
+                *ngFor="let q of questions"
+                class="col-long-text"
+                [title]="sub.answers['q_' + q.id]"
+              >
+                {{ sub.answers['q_' + q.id] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div
+        *ngIf="!isLoading && submissions.length === 0 && selectedFormId"
+        class="text-center"
+        style="padding: 3rem; color: #6b21a8; font-weight: 500"
+      >
+        ยังไม่มีข้อมูลผู้ตอบแบบฟอร์มนี้
+      </div>
+
+      <div
+        *ngIf="!isLoading && !selectedFormId"
+        class="text-center"
+        style="padding: 3rem; color: #6b21a8; font-weight: 500"
+      >
+        กรุณาเลือกประเภทและกดค้นหา
+      </div>
+    </div>
+  </div>
 </div>

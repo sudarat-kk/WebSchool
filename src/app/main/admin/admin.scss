@@ -97,21 +97,17 @@
     }
   }
 
-  &.form-management-card {
+  &.form-management-card,
+  &.form-view-card {
     .card-details .card-title {
       color: #673ab7;
     }
   }
 
+  &.course-management-card,
   &.student-management-card {
     .card-details .card-title {
       color: #00897b;
-    }
-  }
-
-  &.score-submission-card {
-    .card-details .card-title {
-      color: #D81B60 !important;
     }
   }
 }
