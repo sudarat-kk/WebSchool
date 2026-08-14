@@ -8,13 +8,18 @@ import { lastValueFrom } from 'rxjs';
 
 interface GradeItem {
   subject_id: number;
+  subjectCode?: string;
   subjectName: string;
+  group_id?: number | string;
   groupName: string;
   submitDate: string;
   submitTime: string;
   checked: boolean;
   note: string;
   rawDate: Date | null;
+  credits: string | number;
+  rowspan?: number;
+  isFirstInGroup?: boolean;
 }
 
 @Component({
@@ -144,16 +149,23 @@ export class ScoreSubmission implements OnInit {
 
           return {
             subject_id: item.subject_id,
+            subjectCode: item.subject_code || '',
             subjectName: item.subject_name,
+            group_id: item.group_id,
             groupName: item.group_name,
+            credits: (item.credits !== null && item.credits !== undefined && !isNaN(Number(item.credits))) 
+              ? Number(item.credits).toFixed(1) 
+              : (item.credits || '-'),
             submitDate: dateStr,
             submitTime: timeStr,
             checked: checked,
             note: note,
             rawDate: rawDate,
-            has_scores_in_db: item.has_scores_in_db // เก็บไว้เช็คเพิ่มเติมได้
+            has_scores_in_db: item.has_scores_in_db
           };
         });
+
+        this.calculateRowspans(this.gradeItems);
         this.updateSummary();
         this.cdr.detectChanges(); // บังคับให้ Angular อัปเดต UI ทันที
         }, 0);
@@ -185,10 +197,99 @@ export class ScoreSubmission implements OnInit {
     this.updateSummary();
   }
 
+  groupSummary = {
+    main: { total: 0, verified: 0, pending: 0 },
+    minor: { total: 0, verified: 0, pending: 0 },
+    supporting: { total: 0, verified: 0, pending: 0 },
+    practical: { total: 0, verified: 0, pending: 0 },
+    totalCredits: 0
+  };
+
   updateSummary() {
     this.summaryData.totalSubjects = this.gradeItems.length;
     this.summaryData.verifiedSubjects = this.gradeItems.filter(item => item.checked).length;
     this.summaryData.pendingVerifications = this.summaryData.totalSubjects - this.summaryData.verifiedSubjects;
+
+    // คำนวณสรุปแยกตามหมวดหมู่
+    this.groupSummary = {
+      main: { total: 0, verified: 0, pending: 0 },
+      minor: { total: 0, verified: 0, pending: 0 },
+      supporting: { total: 0, verified: 0, pending: 0 },
+      practical: { total: 0, verified: 0, pending: 0 },
+      totalCredits: 0
+    };
+
+    for (const item of this.gradeItems) {
+      const cat = this.getCategoryKey(item);
+      this.groupSummary[cat].total++;
+      if (item.checked) {
+        this.groupSummary[cat].verified++;
+      } else {
+        this.groupSummary[cat].pending++;
+      }
+
+      // คำนวณหน่วยกิตรวม (นับเฉพาะตัวแรกในกลุ่มเพื่อไม่ให้ซ้ำ)
+      if (item.isFirstInGroup && item.credits && !isNaN(Number(item.credits))) {
+        this.groupSummary.totalCredits += Number(item.credits);
+      }
+    }
+  }
+
+  getCategoryKey(item: GradeItem): 'main' | 'minor' | 'supporting' | 'practical' {
+    const code = (item.subjectCode || '').toUpperCase();
+    const name = (item.groupName || '').trim().toUpperCase();
+
+    // 1. แยกอักษรตัวแรกจาก groupName (กรุ๊ปวิชา) ตามที่ผู้ใช้ระบุ
+    if (name.startsWith('MN')) {
+      return 'minor';
+    }
+    if (name.startsWith('M')) {
+      return 'main';
+    }
+    if (name.startsWith('S')) {
+      return 'supporting';
+    }
+    if (name.startsWith('P')) {
+      return 'practical';
+    }
+
+    // 2. Fallback ตรวจสอบจากคำในภาษาไทย หรือ subjectCode
+    if (name.includes('รอง') || code.startsWith('MN')) {
+      return 'minor';
+    }
+    if (name.includes('หลัก') || code.startsWith('M-') || code.startsWith('MAIN')) {
+      return 'main';
+    }
+    if (name.includes('ประกอบ') || code.startsWith('S-') || code.startsWith('SUP')) {
+      return 'supporting';
+    }
+    if (name.includes('ปฏิบัติ') || code.startsWith('P-') || code.startsWith('PRAC')) {
+      return 'practical';
+    }
+
+    return 'main'; // ค่าเริ่มต้น
+  }
+
+  getRowClass(item: GradeItem): string {
+    const cat = this.getCategoryKey(item);
+    switch (cat) {
+      case 'main': return 'row-m';
+      case 'minor': return 'row-mn';
+      case 'supporting': return 'row-s';
+      case 'practical': return 'row-p';
+      default: return '';
+    }
+  }
+
+  getPrintIndexClass(item: GradeItem): string {
+    const cat = this.getCategoryKey(item);
+    switch (cat) {
+      case 'main': return 'index-m';
+      case 'minor': return 'index-mn';
+      case 'supporting': return 'index-s';
+      case 'practical': return 'index-p';
+      default: return '';
+    }
   }
 
   goBack() {
@@ -263,6 +364,22 @@ export class ScoreSubmission implements OnInit {
     } catch (error) {
       console.error('Error saving', error);
       Swal.fire('ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+    }
+  }
+
+  calculateRowspans(items: GradeItem[]) {
+    let i = 0;
+    while (i < items.length) {
+      const currentGroupId = items[i].group_id || items[i].groupName;
+      let span = 1;
+      items[i].isFirstInGroup = true;
+
+      while (i + span < items.length && (items[i + span].group_id || items[i + span].groupName) === currentGroupId) {
+        items[i + span].isFirstInGroup = false;
+        span++;
+      }
+      items[i].rowspan = span;
+      i += span;
     }
   }
 }
