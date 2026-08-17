@@ -57,4 +57,8 @@ export class GeneralEvaluationService {
   submitEvaluationAnswer(payload: any): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/forms/submit`, payload);
   }
+
+  getFormSubmissions(formId: number | string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/form-submissions/${formId}`);
+  }
 }

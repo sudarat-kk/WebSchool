@@ -22,83 +22,84 @@
     <div class="management-section">
       <h3 class="section-title">เมนูการจัดการ</h3>
 
-      <!-- 🔵 การ์ดใหม่: จัดการหลักสูตรและรายวิชา -->
+      <!-- 🔵 หมวดหมู่: ข้อมูลพื้นฐาน (สีเขียว Teal) -->
+      <!-- จัดการหลักสูตรและรายวิชา -->
       <div class="action-card course-management-card">
         <div class="card-details">
           <h4 class="card-title">จัดการหลักสูตรและรายวิชา</h4>
           <p class="card-subtitle">เพิ่มหลักสูตรใหม่ หรือเพิ่มรายวิชาเข้าไปในหลักสูตรที่มีอยู่</p>
         </div>
 
-        <button type="button" class="btn-navigate btn-purple-light" style="background-color: #8b5cf6; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: bold;" routerLink="/admin/addcourse">
+        <button mat-raised-button class="btn-navigate btn-teal" routerLink="/admin/addcourse">
           <mat-icon class="btn-icon">add_box</mat-icon>
           <span>เพิ่มหลักสูตร / เพิ่มวิชา</span>
         </button>
       </div>
 
-      <!--จัดการข้อมูลนักเรียน (แก้ไขปุ่มตรงนี้แล้ว) -->
+      <!-- จัดการข้อมูลนักเรียน -->
       <div class="action-card student-management-card">
         <div class="card-details">
           <h4 class="card-title">จัดการข้อมูลนักเรียน</h4>
           <p class="card-subtitle">เพิ่ม นำเข้า แก้ไข และจัดการรายชื่อนักเรียนในระบบ</p>
         </div>
 
-        <!-- ✅ เปลี่ยนเป็นใช้ class="btn-navigate btn-teal" ให้เข้ากับสไตล์ปุ่มอื่น -->
-        <button type="button" class="btn-navigate btn-teal" routerLink="/admin/addstudent">
+        <button mat-raised-button class="btn-navigate btn-teal" routerLink="/admin/addstudent">
           <mat-icon class="btn-icon">add</mat-icon>
           <span>เพิ่มข้อมูลนักเรียน</span>
         </button>
       </div>
 
-      <!-- การ์ดที่ 1: แบบกรอกคะแนนนักเรียน (ของเดิม) -->
+      <!-- 🔵 หมวดหมู่: การจัดการคะแนน (สีน้ำเงิน Blue) -->
+      <!-- แบบกรอกคะแนนนักเรียน -->
       <div class="action-card">
         <div class="card-details">
           <h4 class="card-title">แบบกรอกคะแนนนักเรียน</h4>
           <p class="card-subtitle">สำหรับเข้าสู่หน้าบันทึกและจัดการคะแนนในระบบ</p>
         </div>
 
-        <button mat-raised-button color="primary" routerLink="/admin/scoremanagement" class="btn-navigate">
+        <button mat-raised-button class="btn-navigate" routerLink="/admin/scoremanagement">
           <mat-icon class="btn-icon">edit</mat-icon>
           ไปยังหน้ากรอกคะแนน
         </button>
       </div>
 
-      <!-- การ์ดใหม่: ตรวจสอบการส่งคะแนน -->
+      <!-- ตรวจสอบสถานะการส่งคะแนน -->
       <div class="action-card score-submission-card">
         <div class="card-details">
           <h4 class="card-title">ตรวจสอบสถานะการส่งคะแนน</h4>
           <p class="card-subtitle">เช็คสถานะการส่งคะแนนของแต่ละรายวิชา ว่าอาจารย์ส่งครบแล้วหรือยัง</p>
         </div>
 
-        <button type="button" class="btn-navigate" style="background-color: #3b82f6; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: bold;" routerLink="/score-submission">
+        <button mat-raised-button class="btn-navigate" routerLink="/score-submission">
           <mat-icon class="btn-icon">fact_check</mat-icon>
           <span>ตรวจสอบการส่งคะแนน</span>
         </button>
       </div>
 
-      <!-- การ์ดที่ 2: เพิ่มการ์ดสำหรับไปยังหน้าแบบฟอร์ม (ธีมม่วงพาสเทล) -->
+      <!-- 🔵 หมวดหมู่: แบบประเมิน (สีม่วง Purple) -->
+      <!-- จัดการและสร้างแบบฟอร์มประเมิน -->
       <div class="action-card form-management-card">
         <div class="card-details">
           <h4 class="card-title">จัดการและสร้างแบบฟอร์มประเมิน</h4>
           <p class="card-subtitle">สร้าง ผูกหลักสูตร วางลิงก์ Google Form และเปิด-ปิดใช้งานแบบประเมิน</p>
         </div>
 
-        <!-- ใช้ routerLink ชี้ไปยัง Path หน้าฟอร์มที่คุณกำหนดไว้ใน Routing -->
-        <button mat-raised-button color="primary" routerLink="/admin/form" class="btn-navigate btn-purple">
+        <button mat-raised-button class="btn-navigate btn-purple" routerLink="/admin/form">
           <mat-icon class="btn-icon">assignment</mat-icon>
           ไปยังหน้าจัดการแบบฟอร์ม
         </button>
       </div>
 
-      <div class="action-card score-submission-card">
+      <!-- แสดงข้อมูลแบบฟอร์มประเมิน -->
+      <div class="action-card form-view-card">
         <div class="card-details">
-          <h4 class="card-title">ตรวจสอบการส่งคะแนน</h4>
-          <p class="card-subtitle">เช็คข้อมูลการส่งคะแนน</p>
+          <h4 class="card-title">แสดงข้อมูลแบบฟอร์มประเมิน</h4>
+          <p class="card-subtitle">ตรวจสอบข้อมูลการตอบแบบประเมินและข้อเสนอแนะ</p>
         </div>
 
-        <!-- ใช้ routerLink ชี้ไปยัง Path หน้าฟอร์มที่คุณกำหนดไว้ใน Routing -->
-        <button mat-raised-button routerLink="/admin/score-submission" class="btn-navigate btn-rose">
-          <mat-icon class="btn-icon">assignment</mat-icon>
-          ไปยังหน้าตรวจสอบการส่งคะแนน
+        <button mat-raised-button class="btn-navigate btn-purple" routerLink="/admin/form-view">
+          <mat-icon class="btn-icon">visibility</mat-icon>
+          ไปยังหน้าข้อมูลแบบฟอร์ม
         </button>
       </div>
 

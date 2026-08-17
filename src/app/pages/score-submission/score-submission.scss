@@ -322,6 +322,24 @@ $icon-pending-color: #ff9800;  // สีส้ม
       }
     }
   }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+  }
+
+  // Row Classes based on Subject Group
+  .row-m { border-left: 4px solid #fde047; } // Yellow
+  .row-mn { border-left: 4px solid #fda4af; } // Red
+  .row-s { border-left: 4px solid #93c5fd; } // Blue
+  .row-p { border-left: 4px solid #e5e7eb; } // Gray
+
+  .text-center {
+    text-align: center;
+  }
 }
 
 // ==========================================
@@ -447,6 +465,28 @@ $icon-pending-color: #ff9800;  // สีส้ม
     td.text-center {
       text-align: center !important;
     }
+
+    /* สีช่องลำดับในตารางพิมพ์ */
+    td.index-m, td.cat-label-m {
+      background-color: #fef08a !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    td.index-mn, td.cat-label-mn {
+      background-color: #fecdd3 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    td.index-s, td.cat-label-s {
+      background-color: #bfdbfe !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    td.index-p, td.cat-label-p {
+      background-color: #e5e7eb !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
   }
 
   /* เลียนแบบช่อง Checkbox */
@@ -469,7 +509,7 @@ $icon-pending-color: #ff9800;  // สีส้ม
 
   /* ตารางสรุปด้านล่าง */
   .print-summary-section {
-    width: 50%;
+    width: 65%;
     margin: 0 auto;
   }
 
