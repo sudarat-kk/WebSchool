@@ -182,11 +182,6 @@
                                 [class.group-header-single]="grp.isSingle"
                                 [class.group-header-multi]="!grp.isSingle">
                               <div class="grp-header-title">{{ grp.groupName }}</div>
-                              @if (grp.isSingle) {
-                                <div class="grp-header-credit">{{ grp.credit }} นก.</div>
-                              } @else {
-                                <div class="grp-header-credit">รวม {{ grp.subjects.length }} วิชา {{ grp.credit }} นก.</div>
-                              }
                             </th>
                           }
                           <th rowspan="2" class="text-center highlight-col">ฝึกอบรม<br><small>(100)</small></th>

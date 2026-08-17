@@ -76,6 +76,8 @@ export class ScoreManagement implements OnInit {
   isSaving: boolean = false;
   isLoading: boolean = false;
   isSaved: boolean = false; 
+  isMaxScoreSaved: boolean = false;
+  isSU: boolean = false;
   showFailingHighlight: boolean = false;
 
   constructor(
@@ -155,9 +157,15 @@ export class ScoreManagement implements OnInit {
             return String(a.student_code || '').localeCompare(String(b.student_code || ''), undefined, { numeric: true });
           });
 
-          if (res.max_score !== undefined && res.max_score !== null) {
+          if (res.max_score !== undefined && res.max_score !== null && res.max_score > 0) {
             this.inputMaxScore = res.max_score;
+            this.isMaxScoreSaved = true;
+          } else {
+            this.inputMaxScore = null;
+            this.isMaxScoreSaved = false;
           }
+          
+          this.isSU = !!res.is_su; // Load is_su from API
           
           const hasScores = this.studentList.some((s) => s.raw_score !== null && s.raw_score !== undefined && s.raw_score.toString() !== '');
           if (hasScores) {
@@ -167,17 +175,21 @@ export class ScoreManagement implements OnInit {
           this.updateStats();
         }
         this.isLoading = false;
+        this.cdr.detectChanges(); // ให้ Angular อัปเดต UI ทันที
       },
       error: (err) => {
         console.error('Failed to load students', err);
         this.isLoading = false;
         if (err.status === 404) {
           this.studentList = [];
-          this.inputMaxScore = null; // เคลียร์คะแนนเต็มให้เป็นช่องว่าง
+          this.inputMaxScore = null; // ให้เป็น null เพื่อให้ขึ้น placeholder 0 แบบจางๆ
+          this.isMaxScoreSaved = false;
+          this.isSU = false;
           this.updateStats();
           // ดึงข้อความ error จาก backend ถ้ามี
           this.saveError = err.error?.message || 'ไม่พบข้อมูลนักเรียนหรือยังไม่ได้ตั้งค่าวิชาในรุ่นที่เลือก';
         }
+        this.cdr.detectChanges(); // ให้ Angular อัปเดต UI ทันที
       },
     });
   }
@@ -258,17 +270,9 @@ export class ScoreManagement implements OnInit {
   }
 
   onSubjectChange() {
-      this.studentList = [];
-      this.isSaved = false;
-      this.saveError = '';
-      this.updateStats();
-
-      if (this.selectedBatch && this.selectedSubjectId) {
-        this.loadStudents(this.selectedBatch, this.selectedSubjectId);
-      }
-      this.cdr.detectChanges();
     this.studentList = [];
     this.isSaved = false;
+    this.isMaxScoreSaved = false;
     this.saveError = '';
     this.showFailingHighlight = false;
     this.updateStats();
@@ -279,28 +283,52 @@ export class ScoreManagement implements OnInit {
   }
 
   onMaxScoreConfirm() {
-    if (this.selectedSubjectId && this.selectedBatch && this.inputMaxScore !== null) {
+    if (this.selectedSubjectId && this.selectedBatch && (this.inputMaxScore !== null || this.isSU)) {
+      const finalMaxScore = this.isSU ? 1 : this.inputMaxScore;
       this.scoreService
         .updateMaxScore({
           batch_id: this.selectedBatch,
           subject_id: this.selectedSubjectId,
-          max_score: this.inputMaxScore,
+          max_score: finalMaxScore as number,
+          is_su: this.isSU,
         })
         .subscribe({
           next: () => {
             console.log('Max score updated');
             // แจ้งเตือนผู้ใช้งานเมื่อบันทึกคะแนนเต็มสำเร็จ
-            alert('บันทึกคะแนนเต็มสำเร็จ!');
+            Swal.fire({
+              icon: 'success',
+              title: 'สำเร็จ',
+              text: 'บันทึกคะแนนเต็มสำเร็จ!',
+              confirmButtonText: 'ตกลง',
+              confirmButtonColor: '#8e44ad',
+              background: '#ffffff',
+              backdrop: `rgba(0,0,0,0.4)`
+            });
+            this.isMaxScoreSaved = true;
+            this.cdr.detectChanges(); // ให้ Angular อัปเดต UI ทันที
             // โหลดข้อมูลใหม่เพื่อให้ตารางและค่าต่างๆ อัปเดต
             this.loadStudents(this.selectedBatch, this.selectedSubjectId);
           },
           error: (err) => {
             console.error('Failed to update max score', err);
-            alert('เกิดข้อผิดพลาดในการอัปเดตคะแนนเต็ม: ' + (err.error?.message || err.error?.error || 'ไม่ทราบสาเหตุ'));
+            Swal.fire({
+              icon: 'error',
+              title: 'ผิดพลาด',
+              text: 'เกิดข้อผิดพลาดในการอัปเดตคะแนนเต็ม: ' + (err.error?.message || err.error?.error || 'ไม่ทราบสาเหตุ'),
+              confirmButtonText: 'ตกลง',
+              confirmButtonColor: '#d33'
+            });
           },
         });
     } else {
-      alert('กรุณาเลือกรุ่น รายวิชา และกรอกคะแนนเต็มก่อนบันทึก');
+      Swal.fire({
+        icon: 'warning',
+        title: 'ข้อมูลไม่ครบ',
+        text: 'กรุณาเลือกรุ่น รายวิชา และกรอกคะแนนเต็มก่อนบันทึก',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#f39c12'
+      });
     }
   }
 
@@ -317,6 +345,7 @@ export class ScoreManagement implements OnInit {
 
   isInvalidScore(score: any): boolean {
     if (score === null || score === undefined || score.toString() === '') return false;
+    if (this.isSU) return false;
     if (this.inputMaxScore === null) return false;
     const numScore = Number(score);
     const numMax = Number(this.inputMaxScore);
@@ -363,6 +392,7 @@ export class ScoreManagement implements OnInit {
     }
 
     const hasInvalidScores = studentsToSave.some((s) => {
+      if (this.isSU) return false;
       const score = Number(s.raw_score);
       const max = Number(this.inputMaxScore);
       return score < 0 || score > max;
@@ -380,7 +410,7 @@ export class ScoreManagement implements OnInit {
 
     const maxScore = Number(this.inputMaxScore);
     const passThreshold = maxScore * 0.7;
-    const failingStudents = studentsToSave.filter(s => Number(s.raw_score) < passThreshold);
+    const failingStudents = this.isSU ? [] : studentsToSave.filter(s => Number(s.raw_score) < passThreshold);
 
     if (failingStudents.length > 0) {
       this.showFailingHighlight = true; // เปิดไฮไลต์
@@ -408,6 +438,7 @@ export class ScoreManagement implements OnInit {
   }
 
   isFailingScore(score: any): boolean {
+    if (this.isSU) return score === 0;
     if (!this.inputMaxScore || score === null || score === undefined || score.toString() === '') return false;
     return Number(score) < (Number(this.inputMaxScore) * 0.7);
   }
@@ -430,6 +461,7 @@ export class ScoreManagement implements OnInit {
         this.isSaving = false;
         this.isSaved = true;
         this.saveError = '';
+        this.cdr.detectChanges(); // อัปเดต UI ให้ปุ่มกลายเป็นสีเทาและฟิลด์ถูกล็อคทันที
         
         // แจ้งเตือนสำเร็จด้วย SweetAlert2
         Swal.fire({
@@ -440,12 +472,15 @@ export class ScoreManagement implements OnInit {
           confirmButtonColor: '#8e44ad',
           background: '#ffffff',
           backdrop: `rgba(0,0,0,0.4)`
+        }).then(() => {
+          this.cdr.detectChanges(); // เผื่อกรณี UI หายไปหลังป๊อปอัปปิด
         });
       },
       error: (err) => {
         this.isSaving = false;
         this.saveError = 'เกิดข้อผิดพลาดในการบันทึกคะแนน';
         console.error(err);
+        this.cdr.detectChanges(); // อัปเดตข้อความ Error ให้แสดงบน UI ทันที
         
         Swal.fire({
           icon: 'error',
@@ -465,8 +500,13 @@ export class ScoreManagement implements OnInit {
     this.cdr.markForCheck();
   }
 
+  enableMaxScoreEdit() {
+    this.isMaxScoreSaved = false;
+    this.cdr.markForCheck();
+  }
+
   goToNextSubject() {
-    const currentIndex = this.subjects.findIndex((s) => s.subject_id === this.selectedSubjectId);
+    const currentIndex = this.subjects.findIndex((s) => s.subject_id == this.selectedSubjectId);
     const nextIndex = currentIndex + 1;
     if (nextIndex < this.subjects.length) {
       this.selectedSubjectId = this.subjects[nextIndex].subject_id;
@@ -479,7 +519,7 @@ export class ScoreManagement implements OnInit {
   }
 
   goToPreviousSubject() {
-    const currentIndex = this.subjects.findIndex((s) => s.subject_id === this.selectedSubjectId);
+    const currentIndex = this.subjects.findIndex((s) => s.subject_id == this.selectedSubjectId);
     const prevIndex = currentIndex - 1;
     if (prevIndex >= 0) {
       this.selectedSubjectId = this.subjects[prevIndex].subject_id;
@@ -488,12 +528,12 @@ export class ScoreManagement implements OnInit {
   }
 
   get hasPreviousSubject(): boolean {
-    const currentIndex = this.subjects.findIndex((s) => s.subject_id === this.selectedSubjectId);
+    const currentIndex = this.subjects.findIndex((s) => s.subject_id == this.selectedSubjectId);
     return currentIndex > 0;
   }
 
   get hasNextSubject(): boolean {
-    const currentIndex = this.subjects.findIndex((s) => s.subject_id === this.selectedSubjectId);
+    const currentIndex = this.subjects.findIndex((s) => s.subject_id == this.selectedSubjectId);
     return currentIndex >= 0 && currentIndex < this.subjects.length - 1;
   }
 }

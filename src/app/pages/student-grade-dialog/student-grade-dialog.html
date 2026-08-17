@@ -68,7 +68,6 @@
             <th class="text-center" style="width: 90px;">เกรด</th>
             <th class="text-center" style="width: 90px;">ผลการฝึก</th>
             <th class="text-center" style="width: 100px;">Index</th>
-            <th class="text-center" style="width: 110px;">สถานะ</th>
           </tr>
         </thead>
         <tbody>
@@ -86,9 +85,6 @@
               <td class="text-center text-bold grade-text text-purple" [attr.rowspan]="subject.rowspan">{{ subject.grade || '-' }}</td>
               <td class="text-center text-bold text-primary" [attr.rowspan]="subject.rowspan">{{ getNumericGrade(subject.grade) }}</td>
               <td class="text-center text-bold index-text" [attr.rowspan]="subject.rowspan">({{ subject.indexValue || '0.00' }})</td>
-              <td class="text-center" [attr.rowspan]="subject.rowspan">
-                <span class="mini-status pass">ผ่าน</span>
-              </td>
             </ng-container>
           </tr>
         </tbody>

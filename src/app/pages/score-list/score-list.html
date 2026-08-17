@@ -137,12 +137,14 @@
             @for (subj of groupSummary?.subjects; track subj.subject_id) {
               <th style="min-width: 140px">
                 <div class="subject-col-title">{{ subj.subject_name }}</div>
-                <div class="subject-col-max">(เต็ม {{ subj.max_score }})</div>
+                <div class="subject-col-max" *ngIf="!subj.is_su">(เต็ม {{ subj.max_score }})</div>
+                <div class="subject-col-max" *ngIf="subj.is_su">(S/U)</div>
               </th>
             }
 
             <th style="min-width: 110px">คิดเป็นร้อยละ</th>
-            <th style="min-width: 80px">เกรด</th>
+            <th style="min-width: 80px">เกรด (ตัวอักษร)</th>
+            <th style="min-width: 80px">เกรด (ตัวเลข)</th>
             <th style="min-width: 120px">ค่าประกอบ Index</th>
           </tr>
         </thead>
@@ -160,7 +162,7 @@
                   <!-- ถ้าไม่มีคะแนนให้แสดงเครื่องหมายขีด (-) -->
                   {{
                     student.subject_scores[subj.subject_id] !== undefined
-                      ? student.subject_scores[subj.subject_id]
+                      ? (subj.is_su ? (student.subject_scores[subj.subject_id] > 0 ? 'S' : 'U') : student.subject_scores[subj.subject_id])
                       : '-'
                   }}
                 </td>
@@ -168,11 +170,12 @@
 
               <td>{{ student.percent }}%</td>
               <td class="grade-cell">{{ student.grade }}</td>
+              <td class="grade-cell">{{ student.grade_point }}</td>
               <td>{{ student.index_value }}</td>
             </tr>
           } @empty {
             <tr>
-              <td [attr.colspan]="(groupSummary?.subjects?.length || 0) + 6" class="empty-row">
+              <td [attr.colspan]="(groupSummary?.subjects?.length || 0) + 7" class="empty-row">
                 @if (!selectedSubjectId) {
                   กรุณาเลือกข้อมูลตัวกรองให้ครบถ้วนเพื่อแสดงรายชื่อนักเรียน
                 } @else if (!isLoading) {
