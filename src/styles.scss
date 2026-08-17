@@ -13,7 +13,7 @@ html {
         primary: mat.$rose-palette,
         tertiary: mat.$red-palette,
       ),
-      typography: Roboto,
+      typography: Sarabun,
       density: 0,
     )
   );
@@ -34,3 +34,15 @@ body {
 }
 
 /* คุณสามารถเพิ่ม Global Styles อื่นๆ ต่อท้ายด้านล่างนี้ได้เลยครับ */
+
+* {
+  font-family: 'Sarabun', sans-serif !important;
+}
+
+mat-icon, .material-icons, .material-symbols-outlined {
+  font-family: 'Material Icons' !important;
+}
+
+body {
+  font-size: 16px;
+}

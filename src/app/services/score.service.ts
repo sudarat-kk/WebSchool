@@ -36,6 +36,7 @@ export interface UpdateMaxScoreRequest {
   batch_id: number;
   subject_id: number;
   max_score: number;
+  is_su?: boolean;
 }
 
 export interface AdminStudentScore {
@@ -50,6 +51,7 @@ export interface AdminStudentScore {
 export interface AdminSubjectScoresResponse {
   success: boolean;
   max_score: number;
+  is_su?: boolean;
   data: AdminStudentScore[];
 }
 

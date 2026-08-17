@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { ScoreService } from '../../services/score.service';
+import Swal from 'sweetalert2';
 
 export interface SpecialScoreStudent {
   id: number | string;
@@ -43,6 +44,19 @@ export class SpecialScoreDialog implements OnInit {
     if (this.data && this.data.students) {
       // Deep clone to avoid mutating original data before saving
       this.students = JSON.parse(JSON.stringify(this.data.students));
+      
+      // กำหนดค่าเริ่มต้นให้เป็นคะแนนเต็ม หากยังไม่มีการกรอกคะแนน (เป็น 0 หรือ null)
+      this.students.forEach(st => {
+        if (!st.trainingTimeScore) {
+          st.trainingTimeScore = 100;
+        }
+        if (!st.examTimeScore) {
+          st.examTimeScore = 100;
+        }
+        if (!st.behaviorScore) {
+          st.behaviorScore = 200;
+        }
+      });
     }
   }
 
@@ -91,13 +105,27 @@ export class SpecialScoreDialog implements OnInit {
 
     this.scoreService.saveSpecialScoresBulk(payload).subscribe({
       next: (res: any) => {
-        alert('บันทึกข้อมูลคะแนนพิเศษสำเร็จ!');
+        Swal.fire({
+          icon: 'success',
+          title: 'สำเร็จ',
+          text: 'บันทึกข้อมูลคะแนนพิเศษสำเร็จ!',
+          confirmButtonText: 'ตกลง',
+          confirmButtonColor: '#8e44ad',
+          background: '#ffffff',
+          backdrop: `rgba(0,0,0,0.4)`
+        });
         this.isSaving = false;
         this.dialogRef.close(true); // pass true to indicate successful save
       },
       error: (err: any) => {
         console.error('Failed to save special scores', err);
-        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+        Swal.fire({
+          icon: 'error',
+          title: 'ผิดพลาด',
+          text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล',
+          confirmButtonText: 'ตกลง',
+          confirmButtonColor: '#d33'
+        });
         this.isSaving = false;
       }
     });

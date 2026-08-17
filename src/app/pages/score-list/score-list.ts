@@ -28,6 +28,7 @@ interface SubjectColumn {
   subject_id: number;
   subject_name: string;
   max_score: number;
+  is_su?: boolean;
 }
 
 interface StudentResult {
