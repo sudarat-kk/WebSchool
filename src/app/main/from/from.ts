@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -64,6 +64,7 @@ export class From implements OnInit {
   constructor(
     private courseService: CourseService,
     private generalEvaluationService: GeneralEvaluationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -91,7 +92,7 @@ export class From implements OnInit {
     this.generalEvaluationService.getAllForms().subscribe({
       next: (res) => {
         if (res.success && res.data) {
-          this.formList = res.data.map((item: any) => {
+          const mappedData = res.data.map((item: any) => {
             let cName = 'ไม่ระบุ';
             let gName = 'ไม่ระบุรุ่น';
             if (item.batch_id) {
@@ -128,7 +129,12 @@ export class From implements OnInit {
             };
           });
 
+          this.formList = [...mappedData];
           this.generateTableData();
+
+          if (this.cdr) {
+          this.cdr.detectChanges();
+        }
         } else {
           this.formList = [];
           this.generateTableData();
@@ -246,10 +252,10 @@ export class From implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'ลบเลย',
       cancelButtonText: 'ยกเลิก',
-      confirmButtonColor: '#f44336'
+      confirmButtonColor: '#f44336',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.formTypes = this.formTypes.filter(t => t.value !== this.formData.formType);
+        this.formTypes = this.formTypes.filter((t) => t.value !== this.formData.formType);
         this.formData.formType = '';
         this.onTypeChange();
       }
@@ -404,14 +410,31 @@ export class From implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Fetch real questions
-    this.generalEvaluationService.getFormById(item.id).subscribe({
-      next: (res) => {
-        if (res.success && res.data && res.data.questions) {
-          this.formData.questions = res.data.questions;
-        } else {
-          this.addQuestion(); // fallback
-        }
-      },
+   this.generalEvaluationService.getFormById(item.id).subscribe({
+    next: (res: any) => {
+
+        const rawQuestions = res.data?.questions || res.data || [];
+
+        if (res.success && Array.isArray(rawQuestions) && rawQuestions.length > 0) {
+        const mappedQuestions = rawQuestions.map((q: any) => ({
+          question_text: q.question_text || q.questionText || q.title || q.question || '',
+          question_type: q.question_type || q.questionType || q.type || 'choice',
+          choices: Array.isArray(q.choices)
+            ? q.choices.map((c: any) => ({
+                choice_text: c.choice_text || c.choiceText || c.text || '',
+                score_value: c.score_value ?? c.scoreValue ?? c.score ?? 0,
+              }))
+            : [],
+        }));
+
+        this.formData.questions = [...mappedQuestions];
+        this.cdr.detectChanges();
+
+      } else {
+        console.warn('ไม่พบคำถามเดิม หรือโครงสร้างไม่ตรง');
+        this.addQuestion();
+      }
+    },
       error: (err) => {
         console.error('Error fetching questions:', err);
         Swal.fire({
@@ -427,16 +450,30 @@ export class From implements OnInit {
   }
 
   onUpdateForm() {
-    if (!this.selectedFormId) return;
-    if (!this.formData.questions || this.formData.questions.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'ไม่มีคำถาม',
-        text: 'กรุณาสร้างคำถามอย่างน้อย 1 ข้อ',
-        confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#673ab7',
-      });
-      return;
+    console.log('=== เริ่มทำงาน onUpdateForm ===');
+  console.log('selectedFormId:', this.selectedFormId);
+  console.log('questions:', this.formData?.questions);
+
+    if (!this.selectedFormId) {
+    console.warn('❌ ติดเงื่อนไข: selectedFormId เป็น null หรือ undefined');
+    Swal.fire({
+      icon: 'error',
+      title: 'ไม่พบรหัสฟอร์ม',
+      text: 'กรุณาเลือกแบบฟอร์มที่ต้องการแก้ไขใหม่อีกครั้ง',
+    });
+    return;
+  }
+
+  if (!this.formData.questions || this.formData.questions.length === 0) {
+    console.warn('❌ ติดเงื่อนไข: ไม่มีคำถาม');
+    Swal.fire({
+      icon: 'warning',
+      title: 'ไม่มีคำถาม',
+      text: 'กรุณาสร้างคำถามอย่างน้อย 1 ข้อ',
+      confirmButtonText: 'ตกลง',
+      confirmButtonColor: '#673ab7',
+    });
+    return;
     }
 
     const cleanSubjectId =
@@ -462,9 +499,14 @@ export class From implements OnInit {
             text: 'บันทึกการแก้ไขข้อมูลแบบฟอร์มเรียบร้อยแล้ว',
             timer: 1500,
             showConfirmButton: false,
+          }).then(() => {
+            // 🟢 ย้ายมาทำตรงนี้: รอให้ SweetAlert ปิดตัวสนิทก่อนค่อยเปลี่ยนหน้า
+            this.resetForm();
+            this.fetchAllForms();
+            
+            // เลื่อนหน้าจอกลับขึ้นไปด้านบนหน้ารายการ (ถ้าจำเป็น)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           });
-          this.resetForm();
-          this.fetchAllForms();
         } else {
           Swal.fire({
             icon: 'error',
@@ -476,7 +518,7 @@ export class From implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error update:', err);
+        console.error('Error updating form:', err);
         Swal.fire({
           icon: 'error',
           title: 'ไม่สามารถบันทึกได้',
@@ -497,44 +539,64 @@ export class From implements OnInit {
       confirmButtonText: 'ใช่, ลบเลย!',
       cancelButtonText: 'ยกเลิก',
       confirmButtonColor: '#f44336',
-      cancelButtonColor: '#9e9e9e'
+      cancelButtonColor: '#9e9e9e',
     }).then((result) => {
       if (result.isConfirmed) {
         this.generalEvaluationService.deleteGeneralEvaluation(id).subscribe({
           next: (res) => {
             if (res.success) {
-              Swal.fire({
-                icon: 'success',
-                title: 'ลบสำเร็จ!',
-                text: 'ลบแบบฟอร์มออกจากระบบเรียบร้อยแล้ว',
-                timer: 1500,
-                showConfirmButton: false
-              });
-              this.fetchAllForms();
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'ไม่สามารถลบได้',
-                text: res.message || 'เกิดข้อผิดพลาดในการลบแบบฟอร์ม',
-                confirmButtonText: 'ตกลง',
-                confirmButtonColor: '#f44336'
-              });
+            
+            // 🟢 1. ตัดรายการที่ลบออกจาก formList ทันที
+            this.formList = this.formList.filter((item: any) => item.id !== id);
+            
+            // 🟢 2. บังคับให้ป้อนข้อมูลลงตารางใหม่
+            this.generateTableData();
+
+            // 🟢 3. ถ้าฟอร์มที่ลบอยู่ คือตัวที่กำลังเปิดแก้ไข ให้รีเซ็ตฟอร์มด้วย
+            if (this.selectedFormId === id) {
+              this.resetForm();
             }
-          },
-          error: (err) => {
-            console.error('Error delete:', err);
+
+            // 🟢 4. บังคับ Angular อัปเดตหน้าจอทันที
+            if (this.cdr) {
+              this.cdr.detectChanges();
+            }
+
+            Swal.fire({
+              icon: 'success',
+              title: 'ลบสำเร็จ!',
+              text: 'ลบแบบฟอร์มออกจากระบบเรียบร้อยแล้ว',
+              timer: 1500,
+              showConfirmButton: false,
+            });
+
+            // 🟢 5. ดึงข้อมูลจริงจาก Backend มาอัปเดตซ้ำอีกทีเพื่อความชัวร์
+            this.fetchAllForms();
+
+          } else {
             Swal.fire({
               icon: 'error',
               title: 'ไม่สามารถลบได้',
-              text: err.error?.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์',
-              confirmButtonText: 'รับทราบ',
-              confirmButtonColor: '#f44336'
+              text: res.message || 'เกิดข้อผิดพลาดในการลบแบบฟอร์ม',
+              confirmButtonText: 'ตกลง',
+              confirmButtonColor: '#f44336',
             });
           }
-        });
-      }
-    });
-  }
+        },
+        error: (err) => {
+          console.error('Error delete:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'ไม่สามารถลบได้',
+            text: err.error?.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์',
+            confirmButtonText: 'รับทราบ',
+            confirmButtonColor: '#f44336',
+          });
+        },
+      });
+    }
+  });
+}
 
   resetForm() {
     this.isEditMode = false;
@@ -550,6 +612,10 @@ export class From implements OnInit {
     this.addQuestion(); // สร้างข้อว่างเตรียมไว้ให้
     this.availableBatches = [];
     this.availableSubjects = [];
+
+    if (this.cdr) {
+    this.cdr.detectChanges();
+    }
   }
 
   // ==========================================

@@ -14,6 +14,7 @@ import { ScoreService } from '../../services/score.service';
 import { CourseService, CourseGroup } from '../../services/course.service';
 import { Location } from '@angular/common';
 import Swal from 'sweetalert2';
+import { finalize } from 'rxjs/operators';
 
 interface Course {
   id: number;
@@ -75,7 +76,7 @@ export class ScoreManagement implements OnInit {
   saveError: string = '';
   isSaving: boolean = false;
   isLoading: boolean = false;
-  isSaved: boolean = false; 
+  isSaved: boolean = false;
   showFailingHighlight: boolean = false;
 
   constructor(
@@ -85,7 +86,7 @@ export class ScoreManagement implements OnInit {
     private courseService: CourseService,
     private location: Location,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -119,7 +120,6 @@ export class ScoreManagement implements OnInit {
 
     this.dropdownService.getSubjects(batchId).subscribe({
       next: (res) => {
-
         // 2. กำหนดค่าข้อมูลตรงๆ ไม่ต้องใช้ setTimeout ครอบ
         if (res && res.data) {
           this.subjects = res.data;
@@ -144,22 +144,31 @@ export class ScoreManagement implements OnInit {
     this.scoreService.getAdminSubjectScores(batchId, subjectId).subscribe({
       next: (res) => {
         if (res?.success && res.data) {
-          this.studentList = res.data.map((s: any) => ({
-            student_id: s.student_id,
-            student_code: s.student_code,
-            rank_name: s.rank_name || '',
-            first_name: s.first_name,
-            last_name: s.last_name,
-            raw_score: s.raw_score ?? null,
-          })).sort((a: any, b: any) => {
-            return String(a.student_code || '').localeCompare(String(b.student_code || ''), undefined, { numeric: true });
-          });
+          this.studentList = res.data
+            .map((s: any) => ({
+              student_id: s.student_id,
+              student_code: s.student_code,
+              rank_name: s.rank_name || '',
+              first_name: s.first_name,
+              last_name: s.last_name,
+              raw_score: s.raw_score ?? null,
+            }))
+            .sort((a: any, b: any) => {
+              return String(a.student_code || '').localeCompare(
+                String(b.student_code || ''),
+                undefined,
+                { numeric: true },
+              );
+            });
 
           if (res.max_score !== undefined && res.max_score !== null) {
             this.inputMaxScore = res.max_score;
           }
-          
-          const hasScores = this.studentList.some((s) => s.raw_score !== null && s.raw_score !== undefined && s.raw_score.toString() !== '');
+
+          const hasScores = this.studentList.some(
+            (s) =>
+              s.raw_score !== null && s.raw_score !== undefined && s.raw_score.toString() !== '',
+          );
           if (hasScores) {
             this.isSaved = true;
           }
@@ -176,7 +185,8 @@ export class ScoreManagement implements OnInit {
           this.inputMaxScore = null; // เคลียร์คะแนนเต็มให้เป็นช่องว่าง
           this.updateStats();
           // ดึงข้อความ error จาก backend ถ้ามี
-          this.saveError = err.error?.message || 'ไม่พบข้อมูลนักเรียนหรือยังไม่ได้ตั้งค่าวิชาในรุ่นที่เลือก';
+          this.saveError =
+            err.error?.message || 'ไม่พบข้อมูลนักเรียนหรือยังไม่ได้ตั้งค่าวิชาในรุ่นที่เลือก';
         }
       },
     });
@@ -258,15 +268,15 @@ export class ScoreManagement implements OnInit {
   }
 
   onSubjectChange() {
-      this.studentList = [];
-      this.isSaved = false;
-      this.saveError = '';
-      this.updateStats();
+    this.studentList = [];
+    this.isSaved = false;
+    this.saveError = '';
+    this.updateStats();
 
-      if (this.selectedBatch && this.selectedSubjectId) {
-        this.loadStudents(this.selectedBatch, this.selectedSubjectId);
-      }
-      this.cdr.detectChanges();
+    if (this.selectedBatch && this.selectedSubjectId) {
+      this.loadStudents(this.selectedBatch, this.selectedSubjectId);
+    }
+    this.cdr.detectChanges();
     this.studentList = [];
     this.isSaved = false;
     this.saveError = '';
@@ -280,23 +290,41 @@ export class ScoreManagement implements OnInit {
 
   onMaxScoreConfirm() {
     if (this.selectedSubjectId && this.selectedBatch && this.inputMaxScore !== null) {
+      // 1. ตั้งค่าสถานะกำลังบันทึก
+      this.isSaving = true;
+
+      // 2. สั่งเด้งเคอร์เซอร์ออกจากช่องพิมพ์ทันที (ป้องกันการพิมพ์ต่อระหว่างรอ)
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+
+      // 3. บังคับ Angular อัปเดต UI ทันทีในมิลลิวินาทีนี้ เพื่อให้ช่องกลายเป็น [disabled] ทันที
+      this.cdr.detectChanges();
+
       this.scoreService
         .updateMaxScore({
           batch_id: this.selectedBatch,
           subject_id: this.selectedSubjectId,
           max_score: this.inputMaxScore,
         })
+        .pipe(
+          finalize(() => {
+            this.isSaving = false;
+            this.cdr.detectChanges(); // บังคับอัปเดตสถานะ UI อีกครั้งเมื่อจบกระบวนการ
+          }),
+        )
         .subscribe({
           next: () => {
             console.log('Max score updated');
-            // แจ้งเตือนผู้ใช้งานเมื่อบันทึกคะแนนเต็มสำเร็จ
             alert('บันทึกคะแนนเต็มสำเร็จ!');
-            // โหลดข้อมูลใหม่เพื่อให้ตารางและค่าต่างๆ อัปเดต
             this.loadStudents(this.selectedBatch, this.selectedSubjectId);
           },
           error: (err) => {
             console.error('Failed to update max score', err);
-            alert('เกิดข้อผิดพลาดในการอัปเดตคะแนนเต็ม: ' + (err.error?.message || err.error?.error || 'ไม่ทราบสาเหตุ'));
+            alert(
+              'เกิดข้อผิดพลาดในการอัปเดตคะแนนเต็ม: ' +
+                (err.error?.message || err.error?.error || 'ไม่ทราบสาเหตุ'),
+            );
           },
         });
     } else {
@@ -344,12 +372,14 @@ export class ScoreManagement implements OnInit {
         title: 'ข้อมูลไม่ครบ',
         text: 'กรุณาเลือกรุ่นและรายวิชาก่อนบันทึกคะแนน',
         confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#8e44ad'
+        confirmButtonColor: '#8e44ad',
       });
       return;
     }
 
-    const studentsToSave = this.studentList.filter((s) => s.raw_score !== null && s.raw_score !== undefined && s.raw_score.toString() !== '');
+    const studentsToSave = this.studentList.filter(
+      (s) => s.raw_score !== null && s.raw_score !== undefined && s.raw_score.toString() !== '',
+    );
 
     if (studentsToSave.length === 0) {
       Swal.fire({
@@ -357,7 +387,7 @@ export class ScoreManagement implements OnInit {
         title: 'ไม่มีข้อมูล',
         text: 'ไม่มีคะแนนให้บันทึก',
         confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#8e44ad'
+        confirmButtonColor: '#8e44ad',
       });
       return;
     }
@@ -373,14 +403,14 @@ export class ScoreManagement implements OnInit {
         title: 'คะแนนไม่ถูกต้อง',
         text: 'กรุณาตรวจสอบคะแนน (ห้ามติดลบ และต้องไม่เกินคะแนนเต็ม)',
         confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#d33'
+        confirmButtonColor: '#d33',
       });
       return;
     }
 
     const maxScore = Number(this.inputMaxScore);
     const passThreshold = maxScore * 0.7;
-    const failingStudents = studentsToSave.filter(s => Number(s.raw_score) < passThreshold);
+    const failingStudents = studentsToSave.filter((s) => Number(s.raw_score) < passThreshold);
 
     if (failingStudents.length > 0) {
       this.showFailingHighlight = true; // เปิดไฮไลต์
@@ -395,7 +425,7 @@ export class ScoreManagement implements OnInit {
         confirmButtonColor: '#8e44ad',
         cancelButtonColor: '#7f8c8d',
         background: '#ffffff',
-        backdrop: `rgba(0,0,0,0.4)`
+        backdrop: `rgba(0,0,0,0.4)`,
       }).then((result) => {
         if (result.isConfirmed) {
           this.executeSave(studentsToSave);
@@ -408,12 +438,20 @@ export class ScoreManagement implements OnInit {
   }
 
   isFailingScore(score: any): boolean {
-    if (!this.inputMaxScore || score === null || score === undefined || score.toString() === '') return false;
-    return Number(score) < (Number(this.inputMaxScore) * 0.7);
+    if (!this.inputMaxScore || score === null || score === undefined || score.toString() === '')
+      return false;
+    return Number(score) < Number(this.inputMaxScore) * 0.7;
   }
 
   private executeSave(studentsToSave: any[]) {
     this.isSaving = true;
+
+     if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    this.cdr.detectChanges();
+
     this.saveError = '';
 
     const payload = {
@@ -430,7 +468,9 @@ export class ScoreManagement implements OnInit {
         this.isSaving = false;
         this.isSaved = true;
         this.saveError = '';
-        
+
+        this.cdr.detectChanges();
+
         // แจ้งเตือนสำเร็จด้วย SweetAlert2
         Swal.fire({
           icon: 'success',
@@ -439,20 +479,20 @@ export class ScoreManagement implements OnInit {
           confirmButtonText: 'ตกลง',
           confirmButtonColor: '#8e44ad',
           background: '#ffffff',
-          backdrop: `rgba(0,0,0,0.4)`
+          backdrop: `rgba(0,0,0,0.4)`,
         });
       },
       error: (err) => {
         this.isSaving = false;
         this.saveError = 'เกิดข้อผิดพลาดในการบันทึกคะแนน';
         console.error(err);
-        
+
         Swal.fire({
           icon: 'error',
           title: 'ผิดพลาด',
           text: 'เกิดข้อผิดพลาดในการบันทึกคะแนน โปรดลองใหม่อีกครั้ง',
           confirmButtonText: 'ตกลง',
-          confirmButtonColor: '#d33'
+          confirmButtonColor: '#d33',
         });
       },
     });
