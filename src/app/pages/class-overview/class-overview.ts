@@ -11,6 +11,7 @@ import { CourseService, CourseGroup } from '../../services/course.service';
 import { ScoreService } from '../../services/score.service';
 import { StudentGradeDialog, SubjectScoreDetail } from '../student-grade-dialog/student-grade-dialog';
 import { SpecialScoreDialog } from '../special-score-dialog/special-score-dialog';
+import Swal from 'sweetalert2';
 
 export interface SubjectHeader {
   id: number;
@@ -286,7 +287,18 @@ export class ClassOverview implements OnInit {
 
   reProcess(): void {
     this.updateProcessedTime();
-    alert('ระบบทำการประมวลผลสรุปผลการเรียนเรียบร้อยแล้ว!');
+    if (this.selectedBatch) {
+      this.onBatchChange();
+    }
+    Swal.fire({
+      icon: 'success',
+      title: 'สำเร็จ',
+      text: 'ระบบทำการประมวลผลและดึงข้อมูลใหม่เรียบร้อยแล้ว!',
+      confirmButtonText: 'ตกลง',
+      confirmButtonColor: '#8e44ad',
+      background: '#ffffff',
+      backdrop: `rgba(0,0,0,0.4)`
+    });
   }
 
   formatGradeWithIndex(sub: SubjectScoreDetail): { gradeDisplay: string; indexDisplay: string; isSU: boolean } {
