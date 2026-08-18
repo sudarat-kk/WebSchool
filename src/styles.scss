@@ -20,6 +20,14 @@ html {
 }
 
 body {
+  // 1. กำหนดฟอนต์ Sarabun ให้กับระบบ Material Design Token
+  --mat-sys-body-medium-font: 'Sarabun', sans-serif;
+  --mat-sys-body-large-font: 'Sarabun', sans-serif;
+  --mat-sys-label-large-font: 'Sarabun', sans-serif;
+  
+  // 2. กำหนด font-family สำรองให้ตัว body เอง
+  font-family: 'Sarabun', sans-serif;
+
   // Default the application to a light color theme.
   color-scheme: light;
 
@@ -32,6 +40,20 @@ body {
   margin: 0;
   height: 100%;
 }
+
+/*body {
+  // Default the application to a light color theme.
+  color-scheme: light;
+
+  // Set a default background, font and text colors
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}*/
 
 /* คุณสามารถเพิ่ม Global Styles อื่นๆ ต่อท้ายด้านล่างนี้ได้เลยครับ */
 
