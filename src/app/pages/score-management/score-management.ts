@@ -14,6 +14,7 @@ import { ScoreService } from '../../services/score.service';
 import { CourseService, CourseGroup } from '../../services/course.service';
 import { Location } from '@angular/common';
 import Swal from 'sweetalert2';
+import { finalize } from 'rxjs/operators';
 
 interface Course {
   id: number;
@@ -87,7 +88,7 @@ export class ScoreManagement implements OnInit {
     private courseService: CourseService,
     private location: Location,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -121,7 +122,6 @@ export class ScoreManagement implements OnInit {
 
     this.dropdownService.getSubjects(batchId).subscribe({
       next: (res) => {
-
         // 2. กำหนดค่าข้อมูลตรงๆ ไม่ต้องใช้ setTimeout ครอบ
         if (res && res.data) {
           this.subjects = res.data;
@@ -146,16 +146,22 @@ export class ScoreManagement implements OnInit {
     this.scoreService.getAdminSubjectScores(batchId, subjectId).subscribe({
       next: (res) => {
         if (res?.success && res.data) {
-          this.studentList = res.data.map((s: any) => ({
-            student_id: s.student_id,
-            student_code: s.student_code,
-            rank_name: s.rank_name || '',
-            first_name: s.first_name,
-            last_name: s.last_name,
-            raw_score: s.raw_score ?? null,
-          })).sort((a: any, b: any) => {
-            return String(a.student_code || '').localeCompare(String(b.student_code || ''), undefined, { numeric: true });
-          });
+          this.studentList = res.data
+            .map((s: any) => ({
+              student_id: s.student_id,
+              student_code: s.student_code,
+              rank_name: s.rank_name || '',
+              first_name: s.first_name,
+              last_name: s.last_name,
+              raw_score: s.raw_score ?? null,
+            }))
+            .sort((a: any, b: any) => {
+              return String(a.student_code || '').localeCompare(
+                String(b.student_code || ''),
+                undefined,
+                { numeric: true },
+              );
+            });
 
           if (res.max_score !== undefined && res.max_score !== null && res.max_score > 0) {
             this.inputMaxScore = res.max_score;
@@ -187,7 +193,8 @@ export class ScoreManagement implements OnInit {
           this.isSU = false;
           this.updateStats();
           // ดึงข้อความ error จาก backend ถ้ามี
-          this.saveError = err.error?.message || 'ไม่พบข้อมูลนักเรียนหรือยังไม่ได้ตั้งค่าวิชาในรุ่นที่เลือก';
+          this.saveError =
+            err.error?.message || 'ไม่พบข้อมูลนักเรียนหรือยังไม่ได้ตั้งค่าวิชาในรุ่นที่เลือก';
         }
         this.cdr.detectChanges(); // ให้ Angular อัปเดต UI ทันที
       },
@@ -292,6 +299,12 @@ export class ScoreManagement implements OnInit {
           max_score: finalMaxScore as number,
           is_su: this.isSU,
         })
+        .pipe(
+          finalize(() => {
+            this.isSaving = false;
+            this.cdr.detectChanges(); // บังคับอัปเดตสถานะ UI อีกครั้งเมื่อจบกระบวนการ
+          }),
+        )
         .subscribe({
           next: () => {
             console.log('Max score updated');
@@ -373,12 +386,14 @@ export class ScoreManagement implements OnInit {
         title: 'ข้อมูลไม่ครบ',
         text: 'กรุณาเลือกรุ่นและรายวิชาก่อนบันทึกคะแนน',
         confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#8e44ad'
+        confirmButtonColor: '#8e44ad',
       });
       return;
     }
 
-    const studentsToSave = this.studentList.filter((s) => s.raw_score !== null && s.raw_score !== undefined && s.raw_score.toString() !== '');
+    const studentsToSave = this.studentList.filter(
+      (s) => s.raw_score !== null && s.raw_score !== undefined && s.raw_score.toString() !== '',
+    );
 
     if (studentsToSave.length === 0) {
       Swal.fire({
@@ -386,7 +401,7 @@ export class ScoreManagement implements OnInit {
         title: 'ไม่มีข้อมูล',
         text: 'ไม่มีคะแนนให้บันทึก',
         confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#8e44ad'
+        confirmButtonColor: '#8e44ad',
       });
       return;
     }
@@ -403,7 +418,7 @@ export class ScoreManagement implements OnInit {
         title: 'คะแนนไม่ถูกต้อง',
         text: 'กรุณาตรวจสอบคะแนน (ห้ามติดลบ และต้องไม่เกินคะแนนเต็ม)',
         confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#d33'
+        confirmButtonColor: '#d33',
       });
       return;
     }
@@ -425,7 +440,7 @@ export class ScoreManagement implements OnInit {
         confirmButtonColor: '#8e44ad',
         cancelButtonColor: '#7f8c8d',
         background: '#ffffff',
-        backdrop: `rgba(0,0,0,0.4)`
+        backdrop: `rgba(0,0,0,0.4)`,
       }).then((result) => {
         if (result.isConfirmed) {
           this.executeSave(studentsToSave);
@@ -445,6 +460,13 @@ export class ScoreManagement implements OnInit {
 
   private executeSave(studentsToSave: any[]) {
     this.isSaving = true;
+
+     if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    this.cdr.detectChanges();
+
     this.saveError = '';
 
     const payload = {
@@ -487,7 +509,7 @@ export class ScoreManagement implements OnInit {
           title: 'ผิดพลาด',
           text: 'เกิดข้อผิดพลาดในการบันทึกคะแนน โปรดลองใหม่อีกครั้ง',
           confirmButtonText: 'ตกลง',
-          confirmButtonColor: '#d33'
+          confirmButtonColor: '#d33',
         });
       },
     });

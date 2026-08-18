@@ -164,28 +164,47 @@
     width: 100%;
 
     .custom-select {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      border-radius: 20px;
+      font-family: 'Sarabun', sans-serif !important;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333333;
+      padding: 10px 36px 10px 14px; /* เว้นพื้นที่ด้านขวา (36px) ไม่ให้ตัวหนังสือทับลูกศร */
       border: 1px solid #ccc;
-      background-color: #e0e0e0;
-      font-family: inherit;
-      font-size: 1rem;
-      appearance: none;
+      border-radius: 6px;
       outline: none;
+      background-color: #ffffff;
+      width: 100%;
       cursor: pointer;
+      
+      /* 1. ซ่อนลูกศรดั้งเดิมของเบราว์เซอร์ (เพื่อให้ใช้ลูกศรจาก ::after ได้สวยงาม) */
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+
+      /* 2. บังคับให้เมนูดร็อปดาวน์ข้างในใช้ฟอนต์ Sarabun ด้วย */
+      option {
+        font-family: 'Sarabun', sans-serif !important;
+        font-size: 16px;
+        color: #333333;
+        background-color: #ffffff;
+        padding: 8px;
+
+        &[disabled] {
+          color: #999999;
+        }
+      }
     }
     
-    // Add dropdown arrow visually
+    /* ลูกศร Custom (▼) */
     &::after {
       content: '▼';
       position: absolute;
-      right: 15px;
+      right: 14px;
       top: 50%;
       transform: translateY(-50%);
-      pointer-events: none;
-      font-size: 0.8rem;
-      color: #666;
+      pointer-events: none; /* เพื่อให้คลิกทะลุลงไปเปิด select ได้ */
+      font-size: 0.75rem;
+      color: #666666;
     }
   }
 
@@ -199,7 +218,7 @@
       border-radius: 20px;
       border: 1px solid #000;
       background-color: #e0e0e0;
-      font-family: inherit;
+      font-family: 'Sarabun', sans-serif !important; /* กำหนดฟอนต์ให้ช่อง Search ด้วย */
       font-size: 1rem;
       outline: none;
       box-sizing: border-box;
@@ -207,7 +226,7 @@
 
     .search-icon {
       position: absolute;
-      left: 10px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
       color: #333;
