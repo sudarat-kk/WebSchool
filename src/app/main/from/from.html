@@ -5,7 +5,7 @@
       <button mat-icon-button routerLink="/admin" class="btn-header-back" title="ย้อนกลับไปหน้าผู้ดูแลระบบ">
         <mat-icon>chevron_left</mat-icon>
       </button>
-      <h2 class="main-content-title">จัดการแบบฟอร์มประเมิน</h2>
+      <h2 class="main-content-title">จัดการแบบประเมิน</h2>
     </div>
   </div>
 
@@ -16,7 +16,7 @@
       <p class="instruction-text">สร้างชุดคำถามประเมินสำหรับหลักสูตรและรุ่นที่เลือก</p>
 
       <h3 class="mode-indicator" [class.edit-mode]="isEditMode">
-        {{ isEditMode ? '📝 กำลังอยู่ในโหมดแก้ไขข้อมูล' : '✨ สร้างแบบฟอร์มใหม่' }}
+        {{ isEditMode ? '📝 กำลังอยู่ในโหมดแก้ไขข้อมูล' : '✨ สร้างแบบประเมินใหม่' }}
       </h3>
 
       <div class="form-row">
@@ -44,7 +44,7 @@
 
       <div class="form-row">
         <div class="form-group flex-1">
-          <label class="input-label">ประเภทแบบฟอร์ม</label>
+          <label class="input-label">ประเภทแบบประเมิน</label>
           <div style="display: flex; gap: 8px;">
             <select class="custom-input" [(ngModel)]="formData.formType" (change)="onTypeChange()" style="flex: 1;">
               <option value="" disabled selected>เลือกประเภท</option>
@@ -151,13 +151,13 @@
       <div class="final-action" style="margin-top: 32px; border-top: 1px solid #ddd; padding-top: 24px;">
         <div *ngIf="!isEditMode" class="action-buttons-group">
           <button mat-raised-button class="btn-submit-form" (click)="onCreateForm()">
-            สร้างแบบฟอร์มประเมิน
+            สร้างแบบประเมิน
           </button>
         </div>
 
         <div *ngIf="isEditMode" class="edit-buttons-group">
           <button type="button" mat-raised-button class="btn-submit-form btn-update" (click)="onUpdateForm()">
-            บันทึกการแก้ไขแบบฟอร์ม
+            บันทึกการแก้ไขแบบประเมิน
           </button>
           <button mat-stroked-button class="btn-cancel" (click)="resetForm()">
             ยกเลิก
@@ -170,7 +170,7 @@
     <div class="form-list-section mt-5">
       <div class="list-header flex items-center mb-4">
         <div class="vertical-line"></div>
-        <h2 class="section-title">ดูและจัดการแบบฟอร์ม</h2>
+        <h2 class="section-title">ดูและจัดการแบบประเมิน</h2>
       </div>
 
       <div class="filter-box" style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
@@ -197,7 +197,7 @@
           </div>
 
           <div class="form-group flex-1">
-            <label class="input-label">ประเภทแบบฟอร์ม</label>
+            <label class="input-label">ประเภทแบบประเมิน</label>
             <select class="custom-input" [(ngModel)]="filterType" (change)="onFilterTypeChange()">
               <option *ngFor="let type of formTypes" [value]="type.value">
                 {{ type.label }}
@@ -217,7 +217,7 @@
 
         <div *ngIf="!filterCourse || !filterGeneration"
           style="text-align: center; padding: 20px; color: #666; background: #fff;">
-          กรุณาเลือกหลักสูตรและรุ่นด้านบน เพื่อดูรายการแบบฟอร์ม
+          กรุณาเลือกหลักสูตรและรุ่นด้านบน เพื่อดูรายการแบบประเมิน
         </div>
 
         <div class="table-row" *ngFor="let row of displayTableData"
@@ -235,7 +235,7 @@
               </span>
             </ng-container>
             <ng-container *ngIf="!row.hasForm">
-              <span style="color: #999; font-style: italic;">ยังไม่ได้สร้างแบบฟอร์ม</span>
+              <span style="color: #999; font-style: italic;">ยังไม่ได้สร้างแบบประเมิน</span>
             </ng-container>
           </div>
 
@@ -252,7 +252,7 @@
             <ng-container *ngIf="!row.hasForm">
               <button mat-stroked-button color="primary" (click)="onAddLinkAction(row)"
                 style="border-color: #8142ff; color: #8142ff; border-radius: 20px;">
-                <mat-icon style="font-size: 18px;">add</mat-icon> สร้างฟอร์ม
+                <mat-icon style="font-size: 18px;">add</mat-icon> สร้างแบบประเมิน
               </button>
             </ng-container>
           </div>

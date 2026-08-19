@@ -1,0 +1,350 @@
+// 1. Variables
+$primary-color: #5c41e2;
+$primary-light: #f3f0ff;
+$primary-hover: #482dc7;
+
+// 🌟 สีม่วง-เทาอ่อนตามรูปภาพ (#f5f4f9)
+$bg-light: #f5f4f9;      
+$dropdown-bg: #f1ebfd;         
+$dropdown-border: #dcd0f9;
+
+$danger-color: #d9534f;
+$warning-bg: #fff8e6;
+$warning-border: #ffe199;
+$warning-text: #8c6200;
+
+$border-color: #d1d5db;
+$text-muted: #746788;
+
+// 🌟 สั่งบังคับสีม่วงให้ทั้งหน้าจอ
+html, body {
+    background-color: $bg-light !important;
+    margin: 0;
+    padding: 0;
+}
+
+// 🌟 ตัวครอบหลักที่จะดันสีม่วงให้เต็มหน้าจอ
+.profile-edit-page {
+    background-color: $bg-light !important;
+    min-height: 100vh;
+    padding: 40px 16px;
+    box-sizing: border-box;
+}
+
+// 2. Main Card Layout (การ์ดเป็นสีขาวเด่นลอยอยู่บนพื้นสีม่วง)
+.profile-edit-card {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 24px;
+    background-color: #ffffff !important; // ตัวการ์ดเป็นสีขาวบริสุทธิ์
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(92, 65, 226, 0.08);
+
+    .status-banner {
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        font-weight: 600;
+
+        &.status-pending {
+            background-color: $warning-bg;
+            border: 1px solid $warning-border;
+            color: $warning-text;
+        }
+    }
+
+    .card-title {
+        margin-bottom: 20px;
+        color: #2b2545;
+        font-size: 20px;
+    }
+}
+
+// 3. Form Elements & Custom Dropdown
+.edit-form {
+    .form-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+
+        @media (max-width: 576px) {
+            flex-direction: column;
+            gap: 0;
+        }
+    }
+
+    .form-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 16px;
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #3b3355;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+            border: 1px solid $border-color;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+
+            &:focus {
+                border-color: $primary-color;
+                box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+            }
+        }
+    }
+
+    // Custom Dropdown
+    .custom-dropdown {
+        position: relative;
+        width: 100%;
+
+        .dropdown-selected {
+            background-color: $dropdown-bg;
+            border: 1px solid $dropdown-border;
+            border-radius: 8px;
+            padding: 10px 36px 10px 14px;
+            font-size: 14px;
+            color: #2e264e;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            user-select: none;
+            outline: none;
+
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235c41e2' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+
+            &:hover,
+            &:focus {
+                background-color: #ffffff;
+                border-color: $primary-color;
+                box-shadow: 0 0 0 4px rgba(92, 65, 226, 0.18);
+            }
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            border: 1px solid #d4d8fc;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(92, 65, 226, 0.15);
+            list-style: none;
+            padding: 6px 0;
+            margin: 0;
+            z-index: 100;
+            max-height: 220px;
+            overflow-y: auto;
+
+            &.hidden {
+                display: none;
+            }
+
+            .dropdown-item {
+                padding: 10px 16px;
+                font-size: 14px;
+                color: #2e264e;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background-color: $dropdown-bg;
+                    color: $primary-color;
+                    font-weight: 600;
+                }
+
+                &.placeholder {
+                    color: $text-muted;
+                }
+            }
+        }
+    }
+
+    // กล่องอัปโหลดแนบไฟล์
+    .file-upload-wrapper {
+        position: relative;
+        width: 100%;
+
+        .file-input-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        .file-upload-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 100%);
+            border: 2px dashed #c7d2fe;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+
+            .upload-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 50%;
+                background: #ffffff;
+                color: $primary-color;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 12px rgba($primary-color, 0.18);
+                transition: transform 0.3s ease, background-color 0.3s ease;
+            }
+
+            .upload-text {
+                font-size: 14px;
+                color: #3b3355;
+                margin-bottom: 4px;
+
+                .highlight {
+                    color: $primary-color;
+                    font-weight: 600;
+                    text-decoration: underline;
+                }
+            }
+
+            .file-hint {
+                font-size: 12px;
+                color: $text-muted;
+            }
+
+            .file-name-display {
+                margin-top: 10px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #10b981;
+
+                &:not(:empty) {
+                    padding: 4px 12px;
+                    background: #ecfdf5;
+                    border-radius: 20px;
+                }
+            }
+
+            &:hover {
+                background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);
+                border-color: $primary-color;
+
+                .upload-icon {
+                    transform: translateY(-3px) scale(1.05);
+                    background: $primary-color;
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+
+    .form-actions {
+        margin-top: 24px;
+        text-align: right;
+    }
+}
+
+// 4. Buttons
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, background-color 0.2s;
+
+    &:hover {
+        opacity: 0.95;
+    }
+
+    &-primary {
+        background-color: $primary-color;
+        color: #ffffff;
+        width: 100%;
+        box-shadow: 0 4px 12px rgba($primary-color, 0.25);
+
+        &:hover {
+            background-color: $primary-hover;
+        }
+    }
+
+    &-secondary {
+        background-color: #6b7280;
+        color: #ffffff;
+    }
+
+    &-danger {
+        background-color: $danger-color;
+        color: #ffffff;
+    }
+}
+
+// 5. Modal Popup Styles
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(20, 15, 38, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+
+    &.hidden {
+        display: none;
+    }
+
+    .modal-content {
+        background: #ffffff;
+        width: 90%;
+        max-width: 450px;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+
+        .modal-header h3 {
+            margin: 0 0 12px 0;
+            color: $danger-color;
+        }
+
+        .warning-text {
+            font-size: 13px;
+            color: #4b5563;
+            background: $bg-light;
+            padding: 10px;
+            border-left: 4px solid $danger-color;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    }
+}
