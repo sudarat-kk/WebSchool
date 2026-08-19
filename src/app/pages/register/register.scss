@@ -1,11 +1,12 @@
 // Color Variables
-$page-bg: #f5f0f6;         // สีม่วงพาสเทลอ่อนๆ สำหรับพื้นหลังเว็บ
-$card-bg: #ede8f8;         // สีพื้นหลังการ์ด
-$input-bg: #ffffff;        // สีพื้นหลังช่องกรอกข้อมูล
-$input-text: #4a4a4a;
-$placeholder-color: #8c8c8c;
-$button-bg: #9c92f8;       // สีม่วงปุ่มยืนยัน
+$page-bg: #f5f0f6; // สีม่วงพาสเทลอ่อนๆ สำหรับพื้นหลังเว็บ
+$card-bg: #ede8f8; // สีพื้นหลังการ์ด
+$input-bg: #ffffff; // สีพื้นหลังช่องกรอกข้อมูล
+$input-text: #333333;
+$placeholder-color: #999999;
+$button-bg: #9c92f8; // สีม่วงปุ่มยืนยัน
 $button-hover: #8378ed;
+$primary-focus: #8378ed; // สี Highlight ตอน Focus ช่องกรอก
 
 :host {
   display: flex;
@@ -15,32 +16,34 @@ $button-hover: #8378ed;
   background-color: $page-bg;
   padding: 24px 16px;
   box-sizing: border-box;
+  font-family: 'Kanit', 'Prompt', sans-serif; /* แนะนำให้ใช้ฟอนต์ทรงมนสวยๆ */
 }
 
 /* Card Container */
 .register-container {
   width: 100%;
-  max-width: 780px;
+  max-width: 680px; /* ปรับขนาดให้กระชับสมส่วน */
   background-color: $card-bg;
-  border-radius: 24px;       // ขอบมนของการ์ด
-  padding: 40px 48px 56px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  border-radius: 28px;
+  padding: 40px 48px 48px;
+  box-shadow: 0 16px 40px rgba(131, 120, 237, 0.08);
   box-sizing: border-box;
 
-  /* Header Section - ปรับให้อยู่ตรงกลางเป๊ะ */
+  /* Header Section */
   .header {
     display: flex;
-    justify-content: center; // จัดเรียงหัวข้อให้อยู่ตรงกลาง
+    justify-content: center;
     align-items: center;
-    margin-bottom: 36px;
+    margin-bottom: 32px;
     width: 100%;
 
     .title {
-      font-size: 1.8rem;
-      font-weight: 500;
-      color: #000;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #2b2b2b;
       margin: 0;
       text-align: center;
+      letter-spacing: -0.5px;
     }
   }
 
@@ -48,105 +51,104 @@ $button-hover: #8378ed;
   .form-content {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
 
-    .row-three-cols {
+    /* จัดเรียง 2 คอลัมน์สำหรับ ยศ + ชื่อ-สกุล */
+    .row-two-cols {
       display: flex;
       gap: 16px;
 
       .flex-1 {
         flex: 1;
       }
+
       .flex-2 {
         flex: 2;
       }
     }
 
+    /* กล่องควบคุม Input และ Label */
     .input-group {
-      position: relative;
+      display: flex;
+      flex-direction: column;
       width: 100%;
+
+      label {
+        display: block;
+        margin-bottom: 8px; /* เว้นระยะห่างระหว่าง label กับ input ให้สบายตา */
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #4a4a4a;
+
+        .required-asterisk {
+          color: #e53e3e;
+          margin-left: 2px;
+        }
+      }
 
       input {
         width: 100%;
-        height: 60px;
+        height: 48px; /* ขยายความสูงกล่องให้กดง่ายขึ้น */
+        padding: 12px 16px;
         background-color: $input-bg;
-        border: none;
-        border-radius: 16px;
-        padding: 0 14px;
-        font-size: 0.85rem;
+        border: 1.5px solid transparent;
+        border-radius: 12px;
+        font-size: 0.95rem;
         color: $input-text;
         box-sizing: border-box;
-        outline: none;
-        transition: background-color 0.2s ease;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 
         &::placeholder {
           color: $placeholder-color;
         }
 
         &:focus {
-          background-color: darken($input-bg, 4%);
+          outline: none;
+          border-color: $primary-focus;
+          background-color: #ffffff;
+          box-shadow: 0 0 0 4px rgba(156, 146, 248, 0.2);
         }
       }
 
-      /* จัดตำแหน่งปุ่มเปิด/ปิดตาในช่องรหัสผ่าน */
-      &.password-group {
-        input {
-          padding-right: 50px; // เว้นระยะด้านขวาไม่ให้ข้อความทับไอคอน
-        }
-
-        .toggle-password {
-          position: absolute;
-          right: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: transparent;
-          border: none;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 4px;
-          opacity: 0.7;
-          transition: opacity 0.2s ease;
-
-          &:hover {
-            opacity: 1;
-          }
-
-          svg {
-            display: block; // ป้องกันปัญหาระยะขอบส่วนเกินของ SVG
-          }
-        }
+      /* ข้อความอธิบายใต้ช่องรหัสผ่าน */
+      .hint-text {
+        font-size: 0.825rem;
+        color: #ef4444;;
+        margin-top: 6px;
+        line-height: 1.4;
       }
     }
 
-    /* 📍 จัดให้ปุ่ม Google ชิดขวา */
-    .google-container {
+    /* ซองคุมช่องรหัสผ่าน */
+    .password-input-wrapper {
+      position: relative;
+      width: 100%;
       display: flex;
-      justify-content: flex-end; // ดันปุ่มไปฝั่งขวาสุด
-      margin-top: 4px;
+      align-items: center;
 
-      .google-btn {
-        height: 40px;
-        padding: 0 16px;
-        background-color: #ffffff;
-        border: 1px solid rgba(139, 126, 248, 0.2);
-        border-radius: 10px;
+      input {
+        padding-right: 48px; /* เว้นพื้นที่ด้านขวาไม่ให้ข้อความทับไอคอนตา */
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        outline: none;
+        padding: 4px;
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: #4a4a4a;
+        justify-content: center;
         cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-        transition: all 0.2s ease;
+        border-radius: 50%;
+        transition: background-color 0.2s ease;
 
         &:hover {
-          background-color: #fcfbfe;
-          border-color: $button-bg;
-          box-shadow: 0 4px 10px rgba(139, 126, 248, 0.15);
-          transform: translateY(-1px);
+          background-color: rgba(0, 0, 0, 0.05);
         }
 
         svg {
@@ -154,44 +156,54 @@ $button-hover: #8378ed;
         }
       }
     }
+  }
 
-    /* Submit Button Area */
-    .action-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 18px;
+  /* Submit Button Area */
+  .action-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
 
-      .submit-btn {
-        width: 180px;
-        height: 48px;
-        background-color: $button-bg;
-        color: #ffffff;
-        border: none;
-        border-radius: 12px;
-        font-size: 1rem;
-        font-weight: 400;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
+    .submit-btn {
+      width: 200px;
+      height: 50px;
+      background-color: $button-bg;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(156, 146, 248, 0.4);
+      transition: all 0.2s ease;
 
-        &:hover {
-          background-color: $button-hover;
-        }
+      &:hover {
+        background-color: $button-hover;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(131, 120, 237, 0.5);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(131, 120, 237, 0.4);
       }
     }
   }
 }
 
-
-
 /* Responsive adjustment for Mobile */
 @media (max-width: 600px) {
   .register-container {
-    padding: 24px 20px 32px;
-    border-radius: 16px;
+    padding: 28px 20px 36px;
+    border-radius: 20px;
 
-    .form-content .row-three-cols {
+    .form-content .row-two-cols {
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
+    }
+
+    .action-container .submit-btn {
+      width: 100%; /* ปุ่มเต็มความกว้างในมือถือ */
     }
   }
 }

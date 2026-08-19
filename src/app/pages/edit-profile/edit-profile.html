@@ -1,0 +1,107 @@
+<div class="profile-edit-page">
+    <div class="profile-edit-card">
+        <!-- 1. สถานะการตรวจสอบ/อนุมัติ -->
+        <div class="status-banner status-pending">
+            <i class="icon-clock"></i>
+            <span>สถานะ: อยู่ระหว่างรอแอดมินตรวจสอบและอนุมัติ</span>
+        </div>
+
+        <h2 class="card-title">แก้ไขข้อมูลโปรไฟล์</h2>
+
+        <form id="editProfileForm" class="edit-form">
+
+            <!-- 2. เลือกประเภทยืนยันเอกสาร (Custom Dropdown เปลี่ยนสีได้ 100%) -->
+            <div class="form-group">
+                <label>ประเภทการปรับปรุงข้อมูล / แนบไฟล์เอกสาร</label>
+                <div class="custom-dropdown" id="customDropdown">
+                    <div class="dropdown-selected" id="dropdownSelected" tabindex="0">
+                        -- เลือกประเภทยืนยันเอกสาร --
+                    </div>
+                    <ul class="dropdown-menu hidden" id="dropdownMenu">
+                        <li class="dropdown-item" data-value="change-name">แนบไฟล์เปลี่ยนชื่อ-นามสกุล</li>
+                        <li class="dropdown-item" data-value="change-rank">แนบไฟล์เปลี่ยนยศ/เลื่อนตำแหน่ง</li>
+                        <li class="dropdown-item" data-value="both">แนบไฟล์เปลี่ยนทั้งชื่อและยศ</li>
+                    </ul>
+                    <!-- Hidden input สำหรับรองรับการส่งค่าและ Validation ของ Form -->
+                    <input type="hidden" name="docType" id="docTypeInput" required>
+                </div>
+            </div>
+
+            <!-- 3. อัปโหลดเอกสารหลักฐาน -->
+            <div class="form-group">
+                <label for="fileUpload">อัปโหลดเอกสารหลักฐาน (PDF, PNG, JPG)</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" id="fileUpload" class="file-input-hidden" accept=".pdf,.png,.jpg,.jpeg" required>
+                    <label for="fileUpload" class="file-upload-box">
+                        <div class="upload-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="upload-text">
+                            <span class="highlight">คลิกเพื่อเลือกไฟล์</span> หรือลากไฟล์มาวางที่นี่
+                        </div>
+                        <span class="file-hint">รองรับไฟล์ PDF, PNG, JPG (ขนาดไม่เกิน 5MB)</span>
+                        <span id="fileNameDisplay" class="file-name-display"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 4. ข้อมูลยศ + ชื่อ-นามสกุล -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="rank">ยศ / คำนำหน้า</label>
+                    <input type="text" id="rank" name="rank" class="form-control"
+                        placeholder="เช่น ร้อยตำรวจเอก (ร.ต.อ.)" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">ชื่อ</label>
+                    <input type="text" id="firstName" name="firstName" class="form-control" placeholder="กรอกชื่อ"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">นามสกุล</label>
+                    <input type="text" id="lastName" name="lastName" class="form-control" placeholder="กรอกนามสกุล"
+                        required>
+                </div>
+            </div>
+
+            <!-- 5. ปุ่มยืนยันด้านล่าง -->
+            <div class="form-actions">
+                <button type="button" id="openModalBtn" class="btn btn-primary">
+                    ยืนยันแก้ไขข้อมูล
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 6. Modal Popup ยืนยันด้วยรหัสผ่าน -->
+    <div id="confirmModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>ยืนยันการแก้ไขข้อมูล</h3>
+            </div>
+            <div class="modal-body">
+                <p class="warning-text">
+                    <strong>หมายเหตุ:</strong> ข้อมูลนี้สามารถแก้ไขได้เพียง <strong>1 ครั้ง</strong> เท่านั้น
+                    หากยืนยันแล้วจะไม่สามารถแก้ไขได้อีกจนกว่าจะได้รับการอนุมัติ
+                </p>
+                <div class="form-group">
+                    <label for="confirmPassword">กรุณากรอกรหัสผ่านเพื่อยืนยัน:</label>
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="ระบุรหัสผ่านของคุณ">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeModalBtn" class="btn btn-secondary">ยกเลิก</button>
+                <button type="button" id="submitFinalBtn" class="btn btn-danger">ยืนยันข้อมูล</button>
+            </div>
+        </div>
+    </div>
+</div>
