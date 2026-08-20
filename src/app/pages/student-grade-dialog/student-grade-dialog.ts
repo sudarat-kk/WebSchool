@@ -12,11 +12,13 @@ export interface SubjectScoreDetail {
   maxScore?: number;
   percentage?: number | null;
   grade?: string;
+  letterGrade?: string;
   gradePoint?: number;
   indexValue?: number | string | null;
   groupId?: number | string;
   rowspan?: number;
   isFirstInGroup?: boolean;
+  is_su?: boolean;
 }
 
 export interface StudentGradeDialogData {

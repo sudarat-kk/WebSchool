@@ -63,6 +63,10 @@ export class CourseService {
     return this.http.put<any>(`${environment.apiUrl}/batches/${id}`, data);
   }
 
+  toggleBatchActive(id: number | string, is_active: boolean): Observable<any> {
+    return this.http.put<any>(`${environment.apiUrl}/batches/${id}/toggle-active`, { is_active });
+  }
+
   deleteBatch(id: number | string): Observable<any> {
     return this.http.delete<any>(`${environment.apiUrl}/batches/${id}`);
   }

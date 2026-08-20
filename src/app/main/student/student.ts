@@ -161,7 +161,7 @@ export class Student implements OnInit, OnDestroy {
       this.filteredCourses = [];
 
       if (this.currentBatchId) {
-        this.evaluationSub = this.generalEvaluationService.getGeneralEvaluations(this.currentBatchId, type).subscribe({
+        this.evaluationSub = this.generalEvaluationService.getGeneralEvaluations(this.currentBatchId, type, 'student').subscribe({
           next: (res) => {
             let url = '';
             if (res.success && res.data && res.data.length > 0) {

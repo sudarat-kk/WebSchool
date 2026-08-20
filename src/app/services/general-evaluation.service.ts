@@ -20,10 +20,12 @@ export class GeneralEvaluationService {
 
   constructor(private http: HttpClient) { }
 
-  getGeneralEvaluations(batchId: number, type: string): Observable<GeneralEvaluationResponse> { 
-    return this.http.get<GeneralEvaluationResponse>( 
-      `${environment.apiUrl}/general-evaluation/${batchId}?type=${type}` 
-    ); 
+  getGeneralEvaluations(batchId: number, type: string, targetGroup?: string): Observable<GeneralEvaluationResponse> { 
+    let url = `${environment.apiUrl}/general-evaluation/${batchId}?type=${type}`;
+    if (targetGroup) {
+      url += `&targetGroup=${targetGroup}`;
+    }
+    return this.http.get<GeneralEvaluationResponse>(url); 
   }
 
   createGeneralEvaluation(payload: any): Observable<any> {

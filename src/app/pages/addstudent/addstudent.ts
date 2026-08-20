@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -38,7 +38,8 @@ export class Addstudent implements OnInit {
     private location: Location,
     private courseService: CourseService,
     private studentService: StudentService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {}
 
   activeTab: 'single' | 'excel' | 'file' = 'single';
@@ -71,22 +72,18 @@ export class Addstudent implements OnInit {
       const columns = row.split('\t');
       
       // Expected format based on user's Excel:
-      // columns[0] = ลำดับ (Student Code)
-      // columns[1] = รหัสผ่าน (Password)
-      // columns[2] = ยศ - ชื่อ - สกุล
-      // columns[3] = สังกัด (Affiliation)
+      // columns[0] = รหัสผ่าน (Password)
+      // columns[1] = ยศ - ชื่อ - สกุล
+      // columns[2] = สังกัด (Affiliation)
       
-      if (columns.length >= 3) {
+      if (columns.length >= 2) {
         const newStudent = this.getEmptyForm();
         
-        // 1. ลำดับ -> รหัสประจำตัวนักเรียน
-        newStudent.studentCode = columns[0]?.trim() || '';
+        // 1. รหัสผ่าน
+        newStudent.password = columns[0]?.trim() || ''; 
         
-        // 2. รหัสผ่าน
-        newStudent.password = columns[1]?.trim() || ''; // ถ้ารหัสผ่านว่าง เดี๋ยวตอน Submit จะตั้งเป็น 1234 ให้อัตโนมัติ
-        
-        // 3. แยก ยศ ชื่อ สกุล
-        const fullNameStr = columns[2] || '';
+        // 2. แยก ยศ ชื่อ สกุล
+        const fullNameStr = columns[1] || '';
         // ตัดช่องว่างซ้ำซ้อนออกแล้วแยกคำด้วยช่องว่าง
         const nameParts = fullNameStr.trim().split(/\s+/);
         
@@ -96,8 +93,6 @@ export class Addstudent implements OnInit {
           // นามสกุลคือส่วนที่เหลือทั้งหมดมาต่อกัน
           newStudent.lastName = nameParts.slice(2).join(' ');
         } else if (nameParts.length === 2) {
-          // ถ้ามีแค่ 2 คำ สมมติว่าเป็น ชื่อ และ นามสกุล (ไม่มียศ) หรือ ยศ และ ชื่อ
-          // ส่วนใหญ่คงเป็น ยศ ชื่อ หรือ ชื่อ สกุล แต่เอาชัวร์ๆ ตาม format ปกติ
           newStudent.rank = '';
           newStudent.firstName = nameParts[0];
           newStudent.lastName = nameParts[1];
@@ -105,18 +100,18 @@ export class Addstudent implements OnInit {
           newStudent.firstName = nameParts[0];
         }
         
-        // 4. สังกัด
-        newStudent.affiliation = columns[3]?.trim() || '';
+        // 3. สังกัด
+        newStudent.affiliation = columns[2]?.trim() || '';
         
-        // เพิ่มข้อมูลลงใน array ถ้ามีลำดับ หรือชื่อ อย่างใดอย่างหนึ่ง
-        if (newStudent.studentCode || newStudent.firstName) {
+        // เพิ่มข้อมูลลงใน array ถ้ามีชื่อ
+        if (newStudent.firstName) {
           newForms.push(newStudent);
         }
       }
     }
 
     if (newForms.length > 0) {
-      if (this.studentForms.length === 1 && !this.studentForms[0].firstName && !this.studentForms[0].studentCode) {
+      if (this.studentForms.length === 1 && !this.studentForms[0].firstName) {
         this.studentForms = newForms;
       } else {
         this.studentForms = [...this.studentForms, ...newForms];
@@ -129,7 +124,7 @@ export class Addstudent implements OnInit {
         text: `ดึงข้อมูลสำเร็จ ${newForms.length} รายการ กรุณาตรวจสอบข้อมูลและกดบันทึก`
       });
     } else {
-      Swal.fire('ผิดพลาด', 'รูปแบบข้อมูลไม่ถูกต้อง กรุณาก๊อปปี้จากตาราง (ลำดับ | รหัสผ่าน | ยศ-ชื่อ-สกุล | สังกัด)', 'error');
+      Swal.fire('ผิดพลาด', 'รูปแบบข้อมูลไม่ถูกต้อง กรุณาก๊อปปี้จากตาราง (รหัสผ่าน | ยศ-ชื่อ-สกุล | สังกัด)', 'error');
     }
   }
 
@@ -180,18 +175,20 @@ export class Addstudent implements OnInit {
     }
     this.studentService.getStudents(this.selectedBatch).subscribe({
       next: (res) => {
-        const data = Array.isArray(res) ? res : (res.data || []);
-        this.students = data.map((s: any) => ({
-          id: s.id,
-          rank: s.rank_name || s.rankName || '',
-          firstName: s.first_name || s.firstName || '',
-          lastName: s.last_name || s.lastName || '',
-          studentCode: s.student_code || s.studentCode || '',
-          password: s.password || '', // เก็บข้อมูลรหัสผ่านจาก DB
-          affiliation: s.affiliation || '',
-          showPassword: false // ค่าเริ่มต้นให้ซ่อนรหัสผ่านในตาราง
-        }));
-        this.cdr.detectChanges();
+        this.ngZone.run(() => {
+          const data = Array.isArray(res) ? res : (res.data || []);
+          this.students = data.map((s: any) => ({
+            id: s.id,
+            rank: s.rank_name || s.rankName || '',
+            firstName: s.first_name || s.firstName || '',
+            lastName: s.last_name || s.lastName || '',
+            studentCode: s.student_code || s.studentCode || '',
+            password: s.password || '',
+            affiliation: s.affiliation || '',
+            showPassword: false
+          }));
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => console.error('Failed to load students', err),
     });
@@ -256,11 +253,10 @@ export class Addstudent implements OnInit {
         this.studentService.deleteStudent(id).subscribe({
           next: (res) => {
             Swal.fire('สำเร็จ', 'ลบข้อมูลนักเรียนสำเร็จ', 'success');
-            this.students = this.students.filter(s => s.id !== id);
             if (this.editingId === id) {
               this.resetForm();
             }
-            this.cdr.detectChanges();
+            this.fetchStudents(); // โหลดข้อมูลใหม่เพื่ออัปเดตลำดับ
           },
           error: (err) => {
             console.error('Delete failed', err);
@@ -279,8 +275,8 @@ export class Addstudent implements OnInit {
 
     // ตรวจสอบว่าทุกแถวกรอกข้อมูลครบหรือไม่
     for (let form of this.studentForms) {
-      if (!form.firstName || !form.lastName || !form.studentCode) {
-        Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูล ชื่อ, นามสกุล และรหัสนักเรียน ให้ครบถ้วนทุกรายการ', 'warning');
+      if (!form.firstName || !form.lastName) {
+        Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูล ชื่อ และนามสกุล ให้ครบถ้วนทุกรายการ', 'warning');
         return;
       }
     }
@@ -311,7 +307,24 @@ export class Addstudent implements OnInit {
       });
     } else {
       // เพิ่มหลายคนพร้อมกัน
-      const requests = this.studentForms.map(form => {
+      Swal.fire({
+        title: 'กำลังบันทึกข้อมูล...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const addSequentially = (index: number) => {
+        if (index >= this.studentForms.length) {
+          Swal.fire('สำเร็จ', `เพิ่มข้อมูลนักเรียน ${this.studentForms.length} รายการสำเร็จ`, 'success');
+          this.resetForm();
+          this.fetchStudents();
+          this.cdr.detectChanges();
+          return;
+        }
+
+        const form = this.studentForms[index];
         const payload = {
           batch_id: this.selectedBatch,
           student_code: form.studentCode,
@@ -321,29 +334,18 @@ export class Addstudent implements OnInit {
           last_name: form.lastName,
           affiliation: form.affiliation,
         };
-        return this.studentService.addStudent(payload);
-      });
 
-      Swal.fire({
-        title: 'กำลังบันทึกข้อมูล...',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
+        this.studentService.addStudent(payload).subscribe({
+          next: () => addSequentially(index + 1),
+          error: (err) => {
+            console.error('Add failed at index ' + index, err);
+            Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลนักเรียนบางรายการ', 'error');
+            this.fetchStudents();
+          }
+        });
+      };
 
-      forkJoin(requests).subscribe({
-        next: (responses) => {
-          Swal.fire('สำเร็จ', `เพิ่มข้อมูลนักเรียน ${requests.length} รายการสำเร็จ`, 'success');
-          this.resetForm();
-          this.fetchStudents();
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Add failed', err);
-          Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลนักเรียนบางรายการ', 'error');
-        },
-      });
+      addSequentially(0);
     }
   }
 
@@ -377,6 +379,34 @@ export class Addstudent implements OnInit {
         console.error('Upload failed', err);
         Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์', 'error');
       },
+    });
+  }
+
+  resequenceStudents() {
+    if (!this.selectedBatch) return;
+
+    Swal.fire({
+      title: 'ยืนยันการจัดเรียงเลขที่ใหม่?',
+      text: "ระบบจะทำการรันเลขที่นักเรียนใหม่ตั้งแต่ 1 เป็นต้นไป ตามลำดับปัจจุบัน การกระทำนี้ไม่สามารถย้อนกลับได้!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'ใช่, จัดเรียงใหม่เลย!',
+      cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.studentService.resequenceStudents(this.selectedBatch).subscribe({
+          next: (res) => {
+            Swal.fire('สำเร็จ!', 'จัดเรียงเลขที่นักเรียนเรียบร้อยแล้ว', 'success');
+            this.fetchStudents(); // โหลดข้อมูลใหม่
+          },
+          error: (err) => {
+            console.error(err);
+            Swal.fire('ผิดพลาด', 'ไม่สามารถจัดเรียงเลขที่ได้', 'error');
+          }
+        });
+      }
     });
   }
 }

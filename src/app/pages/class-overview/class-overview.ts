@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,6 +20,7 @@ export interface SubjectHeader {
   groupId?: number | string;
   groupName?: string;
   max_score?: number;
+  is_su?: boolean;
 }
 
 export interface SubjectGroupHeader {
@@ -83,7 +84,8 @@ export class ClassOverview implements OnInit {
     private courseService: CourseService,
     private dropdownService: DropdownService,
     private scoreService: ScoreService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -100,9 +102,13 @@ export class ClassOverview implements OnInit {
             id: cg.batches?.[0]?.course_id || cg.course_name,
             group_name: cg.course_name
           }));
+          this.cdr.detectChanges();
         }
       },
-      error: (err) => console.error('Failed to load courses:', err)
+      error: (err) => {
+        console.error('Failed to load courses:', err);
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -130,9 +136,13 @@ export class ClassOverview implements OnInit {
                 id: b.id || b.batch_id,
                 name: b.name || b.batch_name || `รุ่นที่ ${b.id || b.batch_id}`
               }));
+              this.cdr.detectChanges();
             }
           },
-          error: (err) => console.error('Failed to load batches:', err)
+          error: (err) => {
+            console.error('Failed to load batches:', err);
+            this.cdr.detectChanges();
+          }
         });
       }
     }
@@ -177,11 +187,20 @@ export class ClassOverview implements OnInit {
               // ดึงผลการเรียนรวมของกลุ่ม
               let gradeDisplay = '-';
               let indexValue: string | number = '0.00';
+              let originalLetterGrade = '-';
 
               if (sub.groupId && st.group_results && st.group_results[sub.groupId]) {
                  const gResult = st.group_results[sub.groupId];
-                 gradeDisplay = gResult.grade;
+                 
+                 // คำนวณหาเกรดตัวเลขจาก index_value / credit (สำหรับแสดงใน Tab 2)
+                 if (sub.is_su || Number(sub.credit) === 0) {
+                   gradeDisplay = gResult.grade;
+                 } else {
+                   const gp = Number(gResult.index_value) / Number(sub.credit);
+                   gradeDisplay = !isNaN(gp) ? gp.toFixed(2) : gResult.grade;
+                 }
                  indexValue = gResult.index_value;
+                 originalLetterGrade = gResult.grade;
               }
 
               return {
@@ -191,8 +210,10 @@ export class ClassOverview implements OnInit {
                 maxScore: sub.max_score,
                 rawScore: rawScore,
                 grade: gradeDisplay,
+                letterGrade: originalLetterGrade, // เก็บเกรดตัวอักษรไว้แสดงในหน้ารายงานเดี่ยว
                 indexValue: indexValue,
-                groupId: sub.groupId
+                groupId: sub.groupId,
+                is_su: sub.is_su
               };
             });
 
@@ -222,6 +243,7 @@ export class ClassOverview implements OnInit {
           this.subjectGroups = [];
         }
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Error fetching batch scores summary from service:', err);
@@ -229,6 +251,7 @@ export class ClassOverview implements OnInit {
         this.masterSubjects = [];
         this.subjectGroups = [];
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -322,6 +345,15 @@ export class ClassOverview implements OnInit {
       indexDisplay: sub.indexValue && sub.indexValue !== '0.00' ? `(${sub.indexValue})` : '',
       isSU: false
     };
+  }
+
+  getNumericGradeDisplay(grade: string, indexValue: number | string, credit: number): string {
+    const gStr = grade ? String(grade).trim().toUpperCase() : '';
+    if (['A', 'B+', 'B', 'C+', 'C', 'D+', 'D'].includes(gStr)) {
+      const gp = Number(indexValue) / Number(credit);
+      return !isNaN(gp) ? gp.toFixed(2) : gStr;
+    }
+    return gStr;
   }
 
   private updateProcessedTime(): void {
