@@ -43,4 +43,9 @@ export class StudentService {
   deleteStudent(id: number): Observable<any> {
     return this.http.delete<any>(`${environment.apiUrl}/students/${id}`);
   }
+
+  // 6. จัดเรียงเลขที่ใหม่ (PUT)
+  resequenceStudents(batchId: string): Observable<any> {
+    return this.http.put<any>(`${environment.apiUrl}/students/resequence/${batchId}`, {});
+  }
 }

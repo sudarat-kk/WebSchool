@@ -24,6 +24,8 @@ import { AddCourse } from './pages/add-course-dialog/add-course-dialog';
 import { FormView } from './pages/form-view/form-view';
 
 import { EvaluationFillComponent } from './main/student/evaluation-fill/evaluation-fill.component';
+
+import { Certificate } from './pages/certificate/certificate';
 import { EditProfile } from './pages/edit-profile/edit-profile';
 
 export const routes: Routes = [
@@ -67,7 +69,7 @@ export const routes: Routes = [
       { path: 'addcourse', component: AddCourse },
       {path:'score-submission',component: ScoreSubmission},
       {path:'form-view',component: FormView},
-
+      { path: 'certificate', component: Certificate },
     ],
   },
 

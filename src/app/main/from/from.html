@@ -44,11 +44,23 @@
 
       <div class="form-row">
         <div class="form-group flex-1">
-          <label class="input-label">ประเภทแบบประเมิน</label>
+
+          <label class="input-label">กลุ่มเป้าหมาย (Target Group)</label>
+          <select class="custom-input" [(ngModel)]="formData.targetGroup" (change)="onTargetGroupChange()">
+            <option value="" disabled selected>เลือกกลุ่มเป้าหมาย</option>
+            <option *ngFor="let group of targetGroups" [value]="group.value">
+              {{ group.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group flex-1">
+          <label class="input-label">ประเภทแบบฟอร์ม</label>
+
           <div style="display: flex; gap: 8px;">
-            <select class="custom-input" [(ngModel)]="formData.formType" (change)="onTypeChange()" style="flex: 1;">
+            <select class="custom-input" [(ngModel)]="formData.formType" (change)="onTypeChange()" style="flex: 1;" [disabled]="!formData.targetGroup">
               <option value="" disabled selected>เลือกประเภท</option>
-              <option *ngFor="let type of formTypes" [value]="type.value">
+              <option *ngFor="let type of availableFormTypes" [value]="type.value">
                 {{ type.label }}
               </option>
             </select>
@@ -65,15 +77,6 @@
           </div>
         </div>
 
-        <div class="form-group flex-1" *ngIf="formData.formType === 'instructor'">
-          <label class="input-label">เลือกรายวิชา (สำหรับการประเมินผู้สอน)</label>
-          <select class="custom-input" [(ngModel)]="formData.subjectId" [disabled]="!formData.generationId">
-            <option value="" disabled selected>เลือกรายวิชา</option>
-            <option *ngFor="let subject of availableSubjects" [value]="subject.id">
-              {{ subject.name }}
-            </option>
-          </select>
-        </div>
       </div>
 
       <div class="form-group">
@@ -199,7 +202,8 @@
           <div class="form-group flex-1">
             <label class="input-label">ประเภทแบบประเมิน</label>
             <select class="custom-input" [(ngModel)]="filterType" (change)="onFilterTypeChange()">
-              <option *ngFor="let type of formTypes" [value]="type.value">
+              <option value="">ทั้งหมด</option>
+              <option *ngFor="let type of allFormTypesFlat" [value]="type.value">
                 {{ type.label }}
               </option>
             </select>
@@ -208,9 +212,10 @@
       </div>
 
       <div class="table-container">
-        <div class="table-header"
-          style="display: flex; padding: 12px; background: #e0e0e0; font-weight: bold; color: #555;">
-          <div class="col-course" style="flex: 2;">{{ filterType === 'instructor' ? 'วิชา' : 'ประเภทการประเมิน' }}</div>
+
+        <div class="table-header" style="display: flex; padding: 12px; background: #e0e0e0; font-weight: bold; color: #555;">
+          <div class="col-course" style="flex: 2;">ประเภทการประเมิน</div>
+
           <div class="col-link" style="flex: 2;">แบบประเมินในระบบ</div>
           <div class="col-actions" style="flex: 1; text-align: center;">การจัดการ</div>
         </div>
@@ -224,7 +229,7 @@
           style="display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff;">
 
           <div class="col-course" style="flex: 2; font-weight: 500;">
-            {{ row.isSubjectMode ? row.subjectName : 'แบบฟอร์มสำหรับรุ่นนี้' }}
+            {{ row.subjectName }}
           </div>
 
           <div class="col-link" style="flex: 2;">

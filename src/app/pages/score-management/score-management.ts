@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,6 +29,7 @@ interface Batch {
 interface Subject {
   subject_id: number;
   subject_name: string;
+  is_su?: boolean;
 }
 
 interface StudentScore {
@@ -88,7 +89,10 @@ export class ScoreManagement implements OnInit {
     private courseService: CourseService,
     private location: Location,
     private cdr: ChangeDetectorRef,
-    private router: Router,
+
+    private ngZone: NgZone,
+    private router: Router
+
   ) {}
 
   ngOnInit(): void {
@@ -146,22 +150,18 @@ export class ScoreManagement implements OnInit {
     this.scoreService.getAdminSubjectScores(batchId, subjectId).subscribe({
       next: (res) => {
         if (res?.success && res.data) {
-          this.studentList = res.data
-            .map((s: any) => ({
-              student_id: s.student_id,
-              student_code: s.student_code,
-              rank_name: s.rank_name || '',
-              first_name: s.first_name,
-              last_name: s.last_name,
-              raw_score: s.raw_score ?? null,
-            }))
-            .sort((a: any, b: any) => {
-              return String(a.student_code || '').localeCompare(
-                String(b.student_code || ''),
-                undefined,
-                { numeric: true },
-              );
-            });
+
+          this.studentList = res.data.map((s: any) => ({
+            student_id: s.student_id,
+            student_code: s.student_code,
+            rank_name: s.rank_name || '',
+            first_name: s.first_name,
+            last_name: s.last_name,
+            raw_score: s.raw_score !== null && s.raw_score !== undefined ? Number(s.raw_score) : null,
+          })).sort((a: any, b: any) => {
+            return String(a.student_code || '').localeCompare(String(b.student_code || ''), undefined, { numeric: true });
+          });
+
 
           if (res.max_score !== undefined && res.max_score !== null && res.max_score > 0) {
             this.inputMaxScore = res.max_score;
@@ -170,12 +170,38 @@ export class ScoreManagement implements OnInit {
             this.inputMaxScore = null;
             this.isMaxScoreSaved = false;
           }
-          
-          this.isSU = !!res.is_su; // Load is_su from API
-          
+          if (res.is_su !== undefined && res.is_su !== null) {
+            this.isSU = !!res.is_su; // Load is_su from API if provided
+          } else {
+            // Find is_su from subjects list fallback (when API returns empty default response)
+            const subj = this.subjects.find((s: any) => Number(s.subject_id) === Number(this.selectedSubjectId));
+            this.isSU = subj?.is_su ?? false;
+          }
+          if (this.isSU && !this.isMaxScoreSaved) {
+            this.isMaxScoreSaved = true;
+            this.inputMaxScore = 1;
+            
+            this.scoreService.updateMaxScore({
+              batch_id: this.selectedBatch,
+              subject_id: this.selectedSubjectId,
+              max_score: 1
+            }).subscribe({
+              error: (err) => console.error("Auto-save SU max score failed", err)
+            });
+          }
+
           const hasScores = this.studentList.some((s) => s.raw_score !== null && s.raw_score !== undefined && s.raw_score.toString() !== '');
           if (hasScores) {
             this.isSaved = true;
+          }
+
+          // กำหนดค่าเริ่มต้นเป็น "ผ่าน (S)" (raw_score = 1) สำหรับวิชา S/U หากยังไม่มีคะแนน
+          if (this.isSU) {
+            this.studentList.forEach(s => {
+              if (s.raw_score === null || s.raw_score === undefined) {
+                s.raw_score = 1;
+              }
+            });
           }
 
           this.updateStats();
@@ -190,7 +216,17 @@ export class ScoreManagement implements OnInit {
           this.studentList = [];
           this.inputMaxScore = null; // ให้เป็น null เพื่อให้ขึ้น placeholder 0 แบบจางๆ
           this.isMaxScoreSaved = false;
-          this.isSU = false;
+          
+          // Find is_su from subjects list fallback
+          // Find is_su from subjects list fallback
+          // Find is_su from subjects list fallback
+          const subj = this.subjects.find((s: any) => Number(s.subject_id) === Number(this.selectedSubjectId));
+          console.log("Fallback search - selectedSubjectId:", this.selectedSubjectId);
+          console.log("Fallback search - subjects:", this.subjects);
+          console.log("Fallback search - found subj:", subj);
+          this.isSU = subj?.is_su ?? false;
+          console.log("Setting this.isSU to:", this.isSU);
+          
           this.updateStats();
           // ดึงข้อความ error จาก backend ถ้ามี
           this.saveError =
@@ -297,7 +333,6 @@ export class ScoreManagement implements OnInit {
           batch_id: this.selectedBatch,
           subject_id: this.selectedSubjectId,
           max_score: finalMaxScore as number,
-          is_su: this.isSU,
         })
         .pipe(
           finalize(() => {
@@ -372,6 +407,48 @@ export class ScoreManagement implements OnInit {
     if (nextInput) {
       nextInput.focus();
       nextInput.select();
+    }
+  }
+
+  async fillScoreForEveryone() {
+    if (!this.inputMaxScore) {
+      Swal.fire('แจ้งเตือน', 'กรุณากำหนดคะแนนเต็มก่อน', 'warning');
+      return;
+    }
+
+    const { value: score } = await Swal.fire({
+      title: 'กรอกคะแนนให้ทุกคน',
+      input: 'number',
+      inputLabel: `ระบุคะแนนที่ต้องการเติมให้ทุกคน (คะแนนเต็ม ${this.inputMaxScore})`,
+      inputPlaceholder: 'ตัวเลขคะแนน',
+      showCancelButton: true,
+      confirmButtonText: 'เติมคะแนน',
+      cancelButtonText: 'ยกเลิก',
+      inputAttributes: {
+        min: '0',
+        max: this.inputMaxScore.toString(),
+        step: '0.5'
+      },
+      inputValidator: (value) => {
+        if (!value) {
+          return 'กรุณาระบุคะแนน';
+        }
+        if (Number(value) < 0 || Number(value) > (this.inputMaxScore || 100)) {
+          return `คะแนนต้องอยู่ระหว่าง 0 ถึง ${this.inputMaxScore}`;
+        }
+        return null;
+      }
+    });
+
+    if (score !== undefined && score !== null && score !== '') {
+      const numScore = Number(score);
+      this.ngZone.run(() => {
+        this.studentList.forEach(student => {
+          student.raw_score = numScore;
+        });
+        this.updateStats();
+        this.cdr.detectChanges();
+      });
     }
   }
 

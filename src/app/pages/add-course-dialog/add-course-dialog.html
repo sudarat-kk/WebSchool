@@ -112,10 +112,6 @@
           </div>
         </div>
         <div class="form-actions right">
-          <button type="button" class="btn-secondary" (click)="toggleBatchCard()">
-            <span class="material-icons">settings_suggest</span>
-            จัดการหลักสูตร
-          </button>
           <button type="submit" class="btn-submit">บันทึกรุ่น</button>
         </div>
       </form>
@@ -136,6 +132,7 @@
               <th style="padding: 8px; border: 1px solid #ddd;">ปีการศึกษา</th>
               <th style="padding: 8px; border: 1px solid #ddd;">ชื่อรุ่น</th>
               <th style="padding: 8px; border: 1px solid #ddd;">วันที่เริ่ม-สิ้นสุด</th>
+              <th style="padding: 8px; border: 1px solid #ddd; text-align: center; width: 140px;">การแสดงผล ({{ getActiveBatchCount() }}/3)</th>
               <th style="padding: 8px; border: 1px solid #ddd; text-align: center; width: 100px;">จัดการ</th>
             </tr>
           </thead>
@@ -144,7 +141,13 @@
               <td style="padding: 8px; border: 1px solid #ddd;">{{ batch.curriculum_year }}</td>
               <td style="padding: 8px; border: 1px solid #ddd;">{{ batch.batch_name }}</td>
               <td style="padding: 8px; border: 1px solid #ddd;">
-                {{ batch.start_date ? (batch.start_date | date:'dd/MM/yyyy') : '-' }} - {{ batch.end_date ? (batch.end_date | date:'dd/MM/yyyy') : '-' }}
+                {{ toThaiDate(batch.start_date) }} - {{ toThaiDate(batch.end_date) }}
+              </td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                <label class="toggle-switch" style="display: inline-block; vertical-align: middle; margin: 0;">
+                  <input type="checkbox" [checked]="batch.is_active" (change)="onToggleBatch(batch, $event)" />
+                  <span class="slider"></span>
+                </label>
               </td>
               <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
                 <button type="button" mat-icon-button (click)="editBatch(batch)" style="color: #ff9800; transform: scale(0.8);" title="แก้ไขรุ่น">
@@ -157,37 +160,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </div>
-
-    <div class="batch-management-card" [class.show]="isBatchCardOpen">
-      <div class="card-header">
-        <div class="title-group">
-          <span class="material-icons icon-purple">settings_suggest</span>
-          <div>
-            <h3>จัดการการแสดงผลรุ่นหลักสูตร</h3>
-            <p class="subtitle">เลือกเปิด-ปิดรุ่นที่ต้องการให้แสดงหน้าเว็บ (สูงสุด 3 รุ่น)</p>
-          </div>
-        </div>
-        <!-- แสดงจำนวนจาก Getter activeBatchCount -->
-        <span class="badge-counter">แสดงอยู่ {{ activeBatchCount }}/3 รุ่น</span>
-      </div>
-
-      <div class="batch-list">
-        <!-- ใช้ *ngFor วนลูปแสดงผลรายการรุ่น -->
-        <div class="batch-item" *ngFor="let batch of batchesData">
-          <div class="batch-info">
-            <span class="batch-name">{{ batch.name }}</span>
-            <span class="status-tag" [ngClass]="batch.status === 'active' ? 'status-active' : 'status-ended'">
-              {{ batch.status === 'active' ? 'กำลังเปิดรับ' : 'จบหลักสูตรแล้ว' }}
-            </span>
-          </div>
-
-          <label class="toggle-switch">
-            <input type="checkbox" [checked]="batch.isVisible" (change)="onToggleBatch(batch, $event)" />
-            <span class="slider"></span>
-          </label>
-        </div>
       </div>
     </div>
 
@@ -256,7 +228,10 @@
             <input type="text" [(ngModel)]="groupForm.group_name" name="group_name" placeholder="เช่น M01" required>
           </div>
           <div class="form-group short-input">
-            <label>หน่วยกิตรวม</label>
+            <label>
+              หน่วยกิตรวม
+              <span style="color: #f44336; font-size: 13px; font-weight: normal; margin-left: 4px;">(*ถ้าเป็นกลุ่มวิชา S/U ให้ใส่ 0)</span>
+            </label>
             <input type="number" step="0.5" [(ngModel)]="groupForm.credits" name="credits" placeholder="เช่น 2.0"
               required>
           </div>
@@ -334,12 +309,7 @@
           <div class="select-wrapper">
             <select [(ngModel)]="subjectForm.group_id" name="group_id" [disabled]="!selectedBatchForSubject" required>
               <option value="" disabled selected>-- เลือกกลุ่มวิชา --</option>
-<<<<<<< HEAD
-              <option *ngFor="let g of getGroupsForBatch(selectedBatchForSubject)" [value]="g.id">{{ g.group_name }}
-              </option>
-=======
               <option *ngFor="let g of getGroupsForBatch(selectedBatchForSubject)" [value]="g.id">{{ getGroupLabel(g) }}</option>
->>>>>>> 9993060f53613f3dfbc77eaf9684a8e47fd112bb
             </select>
           </div>
         </div>
@@ -347,10 +317,15 @@
         <!-- Multiple Subjects Array -->
         <div class="dynamic-list-container">
           <label>รายชื่อวิชาในกลุ่มนี้ (เพิ่มได้หลายวิชา)</label>
-          <div class="dynamic-row" *ngFor="let subj of subjectsList; let i = index; let isLast = last">
-            <div class="form-group mb-0">
+          <div class="dynamic-row" *ngFor="let subj of subjectsList; let i = index; let isLast = last" style="align-items: center; gap: 16px;">
+            <div class="form-group mb-0" style="flex: 1;">
               <input type="text" [(ngModel)]="subj.subject_name" name="subject_name_{{i}}"
                 placeholder="เช่น ฝ่ายอำนวยการ" required>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <input type="checkbox" id="is_su_{{i}}" [(ngModel)]="subj.is_su" name="is_su_{{i}}" style="width: 16px; height: 16px; cursor: pointer;">
+              <label for="is_su_{{i}}" style="margin: 0; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text-dark);">ประเมินผลเป็น S/U</label>
             </div>
 
             <button type="button" class="btn-icon-action btn-add" (click)="addSubjectField()" *ngIf="isLast"
