@@ -355,31 +355,6 @@ export class From implements OnInit {
   }
 
 
-  isCustomFormType(value: string): boolean {
-    if (!value) return false;
-    const baseTypes = ['instructor', 'director', 'course', 'committee', 'followup'];
-    return !baseTypes.includes(value);
-  }
-
-  removeCustomFormType() {
-    Swal.fire({
-      title: 'ลบประเภทฟอร์มนี้?',
-      text: `คุณต้องการลบประเภท "${this.formData.formType}" ออกจากรายการใช่หรือไม่? (หากมีแบบฟอร์มที่ใช้ประเภทนี้บันทึกอยู่ มันจะกลับมาอีกครั้งเมื่อรีเฟรชหน้าจอ)`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'ลบเลย',
-      cancelButtonText: 'ยกเลิก',
-      confirmButtonColor: '#f44336',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.formTypes = this.formTypes.filter((t) => t.value !== this.formData.formType);
-        this.formData.formType = '';
-        this.onTypeChange();
-      }
-    });
-  }
-
-
   // ==========================================
   // ส่วนจัดการคำถาม (Dynamic Form Builder)
   // ==========================================
