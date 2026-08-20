@@ -24,7 +24,9 @@ import { AddCourse } from './pages/add-course-dialog/add-course-dialog';
 import { FormView } from './pages/form-view/form-view';
 
 import { EvaluationFillComponent } from './main/student/evaluation-fill/evaluation-fill.component';
+
 import { Certificate } from './pages/certificate/certificate';
+import { EditProfile } from './pages/edit-profile/edit-profile';
 
 export const routes: Routes = [
   // หน้าแรก
@@ -70,9 +72,10 @@ export const routes: Routes = [
       { path: 'certificate', component: Certificate },
     ],
   },
+
   { path: 'register', component: Register },
 
-  {path:'register',component: Register},
+  {path:'edit-profile',component: EditProfile},
 
 
 

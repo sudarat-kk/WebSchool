@@ -7,66 +7,74 @@
   <!-- Form Section -->
   <form (submit)="onSubmit()" class="form-content">
     
-    <!-- Top Row: 3 Inputs -->
-    <div class="row-three-cols">
+    <!-- Row 1: ยศ และ ชื่อ-สกุล -->
+    <div class="row-two-cols">
       <div class="input-group flex-1">
-        <input type="text" name="prefix" placeholder="ยศ" />
+        <label for="rank">ยศ</label>
+        <input type="text" id="rank" name="rank" placeholder="" />
+         <small class="hint-text"> *กรุณาระบุชื่อยศเต็ม </small>
       </div>
       <div class="input-group flex-2">
-        <input type="text" name="fullName" placeholder="ชื่อ-นามสกุล" />
-      </div>
-      <div class="input-group flex-1">
-        <input type="text" name="suffix" placeholder="รหัสประจำตัวทหาร" />
+        <label for="fullName">ชื่อ-สกุล</label>
+        <input type="text" id="fullName" name="fullName" placeholder="" required />
       </div>
     </div>
 
-    <!-- Affiliation Input -->
+    <!-- Row 2: หน่วยต้นสังกัด -->
     <div class="input-group">
-      <input type="text" name="affiliation" placeholder="สังกัด" />
+      <label for="affiliation">หน่วยต้นสังกัด</label>
+      <input type="text" id="affiliation" name="affiliation" placeholder="" required />
     </div>
 
-    <!-- Email Input -->
+    <!-- Row 3: เบอร์โทร -->
     <div class="input-group">
-      <input type="email" name="email" placeholder="อีเมล" />
+      <label for="phone">เบอร์โทรศัพท์</label>
+      <input type="tel" id="phone" name="phone" placeholder="" pattern="[0-9]{9,10}" required />
     </div>
 
-    <!-- Password Input -->
+    <!-- Row 4: อีเมล -->
+    <div class="input-group">
+      <label for="email">อีเมล</label>
+      <input type="email" id="email" name="email" placeholder="" required />
+    </div>
+
+    <!-- Row 5: รหัสผ่าน -->
     <div class="input-group password-group">
-      <input 
-        [type]="showPassword ? 'text' : 'password'" 
-        name="password" 
-        placeholder="รหัสผ่าน" 
-      />
-      <button type="button" class="toggle-password" (click)="togglePasswordVisibility()" aria-label="Toggle password">
-        
-        <!-- 1. ไอคอนปิดตา (Eye Off) - แสดงตอนซ่อนรหัสผ่าน -->
-        <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4a4a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
-          <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
-          <line x1="2" y1="2" x2="22" y2="22"></line>
-          <path d="M10.33 10.33a3 3 0 0 0 4.24 4.24"></path>
-        </svg>
+      <label for="password">
+        รหัสผ่าน 
+        <span class="required-asterisk">*</span>
+      </label>
+      
+      <div class="password-input-wrapper">
+        <input 
+          id="password"
+          [type]="showPassword ? 'text' : 'password'" 
+          name="password" 
+          placeholder="" 
+          maxlength="10"
+          minlength="10"
+          required
+        />
+        <button type="button" class="toggle-password" (click)="togglePasswordVisibility()" aria-label="Toggle password">
+          
+          <!-- 1. ไอคอนปิดตา (Eye Off) - แสดงตอนซ่อนรหัสผ่าน -->
+          <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4a4a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+            <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+            <line x1="2" y1="2" x2="22" y2="22"></line>
+            <path d="M10.33 10.33a3 3 0 0 0 4.24 4.24"></path>
+          </svg>
 
-        <!-- 2. ไอคอนเปิดตา (Eye) - แสดงตอนแสดงรหัสผ่าน -->
-        <svg *ngIf="showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4a4a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
+          <!-- 2. ไอคอนเปิดตา (Eye) - แสดงตอนแสดงรหัสผ่าน -->
+          <svg *ngIf="showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4a4a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
 
-      </button>
-    </div>
-
-    <!-- ปุ่ม Google วางไว้ฝั่งล่างขวาก่อนปุ่มยืนยัน -->
-    <div class="google-container">
-      <button type="button" class="google-btn" (click)="onGoogleLogin()">
-        <svg width="18" height="18" viewBox="0 0 24 24">
-          <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
-          <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
-          <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8 0-1.3.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/>
-          <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
-        </svg>
-        <span>ลงทะเบียนด้วย Google</span>
-      </button>
+      <!-- ข้อความคำแนะนำการตั้งรหัสผ่าน -->
+      <small class="hint-text"> *กรุณาใส่รหัสผ่านเป็นเลขประจำตัวทหาร 10 หลัก หรือ ตั้งรหัสผ่านได้ด้วยตนเอง </small>
     </div>
 
     <!-- Submit Button -->

@@ -1,22 +1,22 @@
 <div class="admin-page">
-  
+
   <div class="admin-header-title-container">
     <div class="header-content-wrapper">
       <button mat-icon-button routerLink="/admin" class="btn-header-back" title="ย้อนกลับไปหน้าผู้ดูแลระบบ">
         <mat-icon>chevron_left</mat-icon>
       </button>
-      <h2 class="main-content-title">จัดการแบบฟอร์มประเมิน</h2>
+      <h2 class="main-content-title">จัดการแบบประเมิน</h2>
     </div>
   </div>
 
   <div class="content-container">
-    
+
     <!-- ส่วนที่ 1: หน้าสร้าง/แก้ไขแบบฟอร์ม -->
     <div class="management-section data-entry-section">
       <p class="instruction-text">สร้างชุดคำถามประเมินสำหรับหลักสูตรและรุ่นที่เลือก</p>
-      
+
       <h3 class="mode-indicator" [class.edit-mode]="isEditMode">
-        {{ isEditMode ? '📝 กำลังอยู่ในโหมดแก้ไขข้อมูล' : '✨ สร้างแบบฟอร์มใหม่' }}
+        {{ isEditMode ? '📝 กำลังอยู่ในโหมดแก้ไขข้อมูล' : '✨ สร้างแบบประเมินใหม่' }}
       </h3>
 
       <div class="form-row">
@@ -32,7 +32,8 @@
 
         <div class="form-group flex-1">
           <label class="input-label">รุ่นนักเรียน</label>
-          <select class="custom-input" [(ngModel)]="formData.generationId" [disabled]="!formData.courseName" (change)="onGenerationChange()">
+          <select class="custom-input" [(ngModel)]="formData.generationId" [disabled]="!formData.courseName"
+            (change)="onGenerationChange()">
             <option value="" disabled selected>เลือกรุ่นนักเรียน</option>
             <option *ngFor="let batch of availableBatches" [value]="batch.batch_id">
               {{ batch.batch_name }}
@@ -43,6 +44,7 @@
 
       <div class="form-row">
         <div class="form-group flex-1">
+
           <label class="input-label">กลุ่มเป้าหมาย (Target Group)</label>
           <select class="custom-input" [(ngModel)]="formData.targetGroup" (change)="onTargetGroupChange()">
             <option value="" disabled selected>เลือกกลุ่มเป้าหมาย</option>
@@ -54,6 +56,7 @@
 
         <div class="form-group flex-1">
           <label class="input-label">ประเภทแบบฟอร์ม</label>
+
           <div style="display: flex; gap: 8px;">
             <select class="custom-input" [(ngModel)]="formData.formType" (change)="onTypeChange()" style="flex: 1;" [disabled]="!formData.targetGroup">
               <option value="" disabled selected>เลือกประเภท</option>
@@ -61,10 +64,14 @@
                 {{ type.label }}
               </option>
             </select>
-            <button type="button" class="btn-icon" style="background: #f3e8ff; color: #673ab7; border-radius: 6px; padding: 0 12px; border: 1px dashed #673ab7;" (click)="addNewFormType()" title="เพิ่มประเภทแบบประเมินใหม่">
+            <button type="button" class="btn-icon"
+              style="background: #f3e8ff; color: #673ab7; border-radius: 6px; padding: 0 12px; border: 1px dashed #673ab7;"
+              (click)="addNewFormType()" title="เพิ่มประเภทแบบประเมินใหม่">
               <mat-icon style="font-size: 20px; width: 20px; height: 20px;">add</mat-icon>
             </button>
-            <button *ngIf="isCustomFormType(formData.formType)" type="button" class="btn-icon" style="background: #ffebee; color: #f44336; border-radius: 6px; padding: 0 12px; border: 1px dashed #f44336;" (click)="removeCustomFormType()" title="ลบประเภทนี้ออก">
+            <button *ngIf="isCustomFormType(formData.formType)" type="button" class="btn-icon"
+              style="background: #ffebee; color: #f44336; border-radius: 6px; padding: 0 12px; border: 1px dashed #f44336;"
+              (click)="removeCustomFormType()" title="ลบประเภทนี้ออก">
               <mat-icon style="font-size: 20px; width: 20px; height: 20px;">delete</mat-icon>
             </button>
           </div>
@@ -74,7 +81,8 @@
 
       <div class="form-group">
         <label class="input-label">ชื่อแบบประเมิน</label>
-        <input type="text" class="custom-input" placeholder="เช่น แบบประเมินอาจารย์ผู้สอน ประจำภาคเรียน..." [(ngModel)]="formData.formName"/>
+        <input type="text" class="custom-input" placeholder="เช่น แบบประเมินอาจารย์ผู้สอน ประจำภาคเรียน..."
+          [(ngModel)]="formData.formName" />
       </div>
 
       <hr style="margin: 24px 0; border: 0; border-top: 1px solid #ddd;" />
@@ -83,13 +91,15 @@
       </h3>
 
       <!-- วนลูปแสดงกล่องคำถาม (Dynamic Questions) -->
-      <div *ngFor="let q of formData.questions; let qIndex = index" class="question-card" style="background: #f9f9f9; padding: 16px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 16px; position: relative;">
-        <button mat-icon-button color="warn" (click)="removeQuestion(qIndex)" style="position: absolute; top: 8px; right: 8px;" title="ลบคำถามข้อนี้">
+      <div *ngFor="let q of formData.questions; let qIndex = index" class="question-card"
+        style="background: #f9f9f9; padding: 16px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 16px; position: relative;">
+        <button mat-icon-button color="warn" (click)="removeQuestion(qIndex)"
+          style="position: absolute; top: 8px; right: 8px;" title="ลบคำถามข้อนี้">
           <mat-icon>close</mat-icon>
         </button>
-        
+
         <div style="font-weight: bold; margin-bottom: 12px; color: #555;">คำถามข้อที่ {{ qIndex + 1 }}</div>
-        
+
         <div class="form-row">
           <div class="form-group" style="flex: 3;">
             <label class="input-label">ข้อความคำถาม</label>
@@ -105,30 +115,38 @@
         </div>
 
         <!-- ถ้าเป็นแบบตัวเลือก ให้แสดงส่วนนี้ -->
-        <div *ngIf="q.question_type === 'choice'" class="choices-container" style="margin-top: 12px; padding-left: 16px; border-left: 3px solid #6a1b9a;">
+        <div *ngIf="q.question_type === 'choice'" class="choices-container"
+          style="margin-top: 12px; padding-left: 16px; border-left: 3px solid #6a1b9a;">
           <label class="input-label" style="font-size: 13px; color: #666;">ตัวเลือกสำหรับข้อนี้</label>
-          
-          <div *ngFor="let c of q.choices; let cIndex = index" style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
+
+          <div *ngFor="let c of q.choices; let cIndex = index"
+            style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
             <span style="color: #999; font-size: 13px;">{{ cIndex + 1 }}.</span>
-            <input type="text" class="custom-input" placeholder="ข้อความตัวเลือก" [(ngModel)]="c.choice_text" style="flex: 3;" />
-            <input type="number" class="custom-input" placeholder="คะแนน" [(ngModel)]="c.score_value" style="flex: 1; background-color: #f5f5f5; color: #888; cursor: not-allowed;" readonly title="คะแนนถูกกำหนดไว้คงที่" />
-            <button mat-icon-button color="warn" (click)="removeChoice(qIndex, cIndex)" style="flex-shrink: 0;" title="ลบตัวเลือกนี้">
+            <input type="text" class="custom-input" placeholder="ข้อความตัวเลือก" [(ngModel)]="c.choice_text"
+              style="flex: 3;" />
+            <input type="number" class="custom-input" placeholder="คะแนน" [(ngModel)]="c.score_value"
+              style="flex: 1; background-color: #f5f5f5; color: #888; cursor: not-allowed;" readonly
+              title="คะแนนถูกกำหนดไว้คงที่" />
+            <button mat-icon-button color="warn" (click)="removeChoice(qIndex, cIndex)" style="flex-shrink: 0;"
+              title="ลบตัวเลือกนี้">
               <mat-icon style="font-size: 18px;">remove_circle_outline</mat-icon>
             </button>
           </div>
-          
+
           <button mat-button color="primary" (click)="addChoice(qIndex)" style="margin-top: 8px; padding: 0 8px;">
             <mat-icon style="font-size: 18px; margin-right: 4px;">add</mat-icon> เพิ่มตัวเลือก
           </button>
         </div>
         <!-- ถ้าเป็นแบบข้อความ ไม่ต้องแสดงอะไรเพิ่ม -->
-        <div *ngIf="q.question_type === 'text'" style="margin-top: 12px; font-style: italic; color: #888; font-size: 14px;">
+        <div *ngIf="q.question_type === 'text'"
+          style="margin-top: 12px; font-style: italic; color: #888; font-size: 14px;">
           * ผู้ใช้จะสามารถพิมพ์ข้อความตอบได้อย่างอิสระ
         </div>
       </div>
 
       <!-- ปุ่มเพิ่มคำถามใหม่ -->
-      <button mat-stroked-button color="primary" (click)="addQuestion()" style="border-radius: 20px; border-style: dashed; width: 100%; padding: 8px;">
+      <button mat-stroked-button color="primary" (click)="addQuestion()"
+        style="border-radius: 20px; border-style: dashed; width: 100%; padding: 8px;">
         <mat-icon>add</mat-icon> เพิ่มคำถามใหม่
       </button>
 
@@ -136,13 +154,13 @@
       <div class="final-action" style="margin-top: 32px; border-top: 1px solid #ddd; padding-top: 24px;">
         <div *ngIf="!isEditMode" class="action-buttons-group">
           <button mat-raised-button class="btn-submit-form" (click)="onCreateForm()">
-            สร้างแบบฟอร์มประเมิน
+            สร้างแบบประเมิน
           </button>
         </div>
-        
+
         <div *ngIf="isEditMode" class="edit-buttons-group">
-          <button mat-raised-button class="btn-submit-form btn-update" (click)="onUpdateForm()">
-            บันทึกการแก้ไขแบบฟอร์ม
+          <button type="button" mat-raised-button class="btn-submit-form btn-update" (click)="onUpdateForm()">
+            บันทึกการแก้ไขแบบประเมิน
           </button>
           <button mat-stroked-button class="btn-cancel" (click)="resetForm()">
             ยกเลิก
@@ -155,7 +173,7 @@
     <div class="form-list-section mt-5">
       <div class="list-header flex items-center mb-4">
         <div class="vertical-line"></div>
-        <h2 class="section-title">ดูและจัดการแบบฟอร์ม</h2>
+        <h2 class="section-title">ดูและจัดการแบบประเมิน</h2>
       </div>
 
       <div class="filter-box" style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
@@ -169,10 +187,11 @@
               </option>
             </select>
           </div>
-          
+
           <div class="form-group flex-1">
             <label class="input-label">รุ่น</label>
-            <select class="custom-input" [(ngModel)]="filterGeneration" [disabled]="!filterCourse" (change)="onFilterGenerationChange()">
+            <select class="custom-input" [(ngModel)]="filterGeneration" [disabled]="!filterCourse"
+              (change)="onFilterGenerationChange()">
               <option value="" disabled selected>เลือกรุ่น</option>
               <option *ngFor="let batch of filterBatches" [value]="batch.batch_id">
                 {{ batch.batch_name }}
@@ -181,7 +200,7 @@
           </div>
 
           <div class="form-group flex-1">
-            <label class="input-label">ประเภทแบบฟอร์ม</label>
+            <label class="input-label">ประเภทแบบประเมิน</label>
             <select class="custom-input" [(ngModel)]="filterType" (change)="onFilterTypeChange()">
               <option value="">ทั้งหมด</option>
               <option *ngFor="let type of allFormTypesFlat" [value]="type.value">
@@ -193,22 +212,26 @@
       </div>
 
       <div class="table-container">
+
         <div class="table-header" style="display: flex; padding: 12px; background: #e0e0e0; font-weight: bold; color: #555;">
           <div class="col-course" style="flex: 2;">ประเภทการประเมิน</div>
+
           <div class="col-link" style="flex: 2;">แบบประเมินในระบบ</div>
           <div class="col-actions" style="flex: 1; text-align: center;">การจัดการ</div>
         </div>
 
-        <div *ngIf="!filterCourse || !filterGeneration" style="text-align: center; padding: 20px; color: #666; background: #fff;">
-          กรุณาเลือกหลักสูตรและรุ่นด้านบน เพื่อดูรายการแบบฟอร์ม
+        <div *ngIf="!filterCourse || !filterGeneration"
+          style="text-align: center; padding: 20px; color: #666; background: #fff;">
+          กรุณาเลือกหลักสูตรและรุ่นด้านบน เพื่อดูรายการแบบประเมิน
         </div>
 
-        <div class="table-row" *ngFor="let row of displayTableData" style="display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff;">
-          
+        <div class="table-row" *ngFor="let row of displayTableData"
+          style="display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff;">
+
           <div class="col-course" style="flex: 2; font-weight: 500;">
             {{ row.subjectName }}
           </div>
-          
+
           <div class="col-link" style="flex: 2;">
             <ng-container *ngIf="row.hasForm">
               <span style="display: flex; align-items: center; gap: 4px; color: #2e7d32; font-weight: 500;">
@@ -217,10 +240,10 @@
               </span>
             </ng-container>
             <ng-container *ngIf="!row.hasForm">
-              <span style="color: #999; font-style: italic;">ยังไม่ได้สร้างแบบฟอร์ม</span>
+              <span style="color: #999; font-style: italic;">ยังไม่ได้สร้างแบบประเมิน</span>
             </ng-container>
           </div>
-          
+
           <div class="col-actions" style="flex: 1; display: flex; justify-content: center; gap: 8px;">
             <ng-container *ngIf="row.hasForm">
               <button mat-icon-button color="primary" (click)="onEditAction(row.formDetails)" title="แก้ไขฟอร์ม">
@@ -232,15 +255,17 @@
             </ng-container>
 
             <ng-container *ngIf="!row.hasForm">
-              <button mat-stroked-button color="primary" (click)="onAddLinkAction(row)" style="border-color: #8142ff; color: #8142ff; border-radius: 20px;">
-                <mat-icon style="font-size: 18px;">add</mat-icon> สร้างฟอร์ม
+              <button mat-stroked-button color="primary" (click)="onAddLinkAction(row)"
+                style="border-color: #8142ff; color: #8142ff; border-radius: 20px;">
+                <mat-icon style="font-size: 18px;">add</mat-icon> สร้างแบบประเมิน
               </button>
             </ng-container>
           </div>
-          
+
         </div>
-        
-        <div *ngIf="filterCourse && filterGeneration && displayTableData.length === 0" style="text-align: center; padding: 2rem; color: #777; background: #fff;">
+
+        <div *ngIf="filterCourse && filterGeneration && displayTableData.length === 0"
+          style="text-align: center; padding: 2rem; color: #777; background: #fff;">
           ไม่พบข้อมูลรายวิชาสำหรับรุ่นนี้
         </div>
       </div>

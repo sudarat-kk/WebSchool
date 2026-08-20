@@ -19,3 +19,117 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 }
+
+/* Container จัดเรียงการ์ด 3 ใบให้อยู่แถวเดียวกัน */
+.card-container {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  align-items: stretch; /* 👈 สั่งให้การ์ดทุกใบยืดความสูงเท่ากันตามใบที่สูงที่สุด */
+  margin: 1.5rem 0;
+  width: 100%;
+  box-sizing: border-box;
+
+  /* ปรับรองรับหน้าจอมือถือ (ถ้าจอเล็กกว่า 768px จะเรียงต่อกันเป็นแนวตั้ง) */
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+/* 2. สไตล์ของการ์ดแต่ละใบ */
+/* สไตล์ของการ์ดแต่ละใบ */
+.info-card {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef2f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 👈 จัดทุกอย่างในแนวแกน X ให้อยู่ตรงกลาง */
+  text-align: center;  /* 👈 จัดข้อความทุกบรรทัดให้อยู่ตรงกลาง */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Sarabun', sans-serif !important;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  /* ไอคอนประจำการ์ด */
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto; /* 👈 ดึงไอคอนมาอยู่ตรงกลาง */
+    color: #ffffff;
+
+    .material-icons {
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    &.icon-boss {
+      background-color: #1e3a8a; 
+    }
+
+    &.icon-self {
+      background-color: #0284c7; 
+    }
+
+    &.icon-peer {
+      background-color: #0d9488; 
+    }
+  }
+
+  /* ส่วนเนื้อหาในการ์ด */
+  .card-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 👈 จัดเนื้อหาข้างในให้อยู่ตรงกลาง */
+    flex: 1;
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0 0 0.5rem 0;
+      text-align: center; /* 👈 หัวข้ออยู่ตรงกลาง */
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: #666666;
+      margin: 0 0 1.25rem 0;
+      line-height: 1.5;
+      flex-grow: 1;
+      text-align: center;
+    }
+  }
+
+  /* ปุ่มกด */
+  .card-btn {
+    width: 100%; /* ปุ่มยังคงยืดเต็มความกว้างของการ์ดอย่างสวยงาม */
+    padding: 0.6rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #f1f5f9;
+    color: #334155;
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-family: 'Sarabun', sans-serif !important;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    margin-top: auto; /* ดันปุ่มลงไปขอบล่างให้เท่ากันทุกใบ */
+
+    &:hover {
+      background-color: #3f51b5;
+      color: #ffffff;
+    }
+  }
+}
